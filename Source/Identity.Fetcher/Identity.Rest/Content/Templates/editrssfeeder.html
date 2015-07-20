@@ -1,0 +1,30 @@
+﻿<div class="page-header">
+    <h3>
+        RSS Feeder: {{rssFeeder.Url}}
+    </h3>
+</div>
+
+
+<div>
+    <form ng-submit="editRssFeeder()">
+        
+        <div class="form-group">
+            <span>Url</span>
+            <input type="text"
+                   class="form-control"
+                   placeholder="Url"
+                   value=""
+                   ng-model="rssFeeder.Url"></input>
+        </div>        
+
+        <div class="form-group">
+            <span>Tags</span>
+            <input type="text"
+                   class="form-control"
+                   placeholder="Tags"
+                   value=""
+                   ng-model="rssFeeder.Tags" ng-list></input>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</div>

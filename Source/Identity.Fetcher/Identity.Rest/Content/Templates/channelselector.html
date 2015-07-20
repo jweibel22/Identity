@@ -1,0 +1,17 @@
+﻿<script type="text/ng-template" id="channelSelector.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Select a channel</h4>
+    </div>
+    <form ng-submit="submit()">
+        <div class="modal-body">
+            <div class="form-group">
+                <select class="form-control" data-ng-options="c.Name for c in windowdata.channels" data-ng-model="windowdata.selectedChannel"></select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-default">Close</button>
+            <input type="submit" class="btn btn-primary" value="Submit" />
+        </div>
+    </form>
+</script>

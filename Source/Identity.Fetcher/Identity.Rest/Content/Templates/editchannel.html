@@ -1,0 +1,29 @@
+﻿<div class="page-header">
+    <h3>
+        Channel: {{channel.Name}}
+    </h3>
+</div>
+
+<div>
+    <h4>RSS Feeders</h4>
+    <div ng-repeat="feeder in channel.RssFeeders">
+        {{feeder.Url}} <a href="#/editrssfeeder/{{feeder.Id}}">Edit</a> <a ng-click="removeRssFeeder(feeder)">Remove</a>
+    </div>
+</div>
+
+<div>
+  <form ng-submit="addRssFeeder()"
+      style="margin-top:30px;">
+    <h4>Add a new RSS feeder</h4>
+
+    <div class="form-group">
+      <input type="text"
+             class="form-control"
+             placeholder="Url"
+             ng-model="rssfeederUrl"></input>
+    </div>
+    <button type="submit" class="btn btn-primary">Add</button>
+  </form>
+
+
+</div>

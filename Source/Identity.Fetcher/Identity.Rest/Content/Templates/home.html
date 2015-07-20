@@ -1,0 +1,96 @@
+<h3>Channel: {{channel.Name}}</h3>
+
+<a href="" ng-show="!channelOwned && channelFollowed" ng-click="unsubscribe()">Unsubscribe</a>
+<a href="" ng-show="!channelOwned && !channelFollowed" ng-click="subscribe()">Subscribe</a>
+
+<div ng-show="!channelOwned">
+    <span>Only show unread</span> <input type="checkbox" ng-model="showOnlyUnread" ng-change="showOnlyUnreadChanged()" />
+</div>
+
+<div ng-show="channelOwned">        
+    <a href="#/editchannel/{{channel.Id}}">Edit</a>
+</div>
+
+    <div scroll>
+        <div ng-repeat="post in posts | orderBy:'-Added'" style="margin-top: 20px" class="readable">
+            <div ng-if="postVisible(post)">
+                <!--<span class="glyphicon glyphicon-thumbs-up" ng-click="incrementUpvotes(post)"></span>-->
+                <!--{{post.Upvotes}}-->
+                <span style="font-size:20px; margin-left:10px;">
+                    <a ng-show="post.Uri" href="{{post.Uri}}">
+                        {{post.Title}} {{post.Id}}
+                    </a>
+                    <span ng-hide="post.Uri">
+                        {{post.Title}}
+                    </span>
+                </span>
+                <div ng-bind-html="post.Description" style="margin-left:30px;" />
+                <div style="margin-left:30px;">
+                    <span style="font-weight: bold" ng-repeat="tag in post.Tags">{{tag}} <a href="" ng-show="!follows(tag)" ng-click="follow(tag)">[+]</a> <a href="" ng-show="follows(tag)" ng-click="unfollow(tag)">[-]</a></span>
+                </div>
+                <div style="margin-left:30px;">
+                    <span>{{post.Created | date:'dd/MM/yyyy HH:mm:ss'}} </span>
+                </div>
+                <div style="margin-left:30px;">
+                    <span style="cursor: pointer;" ng-click="loadComments(post)">{{post.CommentCount}} comments</span>
+                    <div ng-repeat="comment in post.Comments | orderBy:'Created'" style="background: #E8E8E8; margin-top: 1px;font-size: medium;">
+                        <div>
+                            <a href="#/profile/{{comment.UserId}}">{{comment.Author}}</a>
+                            <span style="font-size:medium; margin-left:2px;">
+                                {{comment.Body}}
+                            </span>
+                        </div>
+                        <div style="color: #888888; font-size: small">{{comment.CreatedHoursAgo}} hours ago <a>Reply</a></div>
+                    </div>
+                </div>
+                <div style="margin-left:30px;">
+
+                    <button class="btn btn-default btn-xs" ng-click="starPost(post)">
+                        <span ng-class="post.Starred ? 'glyphicon glyphicon-star' : 'glyphicon glyphicon-star-empty'"></span> Star
+                    </button>
+
+                    <button class="btn btn-default btn-xs" ng-click="likePost(post)">
+                        <span ng-class="post.Liked ? 'glyphicon glyphicon-heart' : 'glyphicon glyphicon-heart-empty'"></span> Like
+                    </button>
+
+                    <button class="btn btn-default btn-xs" ng-click="savePost(post)">
+                        <span ng-class="post.Saved ? 'glyphicon glyphicon-floppy-remove' : 'glyphicon glyphicon-floppy-save'"></span> History
+                    </button>
+
+                    <button class="btn btn-default btn-xs" ng-click="publishOnChannel(post)">
+                        <span class="glyphicon glyphicon-share"></span> Publish
+                    </button>
+
+                    <a href="#/viewpost/{{post.Id}}" class="btn btn-default btn-xs">
+                        <span class="glyphicon glyphicon-eye-open"></span> View
+                    </a>
+
+                    <a href="#/editpost/{{post.Id}}" class="btn btn-default btn-xs">
+                        <span class="glyphicon glyphicon-edit"></span> Edit
+                    </a>
+
+                    <button class="btn btn-default btn-xs" ng-show="channelOwned" ng-click="deletePost(post)">
+                        <span class="glyphicon glyphicon-remove"></span> Remove
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/ng-template" id="channelSelector.html">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="myModalLabel">Select a channel</h4>
+        </div>
+        <form ng-submit="submit()">
+            <div class="modal-body">
+                <div class="form-group">
+                    <select class="form-control" data-ng-options="c.Name for c in windowdata.channels" data-ng-model="windowdata.selectedChannel"></select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default">Close</button>
+                <input type="submit" class="btn btn-primary" value="Submit" />
+            </div>
+        </form>
+    </script>

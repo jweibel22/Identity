@@ -28,6 +28,10 @@ namespace Identity.Domain
 
         public IList<ObjectId> Feed { get; set; }
 
+        public IList<string> FollowsTags { get; set; }
+
+        public IList<ObjectId> FollowsChannels { get; set; }
+
         public ObjectId DefaultChannel { get; set; }
     }
 
