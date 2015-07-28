@@ -50,6 +50,7 @@
     <Compile Include="Subscription.cs" />
     <Compile Include="Tagged.cs" />
     <Compile Include="User.cs" />
+    <Compile Include="WeightedTag.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,7 +1,14 @@
 angular.module('inspire').factory('postService', ['$http', '$q', function($http, $q){
     var o = {
         posts: [],
-        queryresults: []
+        queryresults: [],
+        timestamp: new Date(),
+        formattedTimestamp: function () {
+            var s = o.timestamp.getFullYear() + "-" + (o.timestamp.getMonth() + 1) + "-" + o.timestamp.getDate() + " " + o.timestamp.getHours() + ":"
+                + o.timestamp.getMinutes() + ":" + o.timestamp.getSeconds() + "." + o.timestamp.getMilliseconds();
+
+            return s;
+        }
     };
 
     o.getByTag = function(tag) {
@@ -13,14 +20,28 @@ angular.module('inspire').factory('postService', ['$http', '$q', function($http,
         return promise;
     };
 
-    o.getFromChannel = function (channelId, onlyUnread) {
-        var promise = $http.get('/Api/Channel/' + channelId + "?onlyUnread="+onlyUnread);
+    o.getFromChannel = function (channelId, onlyUnread, orderBy) {
+        var fromIndex = 0;
+        var promise = $http.get('/Api/Channel/' + channelId + "?onlyUnread=" + onlyUnread + "&timestamp=" + o.formattedTimestamp() + "&fromIndex=" + fromIndex + "&orderBy=" + orderBy);
+
+        promise.success(function (data) {
+            if (!o.posts[channelId]) {
+                o.posts[channelId] = [];
+            }
+            angular.copy(data.Posts, o.posts[channelId]);
+        });
+        return promise;
+    };
+
+    o.loadMorePosts = function (channelId, onlyUnread, orderBy) {
+        var fromIndex = (o.posts[channelId] ? o.posts[channelId].length : 0);
+        var promise = $http.get('/Api/Channel/' + channelId + "?onlyUnread=" + onlyUnread + "&timestamp=" + o.formattedTimestamp() + "&fromIndex=" + fromIndex + "&orderBy=" + orderBy);
 
             promise.success(function(data){
             if (!o.posts[channelId]) {
                 o.posts[channelId] = [];
             }
-            angular.copy(data.Posts, o.posts[channelId]);
+            angular.copy(o.posts[channelId].concat(data.Posts), o.posts[channelId]);
         });
         return promise;
     };
@@ -31,7 +52,8 @@ angular.module('inspire').factory('postService', ['$http', '$q', function($http,
 
         $http.get('/Api/User').success(function(user) {
 
-            $http.get('/Api/Channel/' + user.SavedChannel + "?onlyUnread=false").success(function (data) {
+            var fromIndex = (o.posts[user.SavedChannel] ? o.posts[user.SavedChannel].length : 0);
+            $http.get('/Api/Channel/' + user.SavedChannel + "?onlyUnread=false" + "&timestamp=" + o.formattedTimestamp() + "&fromIndex=" + fromIndex + "&orderBy=Added").success(function (data) {
                 if (!o.posts[user.SavedChannel]) {
                     o.posts[user.SavedChannel] = [];
                 }

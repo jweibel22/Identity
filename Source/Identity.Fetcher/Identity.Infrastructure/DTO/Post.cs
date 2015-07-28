@@ -36,5 +36,13 @@ namespace Identity.Infrastructure.DTO
         public bool Saved { get; set; }
 
         public DateTime Added { get; set; }
+
+        public bool IsCollapsed { get; set; }
+
+        public string Teaser { get; set; }
+
+        public int Popularity { get; set; }
+
+        public IList<Channel> PublishedIn { get; set; }
     }
 }

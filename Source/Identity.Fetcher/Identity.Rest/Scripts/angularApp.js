@@ -1,4 +1,4 @@
-angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize'])
+angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-jqcloud', 'infinite-scroll'])
 .config([
 '$stateProvider',
 '$urlRouterProvider',
@@ -31,7 +31,7 @@ function($stateProvider, $urlRouterProvider) {
               templateUrl: 'Content/templates/home.html',
             controller: 'MainCtrl',
             resolve: {
-                channelPromise: ['$stateParams', 'postService', function($stateParams, postService){ return postService.getFromChannel($stateParams.channelId, true); }],
+                channelPromise: ['$stateParams', 'postService', function($stateParams, postService){ return postService.getFromChannel($stateParams.channelId, true, 'Added'); }],
                 userPromise: ['userService', function(userService){ return userService.getCurrentUser(); }]
             }
           }
@@ -82,7 +82,7 @@ function($stateProvider, $urlRouterProvider) {
               templateUrl: 'Content/templates/feed.html',
             controller: 'FeedController',
             resolve: {
-              posts: ['feedService', function (feedService) { return feedService.getFeed(); }],
+                posts: ['feedService', function (feedService) { return feedService.getFeed('Added'); }],
               userPromise: ['userService', function(userService){ return userService.getCurrentUser(); }]
             }
           }

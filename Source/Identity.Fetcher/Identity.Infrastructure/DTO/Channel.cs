@@ -15,5 +15,14 @@ namespace Identity.Infrastructure.DTO
         public int UnreadCount { get; set; }
 
         public IList<RssFeeder> RssFeeders { get; set; }
+
+        public IList<WeightedTag> TagCloud { get; set; }
+    }
+
+    public class WeightedTag
+    {
+        public string text { get; set; }
+
+        public decimal weight { get; set; }
     }
 }

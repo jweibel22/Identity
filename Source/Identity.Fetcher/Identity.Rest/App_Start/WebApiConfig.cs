@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using System.Web.Http.ExceptionHandling;
 
 namespace Identity.Rest
 {
@@ -13,6 +14,8 @@ namespace Identity.Rest
 
             // Web API routes
             config.MapHttpAttributeRoutes();
+
+            config.Services.Add(typeof(IExceptionLogger), new Log4NetExceptionLogger());
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",

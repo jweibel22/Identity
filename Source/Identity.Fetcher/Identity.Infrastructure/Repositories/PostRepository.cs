@@ -12,34 +12,39 @@ namespace Identity.Infrastructure.Repositories
 {
     public class PostRepository : IDisposable
     {
-        private readonly IDbConnection con;
+        private readonly IDbTransaction con;
 
-        public PostRepository(IDbConnection con)
+        public PostRepository(IDbTransaction con)
         {
             this.con = con;
         }
 
         public bool PostExists(string uri)
         {
-            return con.Query<int>("select count(*) from Post where Uri=@Uri", new { Uri = uri }).Single() > 0;
+            return con.Connection.Query<int>("select count(*) from Post where Uri=@Uri", new { Uri = uri }, con).Single() > 0;
+        }
+
+        public Post GetByUrl(string uri)
+        {
+            return con.Connection.Query<Post>("select * from Post where Uri=@Uri", new { Uri = uri }, con).SingleOrDefault();
         }
 
         public void AddPost(Post post)
         {
-            post.Id = con.Query<long>("insert Post values(@Created,@Title,@Description,@Uri); SELECT CAST(SCOPE_IDENTITY() as bigint)", post).Single();
+            post.Id = con.Connection.Query<long>("insert Post values(@Created,@Title,@Description,@Uri); SELECT CAST(SCOPE_IDENTITY() as bigint)", post, con).Single();
         }
 
         public void UpdatePost(Post post)
         {
-            con.Execute("update Post set Title=@Title, Description=@Description, Uri=@Uri where Id=@Id", post);
+            con.Connection.Execute("update Post set Title=@Title, Description=@Description, Uri=@Uri where Id=@Id", post, con);
         }
 
         public void TagPost(long postId, IEnumerable<string> tags)
         {
-            con.Execute("delete from Tagged where PostId=@PostId", new { PostId = postId });
+            con.Connection.Execute("delete from Tagged where PostId=@PostId", new { PostId = postId }, con);
             foreach (var tag in tags)
             {
-                con.Execute("insert Tagged values(@PostId,@Tag)", new { PostId = postId, Tag = tag });    
+                con.Connection.Execute("insert Tagged values(@PostId,@Tag)", new { PostId = postId, Tag = tag }, con);    
             }
         }
 
@@ -47,34 +52,77 @@ namespace Identity.Infrastructure.Repositories
         {
             var encodedTag = "%" + tag.Replace("%", "[%]").Replace("[", "[[]").Replace("]", "[]]") + "%";
 
-            return con.Query<Post>(@"select Post.* from Post join Tagged t on t.PostId = Post.Id where t.Tag like @Tag", new { Tag = encodedTag });
+            return con.Connection.Query<Post>(@"select Post.* from Post join Tagged t on t.PostId = Post.Id where t.Tag like @Tag", new { Tag = encodedTag }, con);
         }
 
-        public IEnumerable<Post> UnreadPostsFromChannel(long userId, bool onlyUnread, long channelId)
+        public IEnumerable<Post> PostsFromChannel(long userId, bool onlyUnread, long channelId, DateTime timestamp, int fromIndex, string orderBy)
         {
-            return con.Query<Post>(@"select Post.*, ci.Created as Added from Post 
-                                        left join ReadHistory h on h.PostId = Post.Id and h.UserId = @UserId
-                                        join ChannelItem ci on ci.PostId = Post.Id where ci.ChannelId=@ChannelId and h.PostId IS NULL",
-                    new { ChannelId = channelId, UserId = userId });                            
+            if (orderBy == "Added")
+            {
+                orderBy = "ci.Created";
+            }
+
+            var sql = @"select * from 
+(select Post.*,
+CASE WHEN liked.Created IS NULL THEN 'false' ELSE 'true' END as Liked, 
+CASE WHEN saved.Created IS NULL THEN 'false' ELSE 'true' END as Saved, 
+CASE WHEN starred.Created IS NULL THEN 'false' ELSE 'true' END as Starred, 
+CASE WHEN ReadHistory.Timestamp IS NULL THEN 'false' ELSE 'true' END as [Read],
+dateadd(mi, datediff(mi, 0, ci.Created), 0) as Added, 
+CASE WHEN pop.Popularity IS NULL THEN 0 ELSE pop.Popularity END as Popularity,
+ROW_NUMBER() OVER (ORDER BY {1} desc) AS RowNum
+from Post 
+join ChannelItem ci on ci.PostId = Post.Id 
+join [User] u on u.Id = @UserId 
+left join ChannelItem liked on liked.ChannelId = u.LikedChannel and liked.PostId = Post.Id
+left join ChannelItem saved on saved.ChannelId = u.SavedChannel and saved.PostId = Post.Id
+left join ChannelItem starred on starred.ChannelId = u.StarredChannel and starred.PostId = Post.Id
+left join ReadHistory on ReadHistory.PostId = Post.Id and ReadHistory.UserId = @UserId 
+left join Popularity pop on pop.PostId = Post.Id
+where ci.ChannelId=@ChannelId and Post.Created < @Timestamp {0}) as TBL
+where TBL.RowNum BETWEEN (@FromIndex+1) AND (@FromIndex+10)";
+
+            sql = String.Format(sql, onlyUnread ? " and ReadHistory.Timestamp IS NULL" : "", orderBy);
+
+            return con.Connection.Query<Post>(sql, new { ChannelId = channelId, UserId = userId, Timestamp = timestamp, FromIndex = fromIndex}, con);                
         }
 
-        public IEnumerable<Post> PostsFromChannel(long channelId)
+        public Post GetById(long id, long userId)
         {
-            return con.Query<Post>(@"select Post.*, ci.Created as Added from Post 
-                                        join ChannelItem ci on ci.PostId = Post.Id where ci.ChannelId=@ChannelId",
-                   new { ChannelId = channelId });                
-        }
+            var sql = @"
+select Post.*,
+CASE WHEN liked.Created IS NULL THEN 'false' ELSE 'true' END as Liked, 
+CASE WHEN saved.Created IS NULL THEN 'false' ELSE 'true' END as Saved, 
+CASE WHEN starred.Created IS NULL THEN 'false' ELSE 'true' END as Starred, 
+CASE WHEN ReadHistory.Timestamp IS NULL THEN 'false' ELSE 'true' END as [Read],
+CASE WHEN pop.Popularity IS NULL THEN 0 ELSE pop.Popularity END as Popularity
+from Post 
+join [User] u on u.Id = @UserId 
+left join ChannelItem liked on liked.ChannelId = u.LikedChannel and liked.PostId = Post.Id
+left join ChannelItem saved on saved.ChannelId = u.SavedChannel and saved.PostId = Post.Id
+left join ChannelItem starred on starred.ChannelId = u.StarredChannel and starred.PostId = Post.Id
+left join ReadHistory on ReadHistory.PostId = Post.Id and ReadHistory.UserId = @UserId 
+left join Popularity pop on pop.PostId = Post.Id
+where Post.Id = @Id
+";
 
-        public Post GetById(long id)
-        {
-            return con.Query<Post>("select * from Post where Id=@Id", new { Id = id }).SingleOrDefault();
+            return con.Connection.Query<Post>(sql, new { Id = id, UserId = userId }, con).SingleOrDefault();
         }
 
         public IEnumerable<Tagged> Tags(long postId)
         {
-            return con.Query<Tagged>("select * from Tagged where PostId=@PostId", new { PostId = postId });
+            return con.Connection.Query<Tagged>("select * from Tagged where PostId=@PostId", new { PostId = postId }, con);
         }
-        
+
+        public IEnumerable<Channel> PublishedIn(long postId)
+        {
+            return con.Connection.Query<Channel>(@"
+            select * from Channel where Id in (select top 5 Id from Channel 
+            join ChannelItem ci on ci.ChannelId = Channel.Id and ci.PostId = @PostId
+            left join Subscription s on s.ChannelId = Channel.Id
+            group by Channel.Id
+            order by COUNT(*))", new { PostId = postId }, con);
+        }
 
         public void Dispose()
         {

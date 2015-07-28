@@ -1,113 +1,124 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.ServiceModel.Syndication;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using System.Xml.Linq;
 using Identity.Domain;
 using Identity.Infrastructure.Repositories;
+using log4net;
 
 namespace Identity.Fetcher.WindowsService.Rss
 {
     class RssFeedRefresher
     {
-        private ChannelRepository channelRepo;
-        private PostRepository postRepo;
-        private UserRepository userRepo;
-        private string rssFeederUsername;
+        private readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        public RssFeedRefresher(ChannelRepository channelRepo, PostRepository postRepo, UserRepository userRepo)
+        private readonly ChannelRepository channelRepo;
+        readonly PostRepository postRepo;
+        readonly UserRepository userRepo;
+        private const string rssFeederUsername = "rssfeeder";
+
+        public RssFeedRefresher(PostRepository postRepo, UserRepository userRepo, ChannelRepository channelRepo)
         {
-            this.channelRepo = channelRepo;
             this.postRepo = postRepo;
             this.userRepo = userRepo;
-            rssFeederUsername = "rssfeeder";
+            this.channelRepo = channelRepo;
         }
 
-        public void RefreshFeeds()
-        {            
-            IDictionary<string, ChannelAndTags> rssFeedToChannel = new Dictionary<string, ChannelAndTags>();
-
-            rssFeedToChannel.Add("http://feeds.feedburner.com/upworthy?format=xml", new ChannelAndTags { Name = "upworthy" });
-            rssFeedToChannel.Add("http://motherboard.vice.com/en_us/rss", new ChannelAndTags { Name = "motherboard" });
-            rssFeedToChannel.Add("http://jyllands-posten.dk/?service=rssfeed&mode=top", new ChannelAndTags { Name = "jyllands-posten", Tags = new[] { "news" } });
-            rssFeedToChannel.Add("http://jyllands-posten.dk/nyviden/?service=rssfeed", new ChannelAndTags { Name = "jyllands-posten", Tags = new[] { "science" } });
-            rssFeedToChannel.Add("http://www.quora.com/Computer-Programming/rss", new ChannelAndTags { Name = "quora", Tags = new[] { "programming" } });
-            rssFeedToChannel.Add("http://www.quora.com/rss", new ChannelAndTags { Name = "quora" });
-            //rssFeedToChannel.Add("http://gdata.youtube.com/feeds/base/users/Vsauce/uploads?orderby=updated&client=ytapi-youtube-rss-redirect&v=2&alt=rss", new ChannelAndTags { Name = "vsauce", Tags = new[] { "science" } });
-            rssFeedToChannel.Add("http://www.dr.dk/nyheder/service/feeds/allenyheder", new ChannelAndTags { Name = "dr", Tags = new[] { "news" } });
-            rssFeedToChannel.Add("http://www.dr.dk/mu/Feed/videnskabens-verden?format=podcast&limit=10", new ChannelAndTags { Name = "videnskabens-verden", Tags = new[] { "science" } });
-            rssFeedToChannel.Add("http://videnskab.dk/rss", new ChannelAndTags { Name = "videnskab.dk", Tags = new[] { "science" } });
-            rssFeedToChannel.Add("http://www.dr.dk/mu/Feed/harddisken?format=podcast&limit=10", new ChannelAndTags { Name = "harddisken", Tags = new[] { "technology" } });
-            rssFeedToChannel.Add("http://blog.codinghorror.com/rss/", new ChannelAndTags { Name = "coding-horror", Tags = new[] { "programming" } });
-            rssFeedToChannel.Add("http://www.infoq.com/rss", new ChannelAndTags { Name = "infoq", Tags = new[] { "programming" } });
-            rssFeedToChannel.Add("http://syndication.thedailywtf.com/TheDailyWtf", new ChannelAndTags { Name = "the-daily-wtf", Tags = new[] { "programming" } });
-            rssFeedToChannel.Add("http://feeds2.feedburner.com/tedtalks_video/", new ChannelAndTags { Name = "ted" });
-            rssFeedToChannel.Add("http://feeds.gawker.com/lifehacker/full#_ga=1.201702801.1632047189.1426325163", new ChannelAndTags { Name = "lifehacker" });
-            rssFeedToChannel.Add("http://www.huffingtonpost.com/feeds/index.xml", new ChannelAndTags { Name = "the-huffington-post" });
-            rssFeedToChannel.Add("http://www.dr.dk/mu/Feed/p1-debat-og-soendagsfrokosten-podcast?format=podcast&limit=10", new ChannelAndTags { Name = "p1-debat", Tags = new[] { "p1" } });
-            rssFeedToChannel.Add("http://martinfowler.com/feed.atom", new ChannelAndTags { Name = "martin-fowler", Tags = new[] { "programming" } });
-            //rssFeedToChannel.Add("http://heltnormalt.dk/?view=rss", new ChannelAndTags { Name = "helt-normalt", Tags = new[] { "comedy" } });
-
-            foreach (var kv in rssFeedToChannel)
-            {
-                try
-                {
-                    Execute(kv.Key, kv.Value);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Failed synchronize with rss feed " + kv.Key + "\r\n" + ex.Message);
-                }                
-            }
-        }
-
-        private void Execute(string rssFeedUrl, ChannelAndTags channelAndTags)
+        public void Run()
         {
             var rssFeederUser = userRepo.FindByName(rssFeederUsername);
 
-            var rssReader = new RssReader(rssFeedUrl);
+            var fetchRssFeedersBlock = new TransformBlock<RssFeeder, FeedX>(rssFeeder => new FeedX
+            {
+                Url = rssFeeder.Url,
+                ChannelIds = channelRepo.GetChannelsForRssFeeder(rssFeeder.Id).ToList(),
+                Tags = channelRepo.GetRssFeederTags(rssFeeder.Id)
+            });
 
-            var feed = rssReader.ReadRss();
+            var fetchFeedItemsBlock = new TransformManyBlock<FeedX, Tuple<FeedX, SyndicationItem>>(f =>
+            {
+                log.Info("fetching feed " + f.Url);
+                try
+                {
+                    var rssReader = new RssReader(f.Url);
+                    var feed = rssReader.ReadRss();
+                    return feed.Items.Select(i => new Tuple<FeedX, SyndicationItem>(f, i));
+                }
+                catch (Exception ex)
+                {
+                    log.Error("Unable to fetch feed " + f.Url, ex);
+                    return new Tuple<FeedX, SyndicationItem>[0];
+                }
 
-            foreach (var item in feed.Items)
+            }, new ExecutionDataflowBlockOptions
+            {
+                MaxDegreeOfParallelism = 5
+            });
+            
+            var storeFeedItemBlock = new ActionBlock<Tuple<FeedX, SyndicationItem>>(t =>
             {
                 try
                 {
-                    var channel = channelRepo.FindChannelsByName(channelAndTags.Name).SingleOrDefault();
-
-                    if (channel == null)
-                    {
-                        channel = new Channel(channelAndTags.Name);
-
-                        channelRepo.AddChannel(channel);
-                    }
-
-                    var url = item.Links.First().Uri.ToString();
-
-
+                    var url = t.Item2.Links.First().Uri.ToString();
+                    
                     if (!postRepo.PostExists(url))
                     {
+                        log.Info("processing item " + t.Item2.Title.Text + " from feed " + t.Item1.Url);
+
                         var post = new Post
                         {
-                            Created = GetCreatedTime(item),
-                            Description = GetDescription(item),
-                            Title = item.Title.Text,
+                            Created = GetCreatedTime(t.Item2),
+                            Description = GetDescription(t.Item2),
+                            Title = t.Item2.Title.Text,
                             Uri = url,
                         };
 
                         postRepo.AddPost(post);
-                        postRepo.TagPost(post.Id, item.Categories.Select(c => c.Name).Union(channelAndTags.Tags).Union(new[]{channelAndTags.Name}));
-                        
-                        userRepo.Publish(rssFeederUser.Id, channel.Id, post.Id);
+
+                        postRepo.TagPost(post.Id, t.Item2.Categories.Select(c => c.Name).Union(t.Item1.Tags));
+
+                        foreach (var channelId in t.Item1.ChannelIds)
+                        {
+                            userRepo.Publish(rssFeederUser.Id, channelId, post.Id);
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Failed to add item " + item.Title.Text + "\r\n" + ex.Message);
-                }
+                    log.Error("Unable store item " + t.Item2.Title.Text, ex);
+                }      
+            });
+
+            fetchRssFeedersBlock.LinkTo(fetchFeedItemsBlock);
+            //fetchFeedItemsBlock.LinkTo(storeFeedItemBlock);
+
+            fetchRssFeedersBlock.Completion.ContinueWith(t =>
+            {
+                if (t.IsFaulted) ((IDataflowBlock)fetchFeedItemsBlock).Fault(t.Exception);
+                else fetchFeedItemsBlock.Complete();
+            });
+            fetchFeedItemsBlock.Completion.ContinueWith(t =>
+            {
+                if (t.IsFaulted) ((IDataflowBlock)storeFeedItemBlock).Fault(t.Exception);
+                else storeFeedItemBlock.Complete();
+            });
+
+
+            var feeders = channelRepo.AllRssFeeders();
+
+            foreach (var feeder in feeders)
+            {
+                fetchRssFeedersBlock.Post(feeder);
             }
+
+            fetchRssFeedersBlock.Complete();
+
+            storeFeedItemBlock.Completion.Wait();
         }
 
         private DateTime GetCreatedTime(SyndicationItem item)
@@ -125,7 +136,6 @@ namespace Identity.Fetcher.WindowsService.Rss
                 return DateTime.UtcNow;
             }
         }
-
 
         private string ReadContent(SyndicationItem item)
         {
@@ -147,6 +157,14 @@ namespace Identity.Fetcher.WindowsService.Rss
 
             return item.Summary == null ? "" : item.Summary.Text;
         }
+    }
 
+    class FeedX
+    {
+        public string Url { get; set; }
+
+        public IEnumerable<long> ChannelIds { get; set; }
+
+        public IEnumerable<string> Tags { get; set; }
     }
 }

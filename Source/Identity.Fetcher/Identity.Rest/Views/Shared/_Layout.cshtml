@@ -7,19 +7,20 @@
     @*@Styles.Render("~/Content/css")*@
     @*@Scripts.Render("~/bundles/modernizr")*@
     
+        
+    <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.0/yeti/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/Content/jqcloud.min.css">
     
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-
-    <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.0/yeti/bootstrap.min.css" rel="stylesheet">
-    <!--
-        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
-    -->
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.1/angular-sanitize.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
-    <script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.10.0.js"></script>
-    <script src="/Scripts/angularApp.js"></script>
+    <script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.10.0.js"></script>    
     <script src="/Scripts/bootstrap.min.js"></script>
+    <script src="/Scripts/jqcloud.js"></script>
+    <script src="/Scripts/angular-jqcloud.js"></script>
+    <script src="/Scripts/ng-infinite-scroll.min.js"></script>
+    <script src="/Scripts/angularApp.js"></script>
     <script src="/Scripts/Controllers/home.js"></script>
     <script src="/Scripts/Controllers/posts.js"></script>
     <script src="/Scripts/Controllers/navigator.js"></script>
@@ -36,6 +37,37 @@
     <script src="/Scripts/Services/feeds.js"></script>
     <script src="/Scripts/Services/channels.js"></script>
     <script src="/Scripts/Services/rssFeeders.js"></script>
+    <script src="/Scripts/Directives/stream.js"></script>
+    
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#myNav").affix({
+                offset: {
+                    top: 195
+                }
+            });
+            $("#myNav").on('affixed.bs.affix', function () {
+                alert("The left navigation menu has been affixed. Now it doesn't scroll with the page.");
+            });
+        });
+    </script>
+    
+    @*<script type="text/javascript">
+        var word_array = [
+            { text: "Lorem", weight: 15 },
+            { text: "Ipsum", weight: 9, link: "http://jquery.com/" },
+            { text: "Dolor", weight: 6, html: { title: "I can haz any html attribute" } },
+            { text: "Sit", weight: 7 },
+            { text: "Amet", weight: 5 }
+            // ...as many words as you want
+        ];
+
+        $(function () {
+            // When DOM is ready, select the container element and call the jQCloud method, passing the array of words as the first argument.
+            $("#example").jQCloud(word_array);
+        });
+
+    </script>*@
     
     <style>
         .glyphicon-thumbs-up {
@@ -46,17 +78,17 @@
         }
     </style>
 </head>
-<body>
-    <div class=""> @*container body-content*@
-        @RenderBody()
-        <hr />
-        <footer>
+    <body>        
+        <div class=""> @*container body-content*@
+            @RenderBody()        
+            <hr />
+            <footer>
 
-        </footer>
-    </div>
-
-    @Scripts.Render("~/bundles/jquery")
+            </footer>
+        </div>
+    
+        @*@Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
-    @RenderSection("scripts", required: false)
-</body>
+    @RenderSection("scripts", required: false)*@
+    </body>
 </html>

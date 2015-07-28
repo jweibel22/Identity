@@ -7,64 +7,72 @@ using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Identity.Domain;
+using Channel = Identity.Domain.Channel;
+using RssFeeder = Identity.Domain.RssFeeder;
 
 namespace Identity.Infrastructure.Repositories
 {
     public class ChannelRepository : IDisposable
     {
-        private readonly IDbConnection con;
+        private readonly IDbTransaction con;
 
-        public ChannelRepository(IDbConnection con)
+        public ChannelRepository(IDbTransaction con)
         {
             this.con = con;
         }
 
         public Channel GetById(long id)
         {
-            return con.Query<Channel>("select * from Channel where Id=@Id", new { Id = id }).SingleOrDefault();
+            return con.Connection.Query<Channel>("select * from Channel where Id=@Id", new { Id = id }, con).SingleOrDefault();
         }
 
         public IEnumerable<Channel> FindChannelsByName(string name)
         {
             var encoded = "%" + name.Replace("%", "[%]").Replace("[", "[[]").Replace("]", "[]]") + "%";
-            return con.Query<Channel>("select * from Channel where Name like @Name", new { Name = encoded });
+            return con.Connection.Query<Channel>("select * from Channel where Name like @Name", new { Name = encoded }, con);
         }
 
         public IEnumerable<Channel> All()
         {
-            return con.Query<Channel>("select * from Channel");
+            return con.Connection.Query<Channel>("select * from Channel", null, con);
+        }
+
+        public IEnumerable<WeightedTag> GetTagCloud(long channelId)
+        {
+            return con.Connection.Query<WeightedTag>(@"select top 20 count(*) as Weight, Tag as Text from Tagged join ChannelItem ci on ci.PostId = Tagged.PostId and ci.ChannelId = @ChannelId
+                                            group by Tag order by COUNT(*) desc", new { ChannelId = channelId }, con);
         }
 
         public IEnumerable<long> History(long userId, long channelId)
         {
-            return con.Query<long>(@"select ReadHistory.PostId from ReadHistory  
+            return con.Connection.Query<long>(@"select ReadHistory.PostId from ReadHistory  
                                     join ChannelItem on ChannelItem.PostId = ReadHistory.PostId and ChannelItem.ChannelId = @ChannelId and ReadHistory.UserId=@UserId", 
-                                                                                                                                        new { UserId = userId, ChannelId = channelId });
+                                                                                                                                        new { UserId = userId, ChannelId = channelId }, con);
         }
 
         public IEnumerable<long> Intersection(long channel1Id, long channel2Id)
         {
-            return con.Query<long>(@"select PostId from ChannelItem where ChannelId=@Channel1Id intersect
+            return con.Connection.Query<long>(@"select PostId from ChannelItem where ChannelId=@Channel1Id intersect
                                     select PostId from ChannelItem where ChannelId=@Channel2Id ",
-                                                                                                new { Channel1Id = channel1Id, Channel2Id = channel2Id });
+                                                                                                new { Channel1Id = channel1Id, Channel2Id = channel2Id }, con);
         }
 
         public int UnreadCount(long userId, long channelId)
         {
-            return con.Query<int>(@"select COUNT(*) from ChannelItem
+            return con.Connection.Query<int>(@"select COUNT(*) from ChannelItem
                                     left join ReadHistory on ChannelItem.PostId = ReadHistory.PostId and ReadHistory.UserId = @UserId
                                     where ChannelItem.ChannelId = @ChannelId and ReadHistory.UserId IS NULL", 
-                                                                                                   new { UserId = userId, ChannelId = channelId }).Single();
+                                                                                                   new { UserId = userId, ChannelId = channelId }, con).Single();
         }
 
         public void AddChannel(Channel channel)
         {
-            channel.Id = con.Query<int>("insert Channel values (@Name, @Created, @IsPublic); SELECT CAST(SCOPE_IDENTITY() as bigint)", channel).Single();
+            channel.Id = con.Connection.Query<int>("insert Channel values (@Name, @Created, @IsPublic); SELECT CAST(SCOPE_IDENTITY() as bigint)", channel, con).Single();
         }
 
         public void UpdateChannel(long channelId, bool isPublic, string name, IList<string> rssFeeders)
         {
-            con.Execute("update Channel set Name=@Name, IsPublic=@IsPublic where Id=@Id", new{ Id = channelId, IsPublic = isPublic, Name = name});
+            con.Connection.Execute("update Channel set Name=@Name, IsPublic=@IsPublic where Id=@Id", new { Id = channelId, IsPublic = isPublic, Name = name }, con);
 
             RemoveAllFeeders(channelId);
 
@@ -76,26 +84,26 @@ namespace Identity.Infrastructure.Repositories
 
         public bool PartOf(long channelId, long postId)
         {
-            return con.Query<int>("select count(*) from ChannelItem where ChannelId=@ChannelId and PostId=@PostId",
-                    new {ChannelId = channelId, PostId = postId}).Single() > 0;
+            return con.Connection.Query<int>("select count(*) from ChannelItem where ChannelId=@ChannelId and PostId=@PostId",
+                    new {ChannelId = channelId, PostId = postId}, con).Single() > 0;
         }
 
         public void Delete(long channelId)
         {
-            con.Execute("delete from Subscription where ChannelId=@Id", new { Id = channelId });
-            con.Execute("delete from ChannelOwner where ChannelId=@Id", new { Id = channelId });
-            con.Execute("delete from ChannelItem where ChannelId=@Id", new { Id = channelId });
-            con.Execute("delete from Channel where Id=@Id", new {Id = channelId});
+            con.Connection.Execute("delete from Subscription where ChannelId=@Id", new { Id = channelId }, con);
+            con.Connection.Execute("delete from ChannelOwner where ChannelId=@Id", new { Id = channelId }, con);
+            con.Connection.Execute("delete from ChannelItem where ChannelId=@Id", new { Id = channelId }, con);
+            con.Connection.Execute("delete from Channel where Id=@Id", new { Id = channelId }, con);
         }
 
         public RssFeeder RssFeederById(long id)
         {
-            return con.Query<RssFeeder>("select * from RssFeeder where Id=@Id", new {Id= id}).SingleOrDefault();
+            return con.Connection.Query<RssFeeder>("select * from RssFeeder where Id=@Id", new { Id = id }, con).SingleOrDefault();
         }
 
         public RssFeeder RssFeederByUrl(string url)
         {
-            var rssFeeder = con.Query<RssFeeder>("select * from RssFeeder where Url=@Url", new {Url = url}).SingleOrDefault();
+            var rssFeeder = con.Connection.Query<RssFeeder>("select * from RssFeeder where Url=@Url", new { Url = url }, con).SingleOrDefault();
 
             if (rssFeeder == null)
             {
@@ -103,38 +111,48 @@ namespace Identity.Infrastructure.Repositories
                 {
                     Url = url
                 };
-                rssFeeder.Id = con.Query<int>("insert RssFeeder values (@Url); SELECT CAST(SCOPE_IDENTITY() as bigint)", rssFeeder).Single();
+                rssFeeder.Id = con.Connection.Query<int>("insert RssFeeder values (@Url); SELECT CAST(SCOPE_IDENTITY() as bigint)", rssFeeder, con).Single();
             }
 
             return rssFeeder;
         }
 
+        public IEnumerable<RssFeeder> AllRssFeeders()
+        {
+            return con.Connection.Query<RssFeeder>("select RssFeeder.* from RssFeeder", null, con);
+        }
+
         public IEnumerable<RssFeeder> GetRssFeedersForChannel(long channelId)
         {
-            return con.Query<RssFeeder>("select RssFeeder.* from RssFeeder join FeedInto on FeedInto.RssFeederId = RssFeeder.Id and FeedInto.ChannelId=@Id", new { Id = channelId });
+            return con.Connection.Query<RssFeeder>("select RssFeeder.* from RssFeeder join FeedInto on FeedInto.RssFeederId = RssFeeder.Id and FeedInto.ChannelId=@Id", new { Id = channelId }, con);
+        }
+
+        public IEnumerable<long> GetChannelsForRssFeeder(long rssFeederId)
+        {
+            return con.Connection.Query<long>("select ChannelId from FeedInto where RssFeederId = @RssFeederId", new { RssFeederId = rssFeederId }, con);
         }
 
         public void FeedInto(long rssFeederId, long channelId)
         {
-            con.Execute("update FeedInto set ChannelId=@ChannelId where ChannelId=@ChannelId and RssFeederId=@RssFeederId if @@rowcount = 0 insert FeedInto values(@RssFeederId, @ChannelId)", new { ChannelId = channelId, RssFeederId = rssFeederId });            
+            con.Connection.Execute("update FeedInto set ChannelId=@ChannelId where ChannelId=@ChannelId and RssFeederId=@RssFeederId if @@rowcount = 0 insert FeedInto values(@RssFeederId, @ChannelId)", new { ChannelId = channelId, RssFeederId = rssFeederId }, con);            
         }
 
         public void RemoveAllFeeders(long channelId)
         {
-            con.Execute("delete from FeedInto where ChannelId=@ChannelId", new { ChannelId = channelId});            
+            con.Connection.Execute("delete from FeedInto where ChannelId=@ChannelId", new { ChannelId = channelId }, con);            
         }
 
         public IEnumerable<string> GetRssFeederTags(long rssFeederId)
         {
-            return con.Query<string>("select Tag from FeederTags where RssFeederId=@RssFeederId", new {RssFeederId = rssFeederId});
+            return con.Connection.Query<string>("select Tag from FeederTags where RssFeederId=@RssFeederId", new { RssFeederId = rssFeederId }, con);
         }
 
         public void UpdateTagsOfRssFeeder(long rssFeederId, IEnumerable<string> tags)
         {
-            con.Execute("delete from FeederTags where RssFeederId=@RssFeederId", new { RssFeederId = rssFeederId });
+            con.Connection.Execute("delete from FeederTags where RssFeederId=@RssFeederId", new { RssFeederId = rssFeederId }, con);
             foreach (var tag in tags)
             {
-                con.Execute("insert FeederTags values(@RssFeederId,@Tag)", new { RssFeederId = rssFeederId, Tag = tag });
+                con.Connection.Execute("insert FeederTags values(@RssFeederId,@Tag)", new { RssFeederId = rssFeederId, Tag = tag }, con);
             }
         }
 

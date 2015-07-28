@@ -12,9 +12,11 @@ namespace Identity.Infrastructure.Services
     public interface ILoadDtos
     {
         IEnumerable<DTO.Post> LoadPosts(IEnumerable<Post> post);
-        DTO.Post LoadPost(Post post);
-        DTO.Channel LoadChannel(Channel channel, bool onlyUnread);
-        IEnumerable<DTO.Channel> LoadChannelList(IEnumerable<Channel> channels);
+        DTO.Post LoadPost(User user, Post post);
+
+        IEnumerable<DTO.Post> LoadChannelPosts(User user, Channel channel, bool onlyUnread, DateTime timestamp, int fromIndex, string orderBy);
+        DTO.Channel LoadChannel(User user, Channel channel);
+        IEnumerable<DTO.Channel> LoadChannelList(User user, IEnumerable<Channel> channels);
         DTO.RssFeeder LoadRssFeeder(RssFeeder rssFeeder);
     }
 
@@ -24,13 +26,11 @@ namespace Identity.Infrastructure.Services
         private readonly CommentRepostitory commentRepo;
         private readonly UserRepository userRepo;
         private readonly ChannelRepository channelRepo;
-        private readonly User user;
 
-        public DtoLoader(PostRepository postRepo, CommentRepostitory commentRepo, User user, UserRepository userRepo, ChannelRepository channelRepo)
+        public DtoLoader(PostRepository postRepo, CommentRepostitory commentRepo, UserRepository userRepo, ChannelRepository channelRepo)
         {
             this.postRepo = postRepo;
             this.commentRepo = commentRepo;
-            this.user = user;
             this.userRepo = userRepo;
             this.channelRepo = channelRepo;
         }
@@ -44,6 +44,8 @@ namespace Identity.Infrastructure.Services
             {
                 LoadTags(p);
                 p.CommentCount = commentRepo.CommentCount(p.Id);
+                p.IsCollapsed = p.Teaser != null;
+                p.PublishedIn = postRepo.PublishedIn(p.Id).Select(c => Mapper.Map<DTO.Channel>(c)).ToList();
                 //p.Read = history.Contains(p.Id);
             }
 
@@ -62,20 +64,21 @@ namespace Identity.Infrastructure.Services
             return result;
         }
 
-        public DTO.Post LoadPost(Post post)
+        public DTO.Post LoadPost(User user, Post post)
         {
             var result = Mapper.Map<DTO.Post>(post);
             LoadTags(result);
-            result.Read = userRepo.IsRead(user.Id, post.Id);
-            result.Liked = channelRepo.PartOf(user.LikedChannel, result.Id);
-            result.Starred = channelRepo.PartOf(user.StarredChannel, result.Id);
-            result.Saved = channelRepo.PartOf(user.SavedChannel, result.Id);
+            //result.Read = userRepo.IsRead(user.Id, post.Id);
+            //result.Liked = channelRepo.PartOf(user.LikedChannel, result.Id);
+            //result.Starred = channelRepo.PartOf(user.StarredChannel, result.Id);
+            //result.Saved = channelRepo.PartOf(user.SavedChannel, result.Id);
             result.Comments = commentRepo.CommentsForPost(post.Id).Select(c => Mapper.Map<DTO.Comment>(c)).ToList();
             result.CommentCount = result.Comments.Count;
+            result.PublishedIn = postRepo.PublishedIn(post.Id).Select(c => Mapper.Map<DTO.Channel>(c)).ToList();
             return result;            
         }
 
-        public IEnumerable<DTO.Channel> LoadChannelList(IEnumerable<Channel> channels)
+        public IEnumerable<DTO.Channel> LoadChannelList(User user, IEnumerable<Channel> channels)
         {
             var result = channels.Select(c => Mapper.Map<DTO.Channel>(c)).ToList();
 
@@ -87,33 +90,45 @@ namespace Identity.Infrastructure.Services
             return result;
         }
 
-        public DTO.Channel LoadChannel(Channel channel, bool onlyUnread)
+        public IEnumerable<DTO.Post> LoadChannelPosts(User user, Channel channel, bool onlyUnread, DateTime timestamp, int fromIndex, string orderBy)
         {
-            var result = Mapper.Map<DTO.Channel>(channel);
-
-            var history = channelRepo.History(user.Id, channel.Id);
-            var liked = channelRepo.Intersection(channel.Id, user.LikedChannel);
-            var starred = channelRepo.Intersection(channel.Id, user.StarredChannel);
-            var saved = channelRepo.Intersection(channel.Id, user.SavedChannel);
-            var posts = onlyUnread ? postRepo.UnreadPostsFromChannel(user.Id, onlyUnread, channel.Id) : postRepo.PostsFromChannel(channel.Id);
+            var posts = postRepo.PostsFromChannel(user.Id, onlyUnread, channel.Id, timestamp, fromIndex, orderBy);
             var commentCounts = commentRepo.CommentCounts(channel.Id);
+            var xx = posts.Select(p => Mapper.Map<DTO.Post>(p)).ToList();
 
-            result.Posts = posts.Select(p => Mapper.Map<DTO.Post>(p)).OrderByDescending(p => p.Created).ToList();
-
-            foreach (var p in result.Posts)
+            foreach (var p in xx)
             {
                 LoadTags(p);
-                p.Read = history.Contains(p.Id);
-                p.Saved = saved.Contains(p.Id);
-                p.Starred = starred.Contains(p.Id);
-                p.Liked = liked.Contains(p.Id);
 
                 var commentCount = commentCounts.SingleOrDefault(cc => cc.Id == p.Id);
                 p.CommentCount = commentCount != null ? commentCount.Count : 0;
+                p.IsCollapsed = p.Teaser != null;
             }
+
+            return xx;
+        }
+
+        public DTO.Channel LoadChannel(User user, Channel channel)
+        {
+            var result = Mapper.Map<DTO.Channel>(channel);
+
+            //var posts = postRepo.PostsFromChannel(user.Id, onlyUnread, channel.Id, timestamp, fromIndex);
+            //var commentCounts = commentRepo.CommentCounts(channel.Id);
+
+            //result.Posts = posts.Select(p => Mapper.Map<DTO.Post>(p)).OrderByDescending(p => p.Created).ToList();
+
+            //foreach (var p in result.Posts)
+            //{
+            //    LoadTags(p);
+
+            //    var commentCount = commentCounts.SingleOrDefault(cc => cc.Id == p.Id);
+            //    p.CommentCount = commentCount != null ? commentCount.Count : 0;
+            //    p.IsCollapsed = p.Teaser != null;
+            //}
 
             result.UnreadCount = channelRepo.UnreadCount(user.Id, result.Id);
             result.RssFeeders = channelRepo.GetRssFeedersForChannel(channel.Id).Select(Mapper.Map<DTO.RssFeeder>).ToList();
+            result.TagCloud = channelRepo.GetTagCloud(channel.Id).Select(Mapper.Map<DTO.WeightedTag>).ToList();
 
             return result;
         }

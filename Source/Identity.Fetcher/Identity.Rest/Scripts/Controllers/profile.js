@@ -5,6 +5,9 @@
             $scope.user = userPromise.data;
             $scope.channels = channelService.channels;
 
+            for (var i = 0; i < $scope.user.TagCloud.length; i++) {
+                $scope.user.TagCloud[i].link = "#/search?query=" + $scope.user.TagCloud[i].text;
+            }
 
             $scope.makePublic = function(channel) {
                 channel.IsPrivate = false;

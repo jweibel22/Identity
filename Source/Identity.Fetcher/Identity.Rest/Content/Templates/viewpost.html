@@ -9,12 +9,18 @@
     </h3>
 </div>
 
-<div style="margin-bottom:20px">{{post.Id}}</div>
+<div style="margin-bottom:20px">ID: {{post.Id}}</div>
+<div style="margin-bottom:20px">Popularity: {{post.Popularity}}</div>
 
 <div ng-bind-html="post.Description" style="margin-bottom:20px"/>
 
 <div>
     <span style="font-weight: bold" ng-repeat="tag in post.Tags">{{tag}} </span>
+</div>
+
+<div>
+    Published in:
+    <span style="font-weight: bold" ng-repeat="channel in post.PublishedIn">{{channel.Name}} </span>
 </div>
 
 <div style="margin-top: 20px">

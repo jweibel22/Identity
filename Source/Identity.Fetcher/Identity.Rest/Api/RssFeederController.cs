@@ -14,25 +14,21 @@ using Identity.Infrastructure.Services;
 
 namespace Identity.Rest.Api
 {
+    [UnitOfWorkCommit]
     public class RssFeederController : ApiController
     {
-        private readonly IDbConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
         private readonly ChannelRepository channelRepo;
-        private readonly PostRepository postRepo;
         private readonly UserRepository userRepo;
         private readonly ILoadDtos dtoLoader;
-        private readonly CommentRepostitory commentRepo;
 
         private Domain.User user;
 
-        public RssFeederController()
+        public RssFeederController(ChannelRepository channelRepo, UserRepository userRepo, ILoadDtos dtoLoader)
         {
-            userRepo = new UserRepository(con);
-            channelRepo = new ChannelRepository(con);
-            postRepo = new PostRepository(con);
-            commentRepo = new CommentRepostitory(con);
+            this.channelRepo = channelRepo;
+            this.userRepo = userRepo;
+            this.dtoLoader = dtoLoader;
             user = userRepo.FindByName("jimmy");
-            dtoLoader = new DtoLoader(postRepo, commentRepo, user, userRepo, channelRepo);
         }
 
         [HttpGet]

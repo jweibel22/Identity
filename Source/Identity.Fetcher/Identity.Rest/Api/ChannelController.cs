@@ -7,54 +7,56 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Web.Http;
 using AutoMapper;
 using CsQuery;
 using Identity.Infrastructure.DTO;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
+using log4net;
 using Microsoft.Ajax.Utilities;
 
 namespace Identity.Rest.Api
 {
+    [UnitOfWorkCommit]
     public class ChannelController : ApiController
     {
-        private readonly IDbConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
+        private readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         private readonly ChannelRepository channelRepo;
         private readonly PostRepository postRepo;
         private readonly UserRepository userRepo;
         private readonly ILoadDtos dtoLoader;
-        private readonly CommentRepostitory commentRepo;
 
         private Domain.User user;
 
-        public ChannelController()
+        public ChannelController(IDbTransaction transaction, ILoadDtos dtoLoader, ChannelRepository channelRepo, PostRepository postRepo, UserRepository userRepo)
         {
-            userRepo = new UserRepository(con);
-            channelRepo = new ChannelRepository(con);
-            postRepo = new PostRepository(con);
-            commentRepo = new CommentRepostitory(con);
             user = userRepo.FindByName("jimmy");
-            dtoLoader = new DtoLoader(postRepo, commentRepo, user, userRepo, channelRepo);
+            this.dtoLoader = dtoLoader;
+            this.channelRepo = channelRepo;
+            this.postRepo = postRepo;
+            this.userRepo = userRepo;
         }
 
         [HttpGet]
         public IEnumerable<Channel> Get()
         {
-            return dtoLoader.LoadChannelList(channelRepo.All());    
+            return dtoLoader.LoadChannelList(user, channelRepo.All());    
         }
 
         [HttpGet]
         public IEnumerable<Channel> Get(string query)
         {
             var channels = channelRepo.FindChannelsByName(query);
-            return dtoLoader.LoadChannelList(channels);
+            return dtoLoader.LoadChannelList(user, channels);
         }
 
         [HttpGet]
         public Channel GetById(long id)
         {
-            return dtoLoader.LoadChannel(channelRepo.GetById(id), false);
+            return dtoLoader.LoadChannel(user, channelRepo.GetById(id));           
         }
 
         [HttpPut]
@@ -98,7 +100,7 @@ namespace Identity.Rest.Api
         {
             channelRepo.UpdateChannel(id, !channel.IsPrivate, channel.Name, channel.RssFeeders.Select(f => f.Url).ToList());
 
-            return dtoLoader.LoadChannel(channelRepo.GetById(id), false);
+            return dtoLoader.LoadChannel(user, channelRepo.GetById(id));
         }
 
         [HttpDelete]
@@ -164,8 +166,10 @@ namespace Identity.Rest.Api
         }
 
         [HttpGet]
-        public Channel Get(long id, bool onlyUnread)
-        {             
+        public Channel Get(long id, bool onlyUnread, DateTime timestamp, int fromIndex, string orderBy)
+        {          
+           log.Debug("Fetching items from channel " + id + " and page " + fromIndex);
+
             var channel = channelRepo.GetById(id);
 
             if (channel == null)
@@ -175,7 +179,12 @@ namespace Identity.Rest.Api
 
             var owns = userRepo.Owns(user.Id);
 
-            return dtoLoader.LoadChannel(channel, !owns.Any(c => c.Id == id) && onlyUnread);
+            var result = dtoLoader.LoadChannel(user, channel);
+            result.Posts = dtoLoader.LoadChannelPosts(user, channel, !owns.Any(c => c.Id == id) && onlyUnread, timestamp, fromIndex, orderBy).ToList();
+
+            log.Debug("Items from channel " + id + " was fetched");
+
+            return result;
         }
     }
 }

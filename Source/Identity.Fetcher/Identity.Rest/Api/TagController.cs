@@ -7,6 +7,7 @@ using System.Web.Http;
 
 namespace Identity.Rest.Api
 {
+    [UnitOfWorkCommit]
     public class TagController : ApiController
     {
     }

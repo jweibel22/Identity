@@ -1,0 +1,87 @@
+﻿
+<div style="margin-top:100px">
+    <span>Sort by</span> 
+    <div class="btn-group">
+        <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{selectedSortType}}  <span class="caret"></span></button>
+        <ul class="dropdown-menu">
+            <li ng-repeat="item in sortTypes">
+                <a ng-click="changeSortBy(item)">
+                    {{item}}
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+    <div style="margin-top:10px" scroll infinite-scroll="loadMorePosts()" infinite-scroll-distance="2">
+        <div ng-repeat="post in posts " style="margin-top: 20px" class="readable">
+            <div ng-if="postVisible(post)">
+                <!--| orderBy:selectedSortType:reverse-->
+                <span style="font-size:20px; margin-left:10px;">
+                    <a ng-show="post.Uri" href="{{post.Uri}}" ng-bind-html="post.Title">
+
+                    </a>
+                    <span ng-hide="post.Uri">
+                        {{post.Title}}
+                    </span>
+                </span>
+                <div ng-show="post.IsCollapsed" ng-bind-html="post.Teaser" style=" margin-left:40px ;" />
+                <div collapse="post.IsCollapsed" ng-bind-html="post.Description" style="margin-left:30px;" />
+                <div>
+                    <a ng-click="post.IsCollapsed = !post.IsCollapsed" ng-show="post.Teaser"> Toggle collapse</a>
+                </div>
+                <div style="margin-left:30px;">
+                    <span style="font-weight: bold" ng-repeat="tag in post.Tags">{{tag}} <a href="" ng-show="!follows(tag)" ng-click="follow(tag)">[+]</a> <a href="" ng-show="follows(tag)" ng-click="unfollow(tag)">[-]</a></span>
+                </div>
+                <div style="margin-left:30px;" ng-show="post.PublishedIn">
+                    Published in:
+                    <span style="font-weight: bold" ng-repeat="channel in post.PublishedIn">{{channel.Name}} </span>
+                </div>
+                <div style="margin-left:30px;">
+                    <span>{{post.Created | date:'dd/MM/yyyy HH:mm:ss'}} </span>
+                </div>
+                <div style="margin-left:30px;">
+                    <span style="cursor: pointer;" ng-click="loadComments(post)">{{post.CommentCount}} comments</span>
+                    <div ng-repeat="comment in post.Comments | orderBy:'Created'" style="background: #E8E8E8; margin-top: 1px;font-size: medium;">
+                        <div>
+                            <a href="#/profile/{{comment.UserId}}">{{comment.Author}}</a>
+                            <span style="font-size:medium; margin-left:2px;">
+                                {{comment.Body}}
+                            </span>
+                        </div>
+                        <div style="color: #888888; font-size: small">{{comment.CreatedHoursAgo}} hours ago <a>Reply</a></div>
+                    </div>
+                </div>
+                <div style="margin-left:30px;">
+
+                    <button class="btn btn-default btn-xs" ng-click="starPost(post)">
+                        <span ng-class="post.Starred ? 'glyphicon glyphicon-star' : 'glyphicon glyphicon-star-empty'"></span> Star
+                    </button>
+
+                    <button class="btn btn-default btn-xs" ng-click="likePost(post)">
+                        <span ng-class="post.Liked ? 'glyphicon glyphicon-heart' : 'glyphicon glyphicon-heart-empty'"></span> Like
+                    </button>
+
+                    <button class="btn btn-default btn-xs" ng-click="savePost(post)">
+                        <span ng-class="post.Saved ? 'glyphicon glyphicon-floppy-remove' : 'glyphicon glyphicon-floppy-save'"></span> History
+                    </button>
+
+                    <button class="btn btn-default btn-xs" ng-click="publishOnChannel(post)">
+                        <span class="glyphicon glyphicon-share"></span> Publish
+                    </button>
+
+                    <a href="#/viewpost/{{post.Id}}" class="btn btn-default btn-xs">
+                        <span class="glyphicon glyphicon-eye-open"></span> View
+                    </a>
+
+                    <a href="#/editpost/{{post.Id}}" class="btn btn-default btn-xs">
+                        <span class="glyphicon glyphicon-edit"></span> Edit
+                    </a>
+
+                    <button class="btn btn-default btn-xs" ng-show="channelOwned" ng-click="deletePost(post)">
+                        <span class="glyphicon glyphicon-remove"></span> Remove
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>

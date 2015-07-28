@@ -13,14 +13,14 @@ using Identity.Infrastructure.Repositories;
 
 namespace Identity.Rest.Api
 {
+    [UnitOfWorkCommit]
     public class UserController : ApiController
     {
-        private readonly IDbConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
         private readonly UserRepository userRepo;
 
-        public UserController()
+        public UserController(UserRepository userRepo)
         {
-            userRepo = new UserRepository(con);
+            this.userRepo = userRepo;
         }
 
         public User Get()
@@ -37,7 +37,8 @@ namespace Identity.Rest.Api
                 Owns = userRepo.Owns(user.Id).Select(c => Mapper.Map<Channel>(c)).ToList(),
                 SavedChannel = user.SavedChannel,
                 StarredChannel = user.StarredChannel,
-                LikedChannel = user.LikedChannel
+                LikedChannel = user.LikedChannel,
+                TagCloud = userRepo.GetTagCloud(user.Id).Select(Mapper.Map<Infrastructure.DTO.WeightedTag>).ToList()
             };
 
             return result;

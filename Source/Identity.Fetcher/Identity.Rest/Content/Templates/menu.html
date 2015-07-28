@@ -16,7 +16,7 @@
                         <div class="navbar-collapse collapse navbar-responsive-collapse">
                             <ul class="nav navbar-nav">
                                 <li ng-class="{active: state.current.name == 'home'}"><a href="/#/feed">News feed</a></li>
-                                <li class="dropdown">
+                                <!--<li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Channels <b class="caret"></b></a>
                                     <ul class="dropdown-menu">
                                         <li><a href="#/channels">All</a></li>
@@ -27,7 +27,7 @@
                                             <a href="/#/home/{{channel.Id}}">{{channel.Name}}</a>
                                         </li>
                                     </ul>
-                                </li>
+                                </li>-->
                                 <li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">+ Add content <b class="caret"></b></a>
                                     <ul class="dropdown-menu">
@@ -36,7 +36,7 @@
                                     </ul>
                                 </li>
 
-                                <li class="dropdown">
+                                <!--<li class="dropdown">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Pocket <b class="caret"></b></a>
                                     <ul class="dropdown-menu">
                                         <li><a href="/pocketauth">Link my account to pocket</a></li>
@@ -47,7 +47,7 @@
                                         <li><a href="#">Separated link</a></li>
                                         <li><a href="#">One more separated link</a></li>
                                     </ul>
-                                </li>
+                                </li>-->
                             </ul>
                             
                             <form class="navbar-form navbar-left" ng-submit="channelSearch()">

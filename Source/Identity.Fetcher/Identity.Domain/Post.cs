@@ -16,6 +16,16 @@ namespace Identity.Domain
 
         public DateTime Added { get; set; }
 
+        public bool Read { get; set; }
+
+        public bool Starred { get; set; }
+
+        public bool Liked { get; set; }
+
+        public bool Saved { get; set; }
+
+        public int Popularity { get; set; }
+
         //TODO: do we need this?
         //public int AuthorId { get; set; } 
     }
