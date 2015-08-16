@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -18,7 +17,7 @@ using log4net;
 using Microsoft.Ajax.Utilities;
 
 namespace Identity.Rest.Api
-{
+{    
     [UnitOfWorkCommit]
     public class ChannelController : ApiController
     {
@@ -28,16 +27,19 @@ namespace Identity.Rest.Api
         private readonly PostRepository postRepo;
         private readonly UserRepository userRepo;
         private readonly ILoadDtos dtoLoader;
+        private readonly StarredChannelRssWriter rssWriter;
 
         private Domain.User user;
 
-        public ChannelController(IDbTransaction transaction, ILoadDtos dtoLoader, ChannelRepository channelRepo, PostRepository postRepo, UserRepository userRepo)
+        public ChannelController(ILoadDtos dtoLoader, ChannelRepository channelRepo, PostRepository postRepo, 
+            UserRepository userRepo, StarredChannelRssWriter rssWriter)
         {
             user = userRepo.FindByName("jimmy");
             this.dtoLoader = dtoLoader;
             this.channelRepo = channelRepo;
             this.postRepo = postRepo;
             this.userRepo = userRepo;
+            this.rssWriter = rssWriter;
         }
 
         [HttpGet]
@@ -53,6 +55,7 @@ namespace Identity.Rest.Api
             return dtoLoader.LoadChannelList(user, channels);
         }
 
+        [Authorize]
         [HttpGet]
         public Channel GetById(long id)
         {
@@ -71,10 +74,16 @@ namespace Identity.Rest.Api
             userRepo.Unsubscribe(user.Id, id);
         }
 
+        [Authorize]
         [HttpPut]
         public void Posts(long id, long postId)
         {
             userRepo.Publish(user.Id, id, postId);
+
+            if (user.StarredChannel == id)
+            {
+                rssWriter.Write(user);
+            }
         }
 
         [HttpDelete]

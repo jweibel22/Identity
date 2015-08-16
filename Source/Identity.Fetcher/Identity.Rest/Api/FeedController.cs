@@ -14,6 +14,7 @@ using log4net;
 
 namespace Identity.Rest.Api
 {
+    [Authorize]
     [UnitOfWorkCommit]
     public class FeedController : ApiController
     {

@@ -102,7 +102,7 @@ join Subscription s on s.ChannelId = ci.ChannelId and s.UserId = @UserId
 left join Popularity pop on pop.PostId = Post.Id
 left join ReadHistory on ReadHistory.PostId = Post.Id and ReadHistory.UserId = @UserId where ReadHistory.Timestamp is null
 and Post.Created < @Timestamp) as TBL
-where TBL.RowNum BETWEEN (@FromIndex+1) AND (@FromIndex+10)";
+where TBL.RowNum BETWEEN (@FromIndex+1) AND (@FromIndex+30)";
 
             sql = String.Format(sql, orderBy);
 

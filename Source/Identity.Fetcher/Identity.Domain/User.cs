@@ -11,5 +11,7 @@
         public long StarredChannel { get; set; }
 
         public long LikedChannel { get; set; }
+
+        public string IdentityId { get; set; }
     }
 }

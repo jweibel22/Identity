@@ -1,0 +1,164 @@
+
+    <div class="bs-docs-section clearfix">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="bs-component">
+                    <div class="navbar navbar-default navbar-fixed-top">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                            <a class="navbar-brand" href="#/home">Inspire</a>
+                        </div>
+                        <div class="navbar-collapse collapse navbar-responsive-collapse">
+                            <ul class="nav navbar-nav">
+                                <li ng-class="{active: state.current.name == 'home'}"><a href="/#/feed">News feed</a></li>
+                                <!--<li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Channels <b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#/channels">All</a></li>
+                                        <li ng-repeat="channel in user.Owns">
+                                            <a href="/#/home/{{channel.Id}}">{{channel.Name}}</a>
+                                        </li>
+                                        <li ng-repeat="channel in user.FollowsChannels">
+                                            <a href="/#/home/{{channel.Id}}">{{channel.Name}}</a>
+                                        </li>
+                                    </ul>
+                                </li>-->
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">+ Add content <b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#/home" ng-click="addLink()">Add link</a></li>
+                                        <li><a href="#/home" ng-click="addPost()">Add post</a></li>
+                                    </ul>
+                                </li>
+
+                                <!--<li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Pocket <b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/pocketauth">Link my account to pocket</a></li>
+                                        <li><a href="/pocket">Sync with pocket</a></li>
+                                        <li><a href="#">Something else here</a></li>
+                                        <li class="divider"></li>
+                                        <li class="dropdown-header">Dropdown header</li>
+                                        <li><a href="#">Separated link</a></li>
+                                        <li><a href="#">One more separated link</a></li>
+                                    </ul>
+                                </li>-->
+                            </ul>
+                            
+                            <form class="navbar-form navbar-left" ng-submit="channelSearch()">
+                                <input type="text" class="form-control col-lg-8" placeholder="Channel search" ng-model="channelsearchFor">
+                            </form>
+
+                            <form class="navbar-form navbar-left" ng-submit="search()">
+                                <input type="text" class="form-control col-lg-8" placeholder="Post search" ng-model="searchFor">
+                            </form>
+
+                            <ul class="nav navbar-nav navbar-right">
+                                <li><a href="#/login">Login</a></li>
+                            </ul>
+
+                            <ul class="nav navbar-nav navbar-right">
+                                <li><a href="/logout">Logout</a></li>
+                            </ul>
+                            
+                            <ul class="nav navbar-nav navbar-right">
+                                <li><a href="#/profile/{{user.Id}}">Logged in as {{user.DisplayName}}</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script type="text/ng-template" id="addLinkModal.html">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="myModalLabel">Add a new link</h4>
+        </div>
+        <form ng-submit="submit()">
+            <div class="modal-body">
+                <div class="form-group">
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Link"
+                           value=""
+                           ng-model="windowdata.link"></input>
+                </div>
+                <div class="form-group">
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Tags"
+                           value=""
+                           ng-model="windowdata.linktags"></input>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default">Close</button>
+                <input type="submit" class="btn btn-primary" value="Submit" />
+            </div>
+        </form>
+    </script>
+
+<script type="text/ng-template" id="addPostModal.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Add a new post</h4>
+    </div>
+    <form ng-submit="submit()">
+        <div class="modal-body">
+            <div class="form-group">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Title"
+                       ng-model="windowdata.title"></input>
+            </div>
+            <div class="form-group">
+                <textarea style="height:100px"
+                          class="form-control"
+                          placeholder="Description"
+                          ng-model="windowdata.description"></textarea>
+            </div>
+            <div class="form-group">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Tags"
+                       value=""
+                       ng-model="windowdata.tags"></input>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-default">Close</button>
+            <input type="submit" class="btn btn-primary" value="Submit" />
+        </div>
+    </form>
+</script>
+
+
+<script type="text/ng-template" id="addNewChannel.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Add a new channel</h4>
+    </div>
+    <form ng-submit="submit()">
+        <div class="modal-body">
+            <div class="form-group">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Link"
+                       value=""
+                       ng-model="windowdata.name"></input>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-default">Close</button>
+            <input type="submit" class="btn btn-primary" value="Submit" />
+        </div>
+    </form>
+</script>

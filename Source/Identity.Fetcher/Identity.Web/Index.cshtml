@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Inspire</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.0/yeti/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/Content/jqcloud.min.css">
+
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.1/angular-sanitize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
+    <script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.10.0.js"></script>
+    <script src="/Scripts/bootstrap.min.js"></script>
+    <script src="/Scripts/jqcloud.js"></script>
+    <script src="/Scripts/angular-jqcloud.js"></script>
+    <script src="/Scripts/angular-local-storage.min.js"></script>
+    <script src="/Scripts/ng-infinite-scroll.min.js"></script>
+    <script src="/Scripts/angularApp.js"></script>
+    <script src="/Scripts/Controllers/login.js"></script>
+    <script src="/Scripts/Controllers/associate.js"></script>
+    <script src="/Scripts/Controllers/home.js"></script>
+    <script src="/Scripts/Controllers/posts.js"></script>
+    <script src="/Scripts/Controllers/navigator.js"></script>
+    <script src="/Scripts/Controllers/feed.js"></script>
+    <script src="/Scripts/Controllers/channels.js"></script>
+    <script src="/Scripts/Controllers/searchresults.js"></script>
+    <script src="/Scripts/Controllers/channelSearchResults.js"></script>
+    <script src="/Scripts/Controllers/profile.js"></script>
+    <script src="/Scripts/Controllers/channel.js"></script>
+    <script src="/Scripts/Controllers/rssFeeder.js"></script>
+    <script src="/Scripts/Services/authorization.js"></script>
+    <script src="/Scripts/Services/authInterceptorService.js"></script>
+    <script src="/Scripts/Services/tags.js"></script>
+    <script src="/Scripts/Services/posts.js"></script>
+    <script src="/Scripts/Services/users.js"></script>
+    <script src="/Scripts/Services/feeds.js"></script>
+    <script src="/Scripts/Services/channels.js"></script>
+    <script src="/Scripts/Services/rssFeeders.js"></script>
+    <script src="/Scripts/Directives/stream.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#myNav").affix({
+                offset: {
+                    top: 195
+                }
+            });
+            $("#myNav").on('affixed.bs.affix', function () {
+                alert("The left navigation menu has been affixed. Now it doesn't scroll with the page.");
+            });
+        });
+    </script>
+
+    <style>
+        .glyphicon-thumbs-up {
+            cursor: pointer;
+        }
+
+        a[ng-click] {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="">
+        <div ng-app="inspire">
+
+            <div ui-view="header"></div>
+
+            <div class="row" style="margin-top:50px">
+                <div class="col-md-3">
+                    <div ui-view="channels" class="nav nav-stacked affix"></div>
+                </div>
+                <div class="col-md-6">
+                    <div ui-view="container"></div>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <footer></footer>
+    </div>
+</body>
+</html>
+
+
+

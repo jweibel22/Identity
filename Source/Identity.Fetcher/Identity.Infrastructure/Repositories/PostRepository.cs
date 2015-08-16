@@ -80,7 +80,7 @@ left join ChannelItem starred on starred.ChannelId = u.StarredChannel and starre
 left join ReadHistory on ReadHistory.PostId = Post.Id and ReadHistory.UserId = @UserId 
 left join Popularity pop on pop.PostId = Post.Id
 where ci.ChannelId=@ChannelId and Post.Created < @Timestamp {0}) as TBL
-where TBL.RowNum BETWEEN (@FromIndex+1) AND (@FromIndex+10)";
+where TBL.RowNum BETWEEN (@FromIndex+1) AND (@FromIndex+30)";
 
             sql = String.Format(sql, onlyUnread ? " and ReadHistory.Timestamp IS NULL" : "", orderBy);
 
