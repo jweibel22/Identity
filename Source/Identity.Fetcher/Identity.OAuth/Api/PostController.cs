@@ -26,7 +26,9 @@ namespace Identity.Rest.Api
             this.postRepo = postRepo;
             this.userRepo = userRepo;
             this.commentRepo = commentRepo;
-            user = userRepo.FindByName("jimmy");
+
+            var identity = User.Identity as ClaimsIdentity;
+            user = userRepo.FindByName(identity.Name);
         }
 
         public IEnumerable<Post> Get(string tag)
@@ -42,8 +44,7 @@ namespace Identity.Rest.Api
 
         [HttpGet]
         public Post Get(long id)
-        {
-            var identity = User.Identity as ClaimsIdentity;
+        {            
             return dtoLoader.LoadPost(user, postRepo.GetById(id, user.Id));
         }
 

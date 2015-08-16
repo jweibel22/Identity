@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Security.Claims;
 using System.Web.Http;
 using AutoMapper;
 using CsQuery;
@@ -15,9 +16,9 @@ using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
 using log4net;
 
-
 namespace Identity.Rest.Api
-{    
+{
+    [Authorize]
     [UnitOfWorkCommit]
     public class ChannelController : ApiController
     {
@@ -34,7 +35,9 @@ namespace Identity.Rest.Api
         public ChannelController(ILoadDtos dtoLoader, ChannelRepository channelRepo, PostRepository postRepo, 
             UserRepository userRepo, StarredChannelRssWriter rssWriter)
         {
-            user = userRepo.FindByName("jimmy");
+            var identity = User.Identity as ClaimsIdentity;
+            user = userRepo.FindByName(identity.Name);
+
             this.dtoLoader = dtoLoader;
             this.channelRepo = channelRepo;
             this.postRepo = postRepo;
@@ -55,7 +58,6 @@ namespace Identity.Rest.Api
             return dtoLoader.LoadChannelList(user, channels);
         }
 
-        [Authorize]
         [HttpGet]
         public Channel GetById(long id)
         {
@@ -73,8 +75,7 @@ namespace Identity.Rest.Api
         {
             userRepo.Unsubscribe(user.Id, id);
         }
-
-        [Authorize]
+        
         [HttpPut]
         public void Posts(long id, long postId)
         {

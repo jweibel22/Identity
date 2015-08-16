@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Web.Http;
 using AutoMapper;
 using Identity.Infrastructure.DTO;
@@ -25,7 +26,8 @@ namespace Identity.Rest.Api
 
         public User Get()
         {
-            var user = userRepo.FindByName("jimmy");
+            var identity = User.Identity as ClaimsIdentity;
+            var user = userRepo.FindByName(identity.Name);
 
             var result = new User
             {

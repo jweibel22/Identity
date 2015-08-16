@@ -75,7 +75,7 @@ namespace Identity.OAuth
                 .SingleOrDefault();
         }
 
-        public void Create(string userId, string username)
+        public User Create(string userId, string username)
         {
             con.Execute("insert [User] values (@Username, @SavedChannel, @StarredChannel,@LikedChannel, @IdentityId)",
                 new
@@ -86,6 +86,10 @@ namespace Identity.OAuth
                     LikedChannel = 0,
                     IdentityId = userId
                 });
+
+            return
+                con.Query<User>("select * from [User] where IdentityId=@IdentityId", new {IdentityId = userId})
+                    .SingleOrDefault();
         }
 
         public void AddLogin(string userId, string loginProvider, string providerKey)

@@ -134,7 +134,7 @@ namespace Identity.OAuth.Controllers
 
             try
             {
-                _repo.Create(Guid.NewGuid().ToString(), model.UserName);
+                user = _repo.Create(Guid.NewGuid().ToString(), model.UserName);
             }
             catch (Exception ex)
             {

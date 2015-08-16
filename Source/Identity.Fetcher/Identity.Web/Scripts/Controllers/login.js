@@ -47,8 +47,7 @@ angular.module('inspire').controller('LoginController', ['$scope', '$location', 
                     externalAccessToken: fragment.external_access_token
                 };
 
-                $location.path('/associate');
-
+                $location.replace().path('/associate');
             }
             else {
                 //Obtain access token and redirect to orders

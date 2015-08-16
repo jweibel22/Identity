@@ -1,6 +1,6 @@
 angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-jqcloud', 'infinite-scroll', 'LocalStorageModule'])
     .constant('ngSettings', {
-        baseUrl: "http://localhost:57378/",
+        baseUrl: "http://localhost:57294/",
         oAuthBaseUrl: "http://localhost:57294/",
         clientId: 'ngAuthApp'
     })
@@ -32,7 +32,7 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                         }
                     }
                 })
-                .state('root.login', {
+                .state('login', {
                     url: '/login',
                     views: {
                         'container@': {
@@ -44,7 +44,7 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                         }
                     }
                 })
-                .state('root.associate', {
+                .state('associate', {
                     url: '/associate',
                     views: {
                         'container@': {

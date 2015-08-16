@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Security.Claims;
 using System.Web.Http;
 using Identity.Infrastructure.DTO;
 using Identity.Infrastructure.Repositories;
@@ -28,7 +29,9 @@ namespace Identity.Rest.Api
         {
             this.dtoLoader = dtoLoader;
             this.userRepo = userRepo;
-            user = userRepo.FindByName("jimmy");
+
+            var identity = User.Identity as ClaimsIdentity;
+            user = userRepo.FindByName(identity.Name);
         }
 
         [HttpGet]

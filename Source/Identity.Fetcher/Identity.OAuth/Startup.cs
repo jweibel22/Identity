@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Http;
 using Identity.OAuth.Providers;
 using Identity.Rest;
+using log4net.Config;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Facebook;
 using Microsoft.Owin.Security.Google;
@@ -36,6 +37,10 @@ namespace Identity.OAuth
             app.UseNinjectMiddleware(CreateKernel);
             app.UseNinjectWebApi(config);
             app.UseWebApi(config);
+
+            AutoMapperConfiguration.Configure();
+
+            XmlConfigurator.Configure();
         }
 
         private static IKernel CreateKernel()
