@@ -4,10 +4,15 @@ using System.Linq;
 using System.Web;
 using System.Web.Http;
 using Identity.OAuth.Providers;
+using Identity.Rest;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Facebook;
 using Microsoft.Owin.Security.Google;
 using Microsoft.Owin.Security.OAuth;
+using Ninject;
+using Ninject.Web.Common;
+using Ninject.Web.Common.OwinHost;
+using Ninject.Web.WebApi.OwinHost;
 using Owin;
 
 [assembly: OwinStartup(typeof(Identity.OAuth.Startup))]
@@ -28,8 +33,30 @@ namespace Identity.OAuth
 
             WebApiConfig.Register(config);
             app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
+            app.UseNinjectMiddleware(CreateKernel);
+            app.UseNinjectWebApi(config);
             app.UseWebApi(config);
         }
+
+        private static IKernel CreateKernel()
+        {
+            var kernel = new StandardKernel();
+            try
+            {
+                kernel.Bind<Func<IKernel>>().ToMethod(ctx => () => new Bootstrapper().Kernel);
+                kernel.Bind<IHttpModule>().To<HttpApplicationInitializationHttpModule>();
+
+                kernel.Load<WebModule>();
+
+                return kernel;
+            }
+            catch
+            {
+                kernel.Dispose();
+                throw;
+            }
+        }
+
 
         public void ConfigureOAuth(IAppBuilder app)
         {
