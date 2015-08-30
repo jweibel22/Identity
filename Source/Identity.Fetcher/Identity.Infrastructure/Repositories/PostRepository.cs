@@ -59,26 +59,37 @@ namespace Identity.Infrastructure.Repositories
         {
             if (orderBy == "Added")
             {
-                orderBy = "ci.Created";
+                orderBy = "ci.Created desc";
+            }
+            else if (orderBy == "Popularity")
+            {
+                orderBy = "userpop.Popularity desc, pop.Popularity desc";
+            }
+            else
+            {
+                throw new Exception("Unexpected orderby clause: " + orderBy);
             }
 
             var sql = @"select * from 
-(select Post.*,
+(select Post.*, poster.Id as PosterId, poster.Username as PosterUserName,
 CASE WHEN liked.Created IS NULL THEN 'false' ELSE 'true' END as Liked, 
 CASE WHEN saved.Created IS NULL THEN 'false' ELSE 'true' END as Saved, 
 CASE WHEN starred.Created IS NULL THEN 'false' ELSE 'true' END as Starred, 
 CASE WHEN ReadHistory.Timestamp IS NULL THEN 'false' ELSE 'true' END as [Read],
 dateadd(mi, datediff(mi, 0, ci.Created), 0) as Added, 
 CASE WHEN pop.Popularity IS NULL THEN 0 ELSE pop.Popularity END as Popularity,
-ROW_NUMBER() OVER (ORDER BY {1} desc) AS RowNum
+CASE WHEN userpop.Popularity IS NULL THEN 0 ELSE userpop.Popularity END as UserSpecificPopularity,
+ROW_NUMBER() OVER (ORDER BY {1}) AS RowNum
 from Post 
 join ChannelItem ci on ci.PostId = Post.Id 
+join [User] poster on poster.Id = ci.UserId 
 join [User] u on u.Id = @UserId 
 left join ChannelItem liked on liked.ChannelId = u.LikedChannel and liked.PostId = Post.Id
 left join ChannelItem saved on saved.ChannelId = u.SavedChannel and saved.PostId = Post.Id
 left join ChannelItem starred on starred.ChannelId = u.StarredChannel and starred.PostId = Post.Id
 left join ReadHistory on ReadHistory.PostId = Post.Id and ReadHistory.UserId = @UserId 
 left join Popularity pop on pop.PostId = Post.Id
+left join UserSpecificPopularity userpop on userpop.PostId = Post.Id
 where ci.ChannelId=@ChannelId and Post.Created < @Timestamp {0}) as TBL
 where TBL.RowNum BETWEEN (@FromIndex+1) AND (@FromIndex+30)";
 
@@ -95,6 +106,7 @@ CASE WHEN liked.Created IS NULL THEN 'false' ELSE 'true' END as Liked,
 CASE WHEN saved.Created IS NULL THEN 'false' ELSE 'true' END as Saved, 
 CASE WHEN starred.Created IS NULL THEN 'false' ELSE 'true' END as Starred, 
 CASE WHEN ReadHistory.Timestamp IS NULL THEN 'false' ELSE 'true' END as [Read],
+CASE WHEN userpop.Popularity IS NULL THEN 0 ELSE userpop.Popularity END as UserSpecificPopularity,
 CASE WHEN pop.Popularity IS NULL THEN 0 ELSE pop.Popularity END as Popularity
 from Post 
 join [User] u on u.Id = @UserId 
@@ -103,6 +115,7 @@ left join ChannelItem saved on saved.ChannelId = u.SavedChannel and saved.PostId
 left join ChannelItem starred on starred.ChannelId = u.StarredChannel and starred.PostId = Post.Id
 left join ReadHistory on ReadHistory.PostId = Post.Id and ReadHistory.UserId = @UserId 
 left join Popularity pop on pop.PostId = Post.Id
+left join UserSpecificPopularity userpop on userpop.PostId = Post.Id
 where Post.Id = @Id
 ";
 

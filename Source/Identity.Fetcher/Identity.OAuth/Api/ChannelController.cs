@@ -75,16 +75,22 @@ namespace Identity.Rest.Api
         {
             userRepo.Unsubscribe(user.Id, id);
         }
+
+        [HttpPut]
+        public void Leave(long id)
+        {
+            userRepo.Leave(user.Id, id);
+        }
         
         [HttpPut]
         public void Posts(long id, long postId)
         {
             userRepo.Publish(user.Id, id, postId);
 
-            if (user.StarredChannel == id)
-            {
-                rssWriter.Write(user);
-            }
+            //if (user.StarredChannel == id)
+            //{
+            //    rssWriter.Write(user);
+            //}
         }
 
         [HttpDelete]
@@ -98,7 +104,7 @@ namespace Identity.Rest.Api
         {
             var x = new Domain.Channel(channel.Name);
             channelRepo.AddChannel(x);
-            userRepo.Owns(user.Id, x.Id);
+            userRepo.Owns(user.Id, x.Id, false);
 
             channel.Id = x.Id;
             channel.IsPrivate = true;
@@ -116,7 +122,7 @@ namespace Identity.Rest.Api
         [HttpDelete]
         public void Delete(long id)
         {
-            channelRepo.Delete(id);
+            channelRepo.Delete(user.Id, id);
         }
 
         [HttpPost]
@@ -125,7 +131,7 @@ namespace Identity.Rest.Api
             var p = new Domain.Post
             {
                 Created = post.Created,
-                Description = post.Description,
+                Description = post.Description ?? "",
                 Title = post.Title,
                 Uri = post.Uri
             };
@@ -136,7 +142,7 @@ namespace Identity.Rest.Api
             }
 
             postRepo.AddPost(p);
-            userRepo.Publish(user.Id, user.SavedChannel, p.Id);
+            userRepo.Publish(user.Id, id, p.Id);
             postRepo.TagPost(p.Id, post.Tags);
 
             return post;

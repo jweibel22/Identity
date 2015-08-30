@@ -7,7 +7,9 @@ using System.Net.Http;
 using System.Reflection;
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
+using Identity.OAuth;
 using log4net;
 using log4net.Repository.Hierarchy;
 
@@ -18,14 +20,22 @@ namespace Identity.Rest
     {
         private readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+        public override void OnActionExecuting(HttpActionContext actionContext)
+        {
+            //log.Debug(actionContext.ActionDescriptor.ActionName + " executing");            
+        }
+
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
         {                        
             var uoW = actionExecutedContext.Request.GetDependencyScope().GetService(typeof(IDbTransaction)) as IDbTransaction;
+            var con = actionExecutedContext.Request.GetDependencyScope().GetService(typeof(IDbConnection)) as IDbConnection;
 
             //log.Info(String.Format("Action: {0}.{1}", actionExecutedContext.ActionContext.ActionDescriptor.ControllerDescriptor.ControllerName, 
             //    actionExecutedContext.ActionContext.ActionDescriptor.ActionName));
 
-            //if (UoW.Connection != null)
+            //log.Debug(actionExecutedContext.ActionContext.ActionDescriptor.ActionName + " executed");            
+
+            try
             {
                 if (actionExecutedContext.Exception == null)
                 {
@@ -35,6 +45,14 @@ namespace Identity.Rest
                 {
                     uoW.Rollback();
                 }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Failed to commit", ex);
+            }
+            finally
+            {
+                con.Dispose();                
             }
         }
     }

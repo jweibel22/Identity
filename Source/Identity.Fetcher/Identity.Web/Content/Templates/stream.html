@@ -1,33 +1,40 @@
 ﻿
-<div style="margin-top:100px">
-    <span>Sort by</span> 
-    <div class="btn-group">
-        <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{selectedSortType}}  <span class="caret"></span></button>
-        <ul class="dropdown-menu">
-            <li ng-repeat="item in sortTypes">
-                <a ng-click="changeSortBy(item)">
-                    {{item}}
-                </a>
-            </li>
-        </ul>
-    </div>
-</div>
+<div style="margin-top:160px">
+    <table>
+        <tr>
+            <td>
+                <span>Sort by</span>
+                <div class="btn-group">
+                    <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{selectedSortType}}  <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li ng-repeat="item in sortTypes">
+                            <a ng-click="changeSortBy(item)">
+                                {{item}}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
 
-<div>
-    <span>List by</span>
-    <div class="btn-group">
-        <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{selectedListType}}  <span class="caret"></span></button>
-        <ul class="dropdown-menu">
-            <li ng-repeat="item in listTypes">
-                <a ng-click="changeListBy(item)">
-                    {{item}}
-                </a>
-            </li>
-        </ul>
-    </div>
-</div>
+            </td>
+            <td>
+                <span>List by</span>
+                <div class="btn-group">
+                    <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{selectedListType}}  <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li ng-repeat="item in listTypes">
+                            <a ng-click="changeListBy(item)">
+                                {{item}}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
 
-<div style="margin-top:10px" scroll infinite-scroll="loadMorePosts()" infinite-scroll-distance="2">
+            </td>
+        </tr>
+    </table>
+
+
+    <div style="margin-top:10px" scroll infinite-scroll="loadMorePosts()" infinite-scroll-distance="2">
         <div ng-repeat="post in posts " style="margin-top: 20px" class="readable">
             <div ng-if="postVisible(post)">
                 <!--| orderBy:selectedSortType:reverse-->
@@ -42,22 +49,22 @@
 
                 <div ng-show="post.IsCollapsed && selectedListType == 'Full'" ng-bind-html="post.Teaser" style=" margin-left:40px ;" />
                 <div collapse="post.IsCollapsed" ng-bind-html="post.Description" style="margin-left:30px;" />
-                <div>
-                    <a ng-click="post.IsCollapsed = !post.IsCollapsed"> Toggle collapse</a>
+                <div ng-show="post.Expandable">
+                    <a ng-click="post.IsCollapsed = !post.IsCollapsed"> Expand/Collapse</a>
                 </div>
                 <div ng-show="!post.IsCollapsed || selectedListType == 'Full'">
                     <div style="margin-left:30px;">
                         <span style="font-weight: bold" ng-repeat="tag in post.Tags">{{tag}} <a href="" ng-show="!follows(tag)" ng-click="follow(tag)">[+]</a> <a href="" ng-show="follows(tag)" ng-click="unfollow(tag)">[-]</a></span>
                     </div>
                     <div style="margin-left:30px;" ng-show="post.PublishedIn">
-                        Published in:
-                        <span style="font-weight: bold" ng-repeat="channel in post.PublishedIn">{{channel.Name}} </span>
+                        Published in
+                        <a style="font-weight: bold" ng-repeat="channel in post.PublishedIn" href="#/home/{{channel.Id}}"> {{channel.Name}}</a><span> at {{post.Created | date:'dd/MM/yyyy HH:mm:ss'}}</span>
+                    </div>
+                    <div style="margin-left:30px;">                        
+                        <span ng-show="post.PosterUsername">by <a href="#/profile/{{post.PosterId}}">{{post.PosterUsername}}</a> at {{post.Created | date:'dd/MM/yyyy HH:mm:ss'}} </span>
                     </div>
                     <div style="margin-left:30px;">
-                        <span>{{post.Created | date:'dd/MM/yyyy HH:mm:ss'}} </span>
-                    </div>
-                    <div style="margin-left:30px;">
-                        <span style="cursor: pointer;" ng-click="loadComments(post)">{{post.CommentCount}} comments</span>
+                        <span style="cursor: pointer;" ng-show="post.CommentCount > 0" ng-click="loadComments(post)">{{post.CommentCount}} comments</span>
                         <div ng-repeat="comment in post.Comments | orderBy:'Created'" style="background: #E8E8E8; margin-top: 1px;font-size: medium;">
                             <div>
                                 <a href="#/profile/{{comment.UserId}}">{{comment.Author}}</a>
@@ -102,3 +109,4 @@
             </div>
         </div>
     </div>
+</div>

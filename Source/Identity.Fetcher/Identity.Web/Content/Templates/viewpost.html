@@ -10,7 +10,8 @@
 </div>
 
 <div style="margin-bottom:20px">ID: {{post.Id}}</div>
-<div style="margin-bottom:20px">Popularity: {{post.Popularity}}</div>
+<div style="margin-bottom:20px">Post relevance to you: {{post.UserSpecificPopularity}}</div>
+<div style="margin-bottom:20px">Post popularity: {{post.Popularity}}</div>
 
 <div ng-bind-html="post.Description" style="margin-bottom:20px"/>
 

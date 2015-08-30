@@ -88,8 +88,16 @@ namespace Identity.Infrastructure.Repositories
                     new {ChannelId = channelId, PostId = postId}, con).Single() > 0;
         }
 
-        public void Delete(long channelId)
+        public void Delete(long userId, long channelId)
         {
+            var cnt = con.Connection.Query<int>("select count(*) from ChannelOwner where UserId=@UserId and ChannelId=@ChannelId and IsLocked=false",
+                new{ UserId = userId, ChannelId = channelId }).Single();
+
+            if (cnt == 0)
+            {
+                throw new Exception("Access denied, you're not allowed to delete this channel");
+            }
+            
             con.Connection.Execute("delete from Subscription where ChannelId=@Id", new { Id = channelId }, con);
             con.Connection.Execute("delete from ChannelOwner where ChannelId=@Id", new { Id = channelId }, con);
             con.Connection.Execute("delete from ChannelItem where ChannelId=@Id", new { Id = channelId }, con);

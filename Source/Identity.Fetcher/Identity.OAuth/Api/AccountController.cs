@@ -1,33 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Identity.Domain;
+using Identity.Infrastructure.Repositories;
 using Identity.OAuth.Models;
+using Identity.Rest;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json.Linq;
 
-namespace Identity.OAuth.Controllers
+namespace Identity.OAuth.Api
 {
     [RoutePrefix("api/Account")]
+    [UnitOfWorkCommit]
     public class AccountController : ApiController
     {
-        private AuthRepository _repo = null;
+        private readonly ChannelRepository channelRepository;
+        private readonly UserRepository userRepository;
 
         private IAuthenticationManager Authentication
         {
             get { return Request.GetOwinContext().Authentication; }
         }
 
-        public AccountController()
+        public AccountController(ChannelRepository channelRepository, UserRepository userRepository)
         {
-            _repo = new AuthRepository();
+            this.channelRepository = channelRepository;
+            this.userRepository = userRepository;
         }
 
         // POST api/Account/Register
@@ -42,7 +45,7 @@ namespace Identity.OAuth.Controllers
 
             try
             {
-                _repo.RegisterUser(userModel);
+                CreateNewUser(userModel.UserName);
             }
             catch (Exception ex)
             {
@@ -92,7 +95,7 @@ namespace Identity.OAuth.Controllers
                 return new ChallengeResult(provider, this);
             }
 
-            var user = _repo.Find(externalLogin.LoginProvider, externalLogin.ProviderKey);
+            var user = userRepository.Find(externalLogin.LoginProvider, externalLogin.ProviderKey);
 
             bool hasRegistered = user != null;
 
@@ -105,6 +108,57 @@ namespace Identity.OAuth.Controllers
 
             return Redirect(redirectUri);
 
+        }
+
+        private User CreateNewUser(string username)
+        {
+            var starredChannel = new Channel
+            {
+                Created = DateTimeOffset.Now,
+                Name = String.Format("{0}'s starred", username)
+            };
+
+            var savedChannel = new Channel
+            {
+                Created = DateTimeOffset.Now,
+                Name = String.Format("{0}'s saved", username)
+            };
+
+            var likedChannel = new Channel
+            {
+                Created = DateTimeOffset.Now,
+                Name = String.Format("{0}'s liked", username)
+            };
+
+            var inbox = new Channel
+            {
+                Created = DateTimeOffset.Now,
+                Name = String.Format("{0}'s inbox", username)
+            };
+                
+            channelRepository.AddChannel(starredChannel);
+            channelRepository.AddChannel(savedChannel);
+            channelRepository.AddChannel(likedChannel);
+            channelRepository.AddChannel(inbox);
+
+            var user = new User
+            {
+                IdentityId = Guid.NewGuid().ToString(),
+                Username = username,
+                StarredChannel = starredChannel.Id,
+                LikedChannel = likedChannel.Id,
+                SavedChannel = savedChannel.Id,
+                Inbox = inbox.Id
+            };
+
+            userRepository.AddUser(user);
+
+            userRepository.Owns(user.Id, starredChannel.Id, true);
+            userRepository.Owns(user.Id, savedChannel.Id, true);
+            userRepository.Owns(user.Id, likedChannel.Id, true);
+            userRepository.Owns(user.Id, inbox.Id, true);
+
+            return user;
         }
 
         // POST api/Account/RegisterExternal
@@ -123,7 +177,7 @@ namespace Identity.OAuth.Controllers
                 return BadRequest("Invalid Provider or External Access Token");
             }
 
-            var user = _repo.Find(model.Provider, verifiedAccessToken.user_id);
+            var user = userRepository.Find(model.Provider, verifiedAccessToken.user_id);
 
             bool hasRegistered = user != null;
 
@@ -134,7 +188,7 @@ namespace Identity.OAuth.Controllers
 
             try
             {
-                user = _repo.Create(Guid.NewGuid().ToString(), model.UserName);
+                user = CreateNewUser(model.UserName);                
             }
             catch (Exception ex)
             {
@@ -144,7 +198,7 @@ namespace Identity.OAuth.Controllers
 
             try
             {
-                _repo.AddLogin(user.IdentityId, model.Provider, verifiedAccessToken.user_id);
+                userRepository.AddLogin(user, model.Provider, verifiedAccessToken.user_id);
             }
             catch (Exception ex)
             {
@@ -175,7 +229,7 @@ namespace Identity.OAuth.Controllers
                 return BadRequest("Invalid Provider or External Access Token");
             }
 
-            var user = _repo.Find(provider, verifiedAccessToken.user_id);
+            var user = userRepository.Find(provider, verifiedAccessToken.user_id);
 
             bool hasRegistered = user != null;
 
@@ -189,16 +243,6 @@ namespace Identity.OAuth.Controllers
 
             return Ok(accessTokenResponse);
 
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _repo.Dispose();
-            }
-
-            base.Dispose(disposing);
         }
 
         #region Helpers
@@ -229,7 +273,7 @@ namespace Identity.OAuth.Controllers
                 return "client_Id is required";
             }
 
-            var client = _repo.FindClient(clientId);
+            var client = userRepository.FindClient(clientId);
 
             if (client == null)
             {

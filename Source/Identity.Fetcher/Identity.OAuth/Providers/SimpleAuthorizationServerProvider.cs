@@ -5,17 +5,26 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using Identity.Domain;
+using Identity.Infrastructure;
+using Identity.Infrastructure.Repositories;
 using Identity.OAuth.Models;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.OAuth;
+using Ninject;
 
 namespace Identity.OAuth.Providers
 {
     public class SimpleAuthorizationServerProvider : OAuthAuthorizationServerProvider
     {
+        private readonly IKernel kernel;
+
+        public SimpleAuthorizationServerProvider(IKernel kernel)
+        {
+            this.kernel = kernel;
+        }
+
         public override Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
         {
-
             string clientId = string.Empty;
             string clientSecret = string.Empty;
             Client client = null;
@@ -34,10 +43,7 @@ namespace Identity.OAuth.Providers
                 return Task.FromResult<object>(null);
             }
 
-            using (AuthRepository _repo = new AuthRepository())
-            {
-                client = _repo.FindClient(context.ClientId);
-            }
+            client = kernel.Get<UserRepository>().FindClient(context.ClientId);
 
             if (client == null)
             {
@@ -45,7 +51,7 @@ namespace Identity.OAuth.Providers
                 return Task.FromResult<object>(null);
             }
 
-            if (client.ApplicationType == Models.ApplicationTypes.NativeConfidential)
+            if (client.ApplicationType == ApplicationTypes.NativeConfidential)
             {
                 if (string.IsNullOrWhiteSpace(clientSecret))
                 {
@@ -77,22 +83,18 @@ namespace Identity.OAuth.Providers
 
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
-
             var allowedOrigin = context.OwinContext.Get<string>("as:clientAllowedOrigin");
 
             if (allowedOrigin == null) allowedOrigin = "*";
 
             context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { allowedOrigin });
 
-            using (AuthRepository _repo = new AuthRepository())
-            {
-                User user = _repo.FindUser(context.UserName, context.Password);
+            User user = kernel.Get<UserRepository>().FindUser(context.UserName, context.Password);
 
-                if (user == null)
-                {
-                    context.SetError("invalid_grant", "The user name or password is incorrect.");
-                    return;
-                }
+            if (user == null)
+            {
+                context.SetError("invalid_grant", "The user name or password is incorrect.");
+                return;
             }
 
             var identity = new ClaimsIdentity(context.Options.AuthenticationType);
@@ -112,7 +114,6 @@ namespace Identity.OAuth.Providers
 
             var ticket = new AuthenticationTicket(identity, props);
             context.Validated(ticket);
-
         }
 
         public override Task GrantRefreshToken(OAuthGrantRefreshTokenContext context)

@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Client.cs" />
     <Compile Include="DTO\Channel.cs" />
     <Compile Include="DTO\Comment.cs" />
     <Compile Include="DTO\Post.cs" />

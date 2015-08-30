@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Security.Claims;
 using System.Web.Http;
 using AutoMapper;
 using Identity.Domain;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
+using log4net;
 using Post = Identity.Infrastructure.DTO.Post;
 
 namespace Identity.Rest.Api
@@ -14,6 +16,8 @@ namespace Identity.Rest.Api
     [UnitOfWorkCommit]
     public class PostController : ApiController
     {
+        private readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         private readonly CommentRepostitory commentRepo;
         private readonly PostRepository postRepo;
         private readonly UserRepository userRepo;
@@ -79,6 +83,7 @@ namespace Identity.Rest.Api
         [HttpPost]
         public void Read(long id, long userId)
         {
+         log.Info("read");   
             userRepo.Read(userId, id);
         }
     }

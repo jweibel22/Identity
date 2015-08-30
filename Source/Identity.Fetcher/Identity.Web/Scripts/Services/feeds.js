@@ -1,4 +1,4 @@
-angular.module('inspire').factory('feedService', ['$http', 'ngSettings', function ($http, ngSettings) {
+angular.module('inspire').factory('feedService', ['$http', 'ngSettings', 'toasty', function ($http, ngSettings, toasty) {
 
     var o = {
         posts: [],
@@ -20,6 +20,11 @@ angular.module('inspire').factory('feedService', ['$http', 'ngSettings', functio
     o.loadMorePosts = function (orderBy) {
         return $http.get(ngSettings.baseUrl + '/Api/Feed?fromIndex=' + o.posts.length + "&timestamp=" + o.formattedTimestamp() + "&orderBy=" + orderBy).success(function (data) {
             angular.copy(o.posts.concat(data), o.posts);
+
+            toasty.success({
+                title: 'Posts loaded!',
+                msg: 'posts has been loaded!'
+            });
         });
     };
 

@@ -1,16 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Reflection;
 using System.Web;
 using System.Web.Http;
 using Identity.OAuth.Providers;
 using Identity.Rest;
+using log4net;
 using log4net.Config;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Facebook;
 using Microsoft.Owin.Security.Google;
 using Microsoft.Owin.Security.OAuth;
+using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 using Ninject;
+using Ninject.Activation;
 using Ninject.Web.Common;
 using Ninject.Web.Common.OwinHost;
 using Ninject.Web.WebApi.OwinHost;
@@ -22,21 +28,34 @@ namespace Identity.OAuth
 {
     public class Startup
     {
+        private readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         public static OAuthBearerAuthenticationOptions OAuthBearerOptions { get; private set; }
         public static GoogleOAuth2AuthenticationOptions googleAuthOptions { get; private set; }
         public static FacebookAuthenticationOptions facebookAuthOptions { get; private set; }
+
+        private static IKernel kernel = new StandardKernel();
 
         public void Configuration(IAppBuilder app)
         {
             var config = new HttpConfiguration();
 
-            ConfigureOAuth(app);
+            app.Use(async (context, next) =>
+            {
+                RequestScope.Scope.Value = new ScopeObject();
+                //log.Debug("request: " + RequestScope.Scope + ". " + context.Request.Uri.AbsoluteUri);
+                await next();  
+            });
+
+            ConfigureOAuth(app);          
 
             WebApiConfig.Register(config);
             app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
             app.UseNinjectMiddleware(CreateKernel);
             app.UseNinjectWebApi(config);
             app.UseWebApi(config);
+
+
 
             AutoMapperConfiguration.Configure();
 
@@ -45,7 +64,6 @@ namespace Identity.OAuth
 
         private static IKernel CreateKernel()
         {
-            var kernel = new StandardKernel();
             try
             {
                 kernel.Bind<Func<IKernel>>().ToMethod(ctx => () => new Bootstrapper().Kernel);
@@ -74,7 +92,7 @@ namespace Identity.OAuth
                 AllowInsecureHttp = true,
                 TokenEndpointPath = new PathString("/token"),
                 AccessTokenExpireTimeSpan = TimeSpan.FromMinutes(30),
-                Provider = new SimpleAuthorizationServerProvider(),
+                Provider = new SimpleAuthorizationServerProvider(kernel),
                 //RefreshTokenProvider = new SimpleRefreshTokenProvider()
             };
 

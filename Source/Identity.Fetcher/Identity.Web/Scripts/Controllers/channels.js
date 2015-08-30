@@ -1,8 +1,8 @@
 angular.module('inspire')
-    .controller('ChannelsController', [ '$scope', '$http', '$stateParams', 'channelService',
-        function($scope, $http, $stateParams, channelService){
+    .controller('ChannelsController', ['$scope', '$http', '$stateParams', 'userPromise',
+        function ($scope, $http, $stateParams, userPromise) {
 
-            $scope.channels = channelService.channels;
+            $scope.user = userPromise.data;
 
 
         }]);

@@ -12,7 +12,8 @@ namespace Identity.Rest
 
             AutoMapper.Mapper.CreateMap<Post, Infrastructure.DTO.Post>()
                 .ForMember(x => x.Type, _ => _.UseValue("link"))
-                .ForMember(x => x.IsCollapsed, _ => _.UseValue(true))
+                .ForMember(x => x.IsCollapsed, _ => _.ResolveUsing(x => x.Description.Length >= 500))
+                .ForMember(x => x.Expandable, _ => _.ResolveUsing(x => x.Description.Length >= 500))
                 .ForMember(x => x.Teaser, _ => _.ResolveUsing(MapTeaser));
 
             AutoMapper.Mapper.CreateMap<Comment, Infrastructure.DTO.Comment>()
@@ -30,7 +31,7 @@ namespace Identity.Rest
         {
             if (post.Description.Length < 500)
             {
-                return null;
+                return post.Description;
             }
 
             var result = post.Description.Substring(0, Math.Min(post.Description.Length, 500));

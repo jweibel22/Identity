@@ -20,6 +20,10 @@ angular.module('inspire').factory('channelService', ['$http', 'ngSettings', func
         return $http.put(ngSettings.baseUrl + '/Api/Channel/' + channelId + "/Unsubscribe");
     };
 
+    o.leave = function (channelId) {
+        return $http.put(ngSettings.baseUrl + '/Api/Channel/' + channelId + "/Leave");
+    };
+
     o.create = function (channel) {
         return $http.post(ngSettings.baseUrl + '/Api/Channel/', channel).success(function (data) {
             o.channels.push(data);

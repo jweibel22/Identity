@@ -12,6 +12,8 @@
 
         public long LikedChannel { get; set; }
 
+        public long Inbox { get; set; }
+
         public string IdentityId { get; set; }
     }
 }

@@ -12,6 +12,7 @@ namespace Identity.OAuth
         public static void Register(HttpConfiguration config)
         {
             // Web API configuration and services
+            //config.MessageHandlers.Add(new MessageHandler());
 
             // Web API routes
             config.MapHttpAttributeRoutes();

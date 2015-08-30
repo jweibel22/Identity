@@ -44,7 +44,7 @@ namespace Identity.Infrastructure.Services
             {
                 LoadTags(p);
                 p.CommentCount = commentRepo.CommentCount(p.Id);
-                p.IsCollapsed = true; //p.Teaser != null;
+                p.IsCollapsed = p.Description.Length >= 500; //p.Teaser != null;
                 p.PublishedIn = postRepo.PublishedIn(p.Id).Select(c => Mapper.Map<DTO.Channel>(c)).ToList();
                 //p.Read = history.Contains(p.Id);
             }
@@ -102,7 +102,7 @@ namespace Identity.Infrastructure.Services
 
                 var commentCount = commentCounts.SingleOrDefault(cc => cc.Id == p.Id);
                 p.CommentCount = commentCount != null ? commentCount.Count : 0;
-                p.IsCollapsed = true; //p.Teaser != null;
+                p.IsCollapsed = p.Description.Length >= 500; //p.Teaser != null;
             }
 
             return xx;

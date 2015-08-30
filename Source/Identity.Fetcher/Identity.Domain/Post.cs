@@ -26,7 +26,10 @@ namespace Identity.Domain
 
         public int Popularity { get; set; }
 
-        //TODO: do we need this?
-        //public int AuthorId { get; set; } 
+        public int UserSpecificPopularity { get; set; }
+
+        public int PosterId { get; set; }
+
+        public string PosterUsername { get; set; }
     }
 }

@@ -8,6 +8,9 @@ angular.module('inspire').factory('userService', ['$http', 'ngSettings', functio
         return $http.get(ngSettings.baseUrl + '/Api/User');
     };
 
+    o.getUser = function (userId) {
+        return $http.get(ngSettings.baseUrl + '/Api/User/' + userId);
+    };
 
     return o;
 }]);

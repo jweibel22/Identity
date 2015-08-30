@@ -6,7 +6,9 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using System.Web;
+using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
+using Identity.OAuth;
 using log4net;
 using Ninject;
 using Ninject.Modules;
@@ -26,10 +28,12 @@ namespace Identity.Rest
                     var con =
                         new SqlConnection(
                             ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
+                    //log.Info("Opening connection ... " + RequestScope.Scope + " - " + con.ClientConnectionId);
                     con.Open();
+                    
                     return con;
                 })
-                .InRequestScope();
+                .InScope(c => RequestScope.Scope.Value);
 
 
             Bind<IDbTransaction>().ToMethod(x =>
@@ -37,9 +41,13 @@ namespace Identity.Rest
                 var t = x.Kernel.Get<IDbConnection>().BeginTransaction();
                 return t;
             })
-                .InRequestScope();
+                .InScope(c => RequestScope.Scope.Value);
 
-            Bind<ILoadDtos>().To<DtoLoader>().InRequestScope();
+            Bind<ILoadDtos>().To<DtoLoader>().InScope(c => RequestScope.Scope.Value);
+            Bind<ChannelRepository>().ToSelf().InScope(c => RequestScope.Scope.Value);
+            Bind<CommentRepostitory>().ToSelf().InScope(c => RequestScope.Scope.Value);
+            Bind<PostRepository>().ToSelf().InScope(c => RequestScope.Scope.Value);
+            Bind<UserRepository>().ToSelf().InScope(c => RequestScope.Scope.Value);
         }
     }
 }

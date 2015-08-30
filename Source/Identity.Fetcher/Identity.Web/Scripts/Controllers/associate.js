@@ -31,7 +31,7 @@ angular.module('inspire').controller('AssociateController', ['$scope', '$locatio
     var startTimer = function () {
         var timer = $timeout(function () {
             $timeout.cancel(timer);
-            $location.path('#/profile/1');
+            $location.replace().path('#/home');
         }, 2000);
     }
 

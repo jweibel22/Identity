@@ -1,12 +1,13 @@
 ﻿angular.module('inspire')
-    .controller('ProfileController', ['$scope', '$http', '$stateParams', 'channelService', 'userPromise',
-        function ($scope, $http, $stateParams, channelService, userPromise) {
+    .controller('ProfileController', ['$scope', '$http', '$stateParams', 'channelService', 'userPromise', 'profilePromise',
+        function ($scope, $http, $stateParams, channelService, userPromise, profilePromise) {
 
             $scope.user = userPromise.data;
+            $scope.profile = profilePromise.data;
             $scope.channels = channelService.channels;
 
-            for (var i = 0; i < $scope.user.TagCloud.length; i++) {
-                $scope.user.TagCloud[i].link = "#/search?query=" + $scope.user.TagCloud[i].text;
+            for (var i = 0; i < $scope.profile.TagCloud.length; i++) {
+                $scope.profile.TagCloud[i].link = "#/search?query=" + $scope.profile.TagCloud[i].text;
             }
 
             $scope.makePublic = function(channel) {
@@ -21,7 +22,7 @@
 
             $scope.addChannel = function() {
                 channelService.create({ Name: $scope.newChannelName }).success(function(data) {
-                    $scope.user.Owns.push(data);
+                    $scope.profile.Owns.push(data);
                 });
 
                 $scope.newChannelName = "";
@@ -29,9 +30,9 @@
 
             $scope.delete = function (channel) {
                 channelService.delete(channel).success(function(data) {
-                    var index = $scope.user.Owns.indexOf(channel);
+                    var index = $scope.profile.Owns.indexOf(channel);
                     if (index > -1) {
-                        $scope.user.Owns.splice(index, 1);
+                        $scope.profile.Owns.splice(index, 1);
                     }
                 });
 

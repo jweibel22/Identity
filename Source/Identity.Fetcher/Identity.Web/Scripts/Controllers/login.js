@@ -13,7 +13,7 @@ angular.module('inspire').controller('LoginController', ['$scope', '$location', 
 
         authService.login($scope.loginData).then(function (response) {
 
-            $location.path('/#/home');
+            $location.replace().path('/#/home');
 
         },
          function (err) {
@@ -25,7 +25,7 @@ angular.module('inspire').controller('LoginController', ['$scope', '$location', 
 
         var redirectUri = location.protocol + '//' + location.host + '/authcomplete.html';
 
-        var externalProviderUrl = ngSettings.oAuthBaseUrl + "/Api/Account/ExternalLogin?provider=" + provider
+        var externalProviderUrl = ngSettings.baseUrl + "/Api/Account/ExternalLogin?provider=" + provider
                                                                     + "&response_type=token&client_id=" + ngSettings.clientId
                                                                     + "&redirect_uri=" + redirectUri;
         window.$windowScope = $scope;
@@ -54,7 +54,7 @@ angular.module('inspire').controller('LoginController', ['$scope', '$location', 
                 var externalData = { provider: fragment.provider, externalAccessToken: fragment.external_access_token };
                 authService.obtainAccessToken(externalData).then(function (response) {
 
-                    $location.path('#/profile/1');
+                    $location.replace().path('#/home');
 
                 },
              function (err) {

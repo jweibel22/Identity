@@ -9,11 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Domain", "Identity
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Infrastructure", "Identity.Infrastructure\Identity.Infrastructure.csproj", "{807DD115-D67C-462D-B4FC-F06ABBC3112E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Rest", "Identity.Rest\Identity.Rest.csproj", "{438BAC78-273A-4EE9-A4C5-1183DC31BA74}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.WebServer", "Identity.OAuth\Identity.WebServer.csproj", "{402EF8C0-EF82-4101-AAD6-00E539621A16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.OAuth", "Identity.OAuth\Identity.OAuth.csproj", "{402EF8C0-EF82-4101-AAD6-00E539621A16}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Web", "Identity.Web\Identity.Web.csproj", "{4F331350-93B4-4139-9491-08B7598CB084}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.WebClient", "Identity.Web\Identity.WebClient.csproj", "{4F331350-93B4-4139-9491-08B7598CB084}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,10 +31,6 @@ Global
 		{807DD115-D67C-462D-B4FC-F06ABBC3112E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{807DD115-D67C-462D-B4FC-F06ABBC3112E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{807DD115-D67C-462D-B4FC-F06ABBC3112E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{438BAC78-273A-4EE9-A4C5-1183DC31BA74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{438BAC78-273A-4EE9-A4C5-1183DC31BA74}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{438BAC78-273A-4EE9-A4C5-1183DC31BA74}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{438BAC78-273A-4EE9-A4C5-1183DC31BA74}.Release|Any CPU.Build.0 = Release|Any CPU
 		{402EF8C0-EF82-4101-AAD6-00E539621A16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{402EF8C0-EF82-4101-AAD6-00E539621A16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{402EF8C0-EF82-4101-AAD6-00E539621A16}.Release|Any CPU.ActiveCfg = Release|Any CPU

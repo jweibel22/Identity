@@ -2,7 +2,7 @@
 angular.module('inspire')
     .factory('authService', ['$http', '$q', 'localStorageService', 'ngSettings', function ($http, $q, localStorageService, ngSettings) {
 
-        var serviceBase = ngSettings.oAuthBaseUrl;
+        var serviceBase = ngSettings.baseUrl;
     var authServiceFactory = {};
 
     var _authentication = {

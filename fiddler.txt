@@ -1,0 +1,19 @@
+
+POST
+http://localhost:26264/token
+Content-Type: x-www-form-urlencoded
+Body: grant_type=password&username=Jimmy&password=SuperPass
+
+GET
+http://localhost:47039/api/protected
+Content-Type: application/json
+Authorization: Bearer MifFxsDlLaa-fu67New-NNonzdsuiGejbuaeDgfcJ4aroYYYiP7s8XSB_DaIjTLgyPFGd6eS9Zpa3Ti4IjlednTXSFdmrmdD6Do_4-Qi3FkHW3p8GcKEC3VfeyaQolJpswRkmjAYvPSIWzUhamustkMroDgaV4x0FDicwC_D3yyteHaNX_MvVSUppQbr3_DPA_Xm2dTM1u5gYaNcr5fvCEYPkpkQFweUVkHIqpyTciUJUwjsfQkDySGGv2If9uHjTvWdsQbcC1k6d07XSVsc7amRr8b2N4l1f6_7YxRdW_easD2TaFhdRNQ1eo_8dR80_UPRpg
+
+
+
+http://localhost:57294/token
+
+
+http://localhost:57378/api/protected
+Content-Type: application/json
+Authorization: Bearer 2671_RI9WYClnKqCd-vczY7AleKq363iy64eX-MGGECFtsZGw__foji8--2PtEXZMq0tCzY1AtVE_s9nIjqn3u7oB3_dqv8jgVKHCbT4S2TX8vN0tvYBQ712X2g-elvSw_laL4fqvSyzxDc6UOAbg6T7NbZYid-e9EJdsS0kTIbNSpBbWFzURKbVRGpcl5ArurnP3lnGx78uMHiyEcifg1GdLekMx63HMbbTSjSk8F2HwqW8uocL1oMdtHESZgHvoinPSOO1D4gHH01LkYo9rpO_tGRcMoYcxg82XEH2JQjCrrScWp_87ww5aDQTCWAq_-Ta2L5loAXpn-OMGsXEUA

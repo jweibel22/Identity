@@ -1,12 +1,12 @@
 ﻿<div class="page-header">
-    <h3>{{user.DisplayName}}</h3>
+    <h3>{{profile.DisplayName}}</h3>
 </div>
 
 
-<jqcloud words="user.TagCloud" width="500" height="150" delay="10" steps="7" font-size="{from:0.09, to:0.04}"></jqcloud>
+<jqcloud words="profile.TagCloud" width="500" height="150" delay="10" steps="7" font-size="{from:0.09, to:0.04}"></jqcloud>
 
 <h4>Public channels</h4>
-<div ng-repeat="channel in user.Owns" style="margin-left: 20px; margin-top: 10px">
+<div ng-repeat="channel in profile.Owns" style="margin-left: 20px; margin-top: 10px">
     <div ng-if="!channel.IsPrivate">
         <a href="#/home/{{channel.Id}}">
             {{channel.Name}}
@@ -18,29 +18,32 @@
     </div>
 </div>    
 
-<h4>Private channels</h4>
-<div ng-repeat="channel in user.Owns" style="margin-left: 20px;margin-top: 10px">
-    <div ng-if="channel.IsPrivate">
-        <a href="#/home/{{channel.Id}}">
-            {{channel.Name}}
-        </a>
-        <div style="font-size: small">
-            <a ng-click="makePublic(channel)">Make public</a>
-            <a ng-click="delete(channel)">Delete</a>
+<div ng-show="profile.Id == user.Id">
+
+    <h4>Private channels</h4>
+    <div ng-repeat="channel in profile.Owns" style="margin-left: 20px;margin-top: 10px">
+        <div ng-if="channel.IsPrivate">
+            <a href="#/home/{{channel.Id}}">
+                {{channel.Name}}
+            </a>
+            <div style="font-size: small">
+                <a ng-click="makePublic(channel)">Make public</a>
+                <a ng-click="delete(channel)">Delete</a>
+            </div>
         </div>
-    </div>    
-</div>
-    
-
-<form ng-submit="addChannel()"
-      style="margin-top:30px;">
-    <h3>Add a new channel</h3>
-
-    <div class="form-group">
-        <input type="text"
-               class="form-control"
-               placeholder="Channel"
-               ng-model="newChannelName"></input>
     </div>
-    <button type="submit" class="btn btn-primary">Add</button>
-</form>
+
+
+    <form ng-submit="addChannel()"
+          style="margin-top:30px;">
+        <h3>Add a new channel</h3>
+
+        <div class="form-group">
+            <input type="text"
+                   class="form-control"
+                   placeholder="Channel"
+                   ng-model="newChannelName"></input>
+        </div>
+        <button type="submit" class="btn btn-primary">Add</button>
+    </form>
+</div>

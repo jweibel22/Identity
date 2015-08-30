@@ -21,7 +21,9 @@ namespace Identity.Infrastructure.DTO
 
         public DateTime Created { get; set; }
 
-        public User Author { get; set; }
+        public int PosterId { get; set; }
+
+        public string PosterUsername { get; set; }
 
         public int CommentCount { get; set; }
 
@@ -41,7 +43,11 @@ namespace Identity.Infrastructure.DTO
 
         public string Teaser { get; set; }
 
+        public bool Expandable { get; set; }
+
         public int Popularity { get; set; }
+
+        public int UserSpecificPopularity { get; set; }
 
         public IList<Channel> PublishedIn { get; set; }
     }

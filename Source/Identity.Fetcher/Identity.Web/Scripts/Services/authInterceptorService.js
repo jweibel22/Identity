@@ -27,7 +27,7 @@ angular.module('inspire').factory('authInterceptorService', ['$q', '$injector', 
                 }
             }
             authService.logOut();
-            window.location = '#/login';
+            window.location =  '#/login';
         }
         return $q.reject(rejection);
     }

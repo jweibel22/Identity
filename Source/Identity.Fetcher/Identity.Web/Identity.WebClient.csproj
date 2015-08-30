@@ -57,6 +57,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Properties\PublishProfiles\WebClient.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -66,14 +67,19 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="authComplete.html" />
+    <Content Include="Content\ajax-loader.gif" />
+    <Content Include="Content\angular-toasty.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\jqcloud.min.css" />
+    <Content Include="Content\ngToast.min.css" />
     <Content Include="Content\Site.css" />
+    <Content Include="Content\social-buttons.css" />
     <Content Include="Content\style.css" />
     <Content Include="Content\Templates\archive.html" />
     <Content Include="Content\Templates\associate.html" />
     <Content Include="Content\Templates\channels.html" />
+    <Content Include="Content\Templates\channelSearchResults.html" />
     <Content Include="Content\Templates\channelselector.html" />
     <Content Include="Content\Templates\editchannel.html" />
     <Content Include="Content\Templates\editpost.html" />
@@ -88,6 +94,7 @@
     <Content Include="Content\Templates\viewpost.html" />
     <Content Include="Scripts\angular-jqcloud.js" />
     <Content Include="Scripts\angular-local-storage.min.js" />
+    <Content Include="Scripts\angular-toasty.min.js" />
     <Content Include="Scripts\angularApp.js" />
     <Content Include="Scripts\authComplete.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -112,6 +119,7 @@
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\ng-infinite-scroll.min.js" />
+    <Content Include="Scripts\ngToast.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\Services\authInterceptorService.js" />

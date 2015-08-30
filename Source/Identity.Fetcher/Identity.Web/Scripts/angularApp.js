@@ -1,7 +1,7 @@
-angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-jqcloud', 'infinite-scroll', 'LocalStorageModule'])
+angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-jqcloud', 'infinite-scroll', 'LocalStorageModule', 'angular-toasty'])
     .constant('ngSettings', {
-        baseUrl: "http://localhost:57294/",
-        oAuthBaseUrl: "http://localhost:57294/",
+        baseUrl: "http://localhost:8011",
+        //baseUrl: "http://localhost:57294/",
         clientId: 'ngAuthApp'
     })
     .config(function($httpProvider) {
@@ -12,7 +12,6 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
         '$urlRouterProvider',
         function($stateProvider, $urlRouterProvider) {
 
-
             $stateProvider
                 .state('root', {
                     url: '',
@@ -22,7 +21,7 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                             templateUrl: 'Content/templates/channels.html',
                             controller: 'ChannelsController',
                             resolve: {
-                                _: ['channelService', function(channelService) { return channelService.allPublic(); }]
+                                userPromise: ['userService', function (userService) { return userService.getCurrentUser(); }]
                             }
                         },
                         'header': {
@@ -134,7 +133,7 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                     url: '/channelsearch?query',
                     views: {
                         'container@': {
-                            templateUrl: 'Content/templates/channels.html',
+                            templateUrl: 'Content/templates/channelSearchResults.html',
                             controller: 'ChannelSearchResultsController',
                             resolve: {
                                 _: ['$stateParams', 'channelService', function($stateParams, channelService) { return channelService.findByName($stateParams.query); }]
@@ -165,7 +164,8 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                             templateUrl: 'Content/templates/profile.html',
                             controller: 'ProfileController',
                             resolve: {
-                                userPromise: ['userService', function(userService) { return userService.getCurrentUser(); }],
+                                userPromise: ['userService', function (userService) { return userService.getCurrentUser(); }],
+                                profilePromise: ['$stateParams', 'userService', function ($stateParams, userService) { return userService.getUser($stateParams.id); }],
                                 _: ['channelService', function(channelService) { return channelService.allPublic(); }]
                             }
                         }
@@ -219,6 +219,36 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
 
 .run(['authService', function (authService) {
     authService.fillAuthData();
-}]);
+}])
+    .config(function ($httpProvider) {
+        $httpProvider.responseInterceptors.push('myHttpInterceptor');
+        var spinnerFunction = function (data, headersGetter) {
+            // todo start the spinner here
+            $('#loading').show();
+            return data;
+        };
+        $httpProvider.defaults.transformRequest.push(spinnerFunction);
+    })
+    .factory('myHttpInterceptor', ['$q', 'toasty' , function ($q, toasty) {
+        return function (promise) {
+            return promise.then(function (response) {
+                // do something on success
+                // todo hide the spinner
+                $('#loading').hide();
+                return response;
+
+            }, function (response) {
+                $('#loading').hide();
+
+                toasty.error({
+                    title: 'Error',
+                    msg: response.data.ExceptionMessage
+                });
+
+                return $q.reject(response);
+            });
+        };
+    }])
+;
 
 

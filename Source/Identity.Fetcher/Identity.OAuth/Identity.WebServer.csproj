@@ -84,6 +84,7 @@
     <Reference Include="Microsoft.Owin.Security.OAuth">
       <HintPath>..\packages\Microsoft.Owin.Security.OAuth.2.1.0\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Ninject">
       <HintPath>..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
     </Reference>
@@ -156,18 +157,15 @@
     <Compile Include="Api\ChannelController.cs" />
     <Compile Include="Api\FeedController.cs" />
     <Compile Include="Api\PostController.cs" />
-    <Compile Include="Api\ProtectedController.cs" />
     <Compile Include="Api\RssFeederController.cs" />
     <Compile Include="Api\TagController.cs" />
     <Compile Include="Api\UserController.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="AuthRepository.cs" />
     <Compile Include="AutoMapperConfiguration.cs" />
     <Compile Include="ChallengeResult.cs" />
-    <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Api\AccountController.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="Log4NetExceptionLogger.cs" />
-    <Compile Include="Models\Client.cs" />
     <Compile Include="Models\ExternalLoginModels.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -175,12 +173,14 @@
     <Compile Include="Providers\GoogleAuthProvider.cs" />
     <Compile Include="Providers\SimpleAuthorizationServerProvider.cs" />
     <Compile Include="Providers\SimpleRefreshTokenProvider.cs" />
+    <Compile Include="RequestScope.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="UnitOfWorkCommitAttribute.cs" />
     <Compile Include="WebModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <None Include="Properties\PublishProfiles\WebServer.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
