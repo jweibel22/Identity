@@ -84,6 +84,11 @@ namespace Identity.Infrastructure.Repositories
             return con.Connection.Query<User>("select * from [User] where Username=@Username", new { Username = username }, con).SingleOrDefault();
         }
 
+        public IEnumerable<User> SearchByName(string username)
+        {
+            return con.Connection.Query<User>("select * from [User] where Username like @Username", new { Username = username }, con);
+        }
+
         public void Publish(long userId, long channelId, long postId)
         {
             con.Connection.Execute("update ChannelItem set PostId=@PostId where PostId=@PostId and ChannelId=@ChannelId if @@rowcount = 0 insert ChannelItem values(@ChannelId, @PostId, @UserId, @Created)", new { UserId = userId, ChannelId = channelId, PostId = postId, Created = DateTime.Now }, con);
@@ -182,7 +187,7 @@ left join ChannelItem saved on saved.ChannelId = u.SavedChannel and saved.PostId
 left join ChannelItem starred on starred.ChannelId = u.StarredChannel and starred.PostId = Post.Id
 join Subscription s on s.ChannelId = ci.ChannelId and s.UserId = @UserId
 left join Popularity pop on pop.PostId = Post.Id
-left join UserSpecificPopularity userpop on userpop.PostId = Post.Id
+left join UserSpecificPopularity userpop on userpop.PostId = Post.Id and userpop.UserId=@UserId
 left join ReadHistory on ReadHistory.PostId = Post.Id and ReadHistory.UserId = @UserId where ReadHistory.Timestamp is null
 and Post.Created < @Timestamp) as TBL
 where TBL.RowNum BETWEEN (@FromIndex+1) AND (@FromIndex+30)";
@@ -197,5 +202,9 @@ where TBL.RowNum BETWEEN (@FromIndex+1) AND (@FromIndex+30)";
             
         }
 
+        public void Grant(long userId, long channelId)
+        {
+            con.Connection.Execute("update ChannelOwner set UserId=@UserId, ChannelId=@ChannelId where UserId=@UserId and ChannelId=@ChannelId if @@rowcount = 0 insert ChannelOwner values(@ChannelId, @UserId, @IsLocked)", new { UserId = userId, ChannelId = channelId, IsLocked = false }, con);
+        }
     }
 }

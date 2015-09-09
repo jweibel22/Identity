@@ -89,7 +89,7 @@ left join ChannelItem saved on saved.ChannelId = u.SavedChannel and saved.PostId
 left join ChannelItem starred on starred.ChannelId = u.StarredChannel and starred.PostId = Post.Id
 left join ReadHistory on ReadHistory.PostId = Post.Id and ReadHistory.UserId = @UserId 
 left join Popularity pop on pop.PostId = Post.Id
-left join UserSpecificPopularity userpop on userpop.PostId = Post.Id
+left join UserSpecificPopularity userpop on userpop.PostId = Post.Id and userpop.UserId=@UserId
 where ci.ChannelId=@ChannelId and Post.Created < @Timestamp {0}) as TBL
 where TBL.RowNum BETWEEN (@FromIndex+1) AND (@FromIndex+30)";
 
@@ -115,7 +115,7 @@ left join ChannelItem saved on saved.ChannelId = u.SavedChannel and saved.PostId
 left join ChannelItem starred on starred.ChannelId = u.StarredChannel and starred.PostId = Post.Id
 left join ReadHistory on ReadHistory.PostId = Post.Id and ReadHistory.UserId = @UserId 
 left join Popularity pop on pop.PostId = Post.Id
-left join UserSpecificPopularity userpop on userpop.PostId = Post.Id
+left join UserSpecificPopularity userpop on userpop.PostId = Post.Id and userpop.UserId=@UserId
 where Post.Id = @Id
 ";
 

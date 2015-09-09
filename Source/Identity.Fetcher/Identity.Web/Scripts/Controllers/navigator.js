@@ -126,5 +126,11 @@ angular.module('inspire')
                 $scope.channelsearchFor = "";
                 $window.location.href = url;
             }
+
+            $scope.userSearch = function (event) {
+                var url = "#/usersearch?query=" + $scope.usersearchFor;
+                $scope.usersearchFor = "";
+                $window.location.href = url;
+            }
         }
     ]);

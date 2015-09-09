@@ -79,6 +79,7 @@
     <Content Include="Content\Templates\archive.html" />
     <Content Include="Content\Templates\associate.html" />
     <Content Include="Content\Templates\channels.html" />
+    <Content Include="Content\Templates\userSearchResults.html" />
     <Content Include="Content\Templates\channelSearchResults.html" />
     <Content Include="Content\Templates\channelselector.html" />
     <Content Include="Content\Templates\editchannel.html" />
@@ -111,6 +112,8 @@
     <Content Include="Scripts\Controllers\profile.js" />
     <Content Include="Scripts\Controllers\rssFeeder.js" />
     <Content Include="Scripts\Controllers\searchresults.js" />
+    <Content Include="Scripts\Controllers\userSearchResults.js" />
+    <Content Include="Scripts\Directives\scroll.js" />
     <Content Include="Scripts\Directives\stream.js" />
     <Content Include="Scripts\jqcloud.js" />
     <Content Include="Index.cshtml" />
@@ -125,6 +128,7 @@
     <Content Include="Scripts\Services\authInterceptorService.js" />
     <Content Include="Scripts\Services\authorization.js" />
     <Content Include="Scripts\Services\channels.js" />
+    <Content Include="Scripts\Services\channelSelector.js" />
     <Content Include="Scripts\Services\feeds.js" />
     <Content Include="Scripts\Services\posts.js" />
     <Content Include="Scripts\Services\rssFeeders.js" />

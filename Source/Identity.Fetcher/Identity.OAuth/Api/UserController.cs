@@ -72,5 +72,11 @@ namespace Identity.Rest.Api
 
             return Map(user);
         }
+
+        [HttpGet]
+        public IEnumerable<User> Get(string query)
+        {
+            return userRepo.SearchByName(query).Select(Map).ToList();
+        }
     }
 }

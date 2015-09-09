@@ -24,6 +24,10 @@ angular.module('inspire').factory('channelService', ['$http', 'ngSettings', func
         return $http.put(ngSettings.baseUrl + '/Api/Channel/' + channelId + "/Leave");
     };
 
+    o.grant = function (channelId, userId) {
+        return $http.put(ngSettings.baseUrl + '/Api/Channel/' + channelId + "/Grant?userId="+userId);
+    };
+
     o.create = function (channel) {
         return $http.post(ngSettings.baseUrl + '/Api/Channel/', channel).success(function (data) {
             o.channels.push(data);

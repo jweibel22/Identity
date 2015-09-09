@@ -1,4 +1,4 @@
-﻿angular.module('inspire').directive("stream", ['$window', '$location', '$rootScope', '$modal', 'postService', 'feedService', 'userService', function ($window, $location, $rootScope, $modal, postService, feedService, userService) {
+﻿angular.module('inspire').directive("stream", ['$window', '$location', '$rootScope', '$modal', 'postService', 'feedService', 'userService', 'channelSelectorService', function ($window, $location, $rootScope, $modal, postService, feedService, userService, channelSelectorService) {
 
         return {
             restrict: 'E',
@@ -162,34 +162,7 @@
 
                 $scope.publishOnChannel = function (post) {
 
-                    $modal.open({
-                        templateUrl: 'channelSelector.html',
-                        backdrop: true,
-                        windowClass: 'modal',
-                        controller: function ($scope, $modalInstance, windowdata) {
-                            $scope.windowdata = windowdata;
-
-                            $scope.submit = function () {
-
-                                if (!$scope.windowdata.selectedChannel || $scope.windowdata.selectedChannel === '') {
-                                    $modalInstance.dismiss('cancel');
-                                    return;
-                                }
-
-                                postService.savePost($scope.windowdata.selectedChannel.Id, post);
-
-                                $modalInstance.dismiss('cancel');
-                            }
-                            $scope.cancel = function () {
-                                $modalInstance.dismiss('cancel');
-                            };
-                        },
-                        resolve: {
-                            windowdata: function () {
-                                return $scope.publishOnChannelWindowdata;
-                            }
-                        }
-                    });
+                    channelSelectorService.selectChannel($scope.user.Owns, function(id) { postService.savePost(id, post); });
                 }
 
                 //$scope.incrementUpvotes = function (post) {

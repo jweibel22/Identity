@@ -81,16 +81,22 @@ namespace Identity.Rest.Api
         {
             userRepo.Leave(user.Id, id);
         }
+
+        [HttpPut]
+        public void Grant(long id, long userId)
+        {
+            userRepo.Grant(userId, id);
+        }
         
         [HttpPut]
         public void Posts(long id, long postId)
         {
             userRepo.Publish(user.Id, id, postId);
 
-            //if (user.StarredChannel == id)
-            //{
-            //    rssWriter.Write(user);
-            //}
+            if (user.StarredChannel == id)
+            {
+                rssWriter.Write(user);
+            }
         }
 
         [HttpDelete]

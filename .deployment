@@ -1,0 +1,2 @@
+[config]
+project = Source/Identity.Fetcher/Identity.OAuth/Identity.WebServer.csproj

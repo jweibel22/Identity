@@ -141,6 +141,18 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                         }
                     }
                 })
+                .state('root.usersearch', {
+                    url: '/usersearch?query',
+                    views: {
+                        'container@': {
+                            templateUrl: 'Content/templates/userSearchResults.html',
+                            controller: 'UserSearchResultsController',
+                            resolve: {
+                                _: ['$stateParams', 'userService', function ($stateParams, userService) { return userService.findByName($stateParams.query); }]
+                            }
+                        }
+                    }
+                })
                 .state('root.viewpost', {
                     url: '/viewpost/{id}',
                     views: {
