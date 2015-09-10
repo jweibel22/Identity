@@ -3,7 +3,11 @@ CREATE TABLE [dbo].[Channel](
 	[Id] [bigint] IDENTITY(1,1) NOT NULL,
 	[Name] [nchar](20) NOT NULL,
 	[Created] [datetime] NOT NULL,
-	[IsPublic] [bit] NOT NULL
+	[IsPublic] [bit] NOT NULL,
+ CONSTRAINT [PK_Channel] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)
 ) ON [PRIMARY]
 
 
@@ -28,7 +32,11 @@ CREATE TABLE [dbo].[Comment](
 	[PostId] [bigint] NOT NULL,
 	[Text] [text] NOT NULL,
 	[Created] [datetime] NOT NULL,
-	[ReplyingTo] [bigint] NULL
+	[ReplyingTo] [bigint] NULL,
+ CONSTRAINT [PK_Comment] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 
 
@@ -49,7 +57,11 @@ CREATE TABLE [dbo].[Post](
 	[Created] [datetime] NOT NULL,
 	[Title] [nchar](255) NOT NULL,
 	[Description] [text] NOT NULL,
-	[Uri] [nchar](255) NOT NULL
+	[Uri] [nchar](255) NOT NULL,
+ CONSTRAINT [PK_Post] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 
 
@@ -62,7 +74,11 @@ CREATE TABLE [dbo].[ReadHistory](
 
 CREATE TABLE [dbo].[RssFeeder](
 	[Id] [bigint] IDENTITY(1,1) NOT NULL,
-	[Url] [nchar](255) NOT NULL
+	[Url] [nchar](255) NOT NULL,
+ CONSTRAINT [PK_RssFeeder] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)
 ) ON [PRIMARY]
 
 
