@@ -21,7 +21,7 @@ namespace Identity.Infrastructure.Repositories
 
         public void AddUser(User user)
         {
-            user.Id = con.Connection.Query<int>("insert [User] values (@Username, @SavedChannel, @StarredChannel, @LikedChannel, @Inbox, @IdentityId); SELECT CAST(SCOPE_IDENTITY() as bigint)", user, con).Single();
+            user.Id = con.Connection.Query<int>("insert [User] values (@Username, @SavedChannel, @StarredChannel, @LikedChannel, @IdentityId, @Inbox); SELECT CAST(SCOPE_IDENTITY() as bigint)", user, con).Single();
         }
 
         public void AddLogin(User user, string loginProvider, string providerKey)
