@@ -93,10 +93,10 @@ namespace Identity.Rest.Api
         {
             userRepo.Publish(user.Id, id, postId);
 
-            if (user.StarredChannel == id)
-            {
-                rssWriter.Write(user);
-            }
+            //if (user.StarredChannel == id)
+            //{
+            //    rssWriter.Write(user);
+            //}
         }
 
         [HttpDelete]
