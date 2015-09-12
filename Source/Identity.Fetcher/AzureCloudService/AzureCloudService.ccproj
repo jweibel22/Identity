@@ -39,10 +39,12 @@
   <ItemGroup>
     <Folder Include="Identity.WebClientContent\" />
     <Folder Include="Identity.WebServerContent\" />
+    <Folder Include="RssFeederContent\" />
   </ItemGroup>
   <ItemGroup>
     <DiagnosticsConfiguration Include="Identity.WebClientContent\diagnostics.wadcfgx" />
     <DiagnosticsConfiguration Include="Identity.WebServerContent\diagnostics.wadcfgx" />
+    <DiagnosticsConfiguration Include="RssFeederContent\diagnostics.wadcfgx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Identity.OAuth\Identity.WebServer.csproj">
@@ -59,6 +61,14 @@
       <Private>True</Private>
       <RoleType>Web</RoleType>
       <RoleName>Identity.WebClient</RoleName>
+      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+    </ProjectReference>
+    <ProjectReference Include="..\RssFeeder\RssFeeder.csproj">
+      <Name>RssFeeder</Name>
+      <Project>{b6fa9b35-c099-4aee-be09-d84fbc6c1fce}</Project>
+      <Private>True</Private>
+      <RoleType>Worker</RoleType>
+      <RoleName>RssFeeder</RoleName>
       <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
     </ProjectReference>
   </ItemGroup>

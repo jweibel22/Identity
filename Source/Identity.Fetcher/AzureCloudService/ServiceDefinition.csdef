@@ -30,4 +30,9 @@
       <InputEndpoint name="Endpoint1" protocol="http" port="8080" />
     </Endpoints>
   </WebRole>
+  <WorkerRole name="RssFeeder" vmsize="Small">
+    <ConfigurationSettings>
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" />
+    </ConfigurationSettings>
+  </WorkerRole>
 </ServiceDefinition>
