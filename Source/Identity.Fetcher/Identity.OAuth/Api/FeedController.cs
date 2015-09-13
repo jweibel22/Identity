@@ -35,7 +35,7 @@ namespace Identity.Rest.Api
         }
 
         [HttpGet]
-        public IEnumerable<Post> Get(DateTime timestamp, int fromIndex, string orderBy)
+        public IEnumerable<Post> Get(DateTimeOffset timestamp, int fromIndex, string orderBy)
         {
             log.Info("Paging: " + fromIndex);
             return dtoLoader.LoadPosts(userRepo.GetFeed(user.Id, timestamp, fromIndex, orderBy));

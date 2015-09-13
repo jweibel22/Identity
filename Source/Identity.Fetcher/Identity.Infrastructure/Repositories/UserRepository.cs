@@ -91,7 +91,7 @@ namespace Identity.Infrastructure.Repositories
 
         public void Publish(long userId, long channelId, long postId)
         {
-            con.Connection.Execute("update ChannelItem set PostId=@PostId where PostId=@PostId and ChannelId=@ChannelId if @@rowcount = 0 insert ChannelItem values(@ChannelId, @PostId, @UserId, @Created)", new { UserId = userId, ChannelId = channelId, PostId = postId, Created = DateTime.Now }, con);
+            con.Connection.Execute("update ChannelItem set PostId=@PostId where PostId=@PostId and ChannelId=@ChannelId if @@rowcount = 0 insert ChannelItem values(@ChannelId, @PostId, @UserId, @Created)", new { UserId = userId, ChannelId = channelId, PostId = postId, Created = DateTimeOffset.Now }, con);
         }
 
         public void Remove(long userId, long channelId, long postId)
@@ -153,7 +153,7 @@ namespace Identity.Infrastructure.Repositories
                                             group by Tag order by COUNT(*) desc", new { UserId = userId }, con);
         }
 
-        public IEnumerable<Post> GetFeed(long userId, DateTime timestamp, int fromIndex, string orderBy)
+        public IEnumerable<Post> GetFeed(long userId, DateTimeOffset timestamp, int fromIndex, string orderBy)
         {
             if (orderBy == "Added")
             {

@@ -19,7 +19,7 @@ namespace Identity.Infrastructure.DTO
 
         public IList<Comment> Comments { get; set; }
 
-        public DateTime Created { get; set; }
+        public DateTimeOffset Created { get; set; }
 
         public int PosterId { get; set; }
 
@@ -37,7 +37,7 @@ namespace Identity.Infrastructure.DTO
 
         public bool Saved { get; set; }
 
-        public DateTime Added { get; set; }
+        public DateTimeOffset Added { get; set; }
 
         public bool IsCollapsed { get; set; }
 

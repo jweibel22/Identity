@@ -14,7 +14,7 @@ namespace Identity.Infrastructure.Services
         IEnumerable<DTO.Post> LoadPosts(IEnumerable<Post> post);
         DTO.Post LoadPost(User user, Post post);
 
-        IEnumerable<DTO.Post> LoadChannelPosts(User user, Channel channel, bool onlyUnread, DateTime timestamp, int fromIndex, string orderBy);
+        IEnumerable<DTO.Post> LoadChannelPosts(User user, Channel channel, bool onlyUnread, DateTimeOffset timestamp, int fromIndex, string orderBy);
         DTO.Channel LoadChannel(User user, Channel channel);
         IEnumerable<DTO.Channel> LoadChannelList(User user, IEnumerable<Channel> channels);
         DTO.RssFeeder LoadRssFeeder(RssFeeder rssFeeder);
@@ -90,7 +90,7 @@ namespace Identity.Infrastructure.Services
             return result;
         }
 
-        public IEnumerable<DTO.Post> LoadChannelPosts(User user, Channel channel, bool onlyUnread, DateTime timestamp, int fromIndex, string orderBy)
+        public IEnumerable<DTO.Post> LoadChannelPosts(User user, Channel channel, bool onlyUnread, DateTimeOffset timestamp, int fromIndex, string orderBy)
         {
             var posts = postRepo.PostsFromChannel(user.Id, onlyUnread, channel.Id, timestamp, fromIndex, orderBy);
             var commentCounts = commentRepo.CommentCounts(channel.Id);

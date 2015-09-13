@@ -57,7 +57,7 @@ namespace Identity.Rest.Api
         {
             var newComment = new Comment
             {
-                Created = DateTime.Now,
+                Created = DateTimeOffset.Now,
                 PostId = id,
                 Text = comment.Body,
                 UserId = user.Id,

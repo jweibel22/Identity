@@ -10,6 +10,6 @@ namespace Identity.Domain
 
         public long UserId { get; set; }
 
-        public DateTime Created { get; set; }
+        public DateTimeOffset Created { get; set; }
     }
 }

@@ -52,7 +52,7 @@ namespace Identity.Infrastructure.Rss
                     var rssReader = new RssReader(f.RssFeeder.Url);
                     var feed = rssReader.ReadRss();
                     
-                    f.RssFeeder.LastFetch = DateTime.Now;
+                    f.RssFeeder.LastFetch = DateTimeOffset.Now;
                     channelRepo.UpdateRssFeeder(f.RssFeeder);
 
                     return feed.Items.Select(i => new Tuple<FeedX, SyndicationItem>(f, i));

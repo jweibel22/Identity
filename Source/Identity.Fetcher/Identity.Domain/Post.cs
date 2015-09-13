@@ -6,7 +6,7 @@ namespace Identity.Domain
     {
         public long Id { get; set; }
 
-        public DateTime Created { get; set; }
+        public DateTimeOffset Created { get; set; }
 
         public string Title { get; set; }
 
@@ -14,7 +14,7 @@ namespace Identity.Domain
 
         public string Uri { get; set; }
 
-        public DateTime Added { get; set; }
+        public DateTimeOffset Added { get; set; }
 
         public bool Read { get; set; }
 

@@ -188,7 +188,7 @@ namespace Identity.Rest.Api
         }
 
         [HttpGet]
-        public Channel Get(long id, bool onlyUnread, DateTime timestamp, int fromIndex, string orderBy)
+        public Channel Get(long id, bool onlyUnread, DateTimeOffset timestamp, int fromIndex, string orderBy)
         {          
            log.Debug("Fetching items from channel " + id + " and page " + fromIndex);
 

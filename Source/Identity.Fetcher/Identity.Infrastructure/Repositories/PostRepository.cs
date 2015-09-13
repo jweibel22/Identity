@@ -55,7 +55,7 @@ namespace Identity.Infrastructure.Repositories
             return con.Connection.Query<Post>(@"select Post.* from Post join Tagged t on t.PostId = Post.Id where t.Tag like @Tag", new { Tag = encodedTag }, con);
         }
 
-        public IEnumerable<Post> PostsFromChannel(long userId, bool onlyUnread, long channelId, DateTime timestamp, int fromIndex, string orderBy)
+        public IEnumerable<Post> PostsFromChannel(long userId, bool onlyUnread, long channelId, DateTimeOffset timestamp, int fromIndex, string orderBy)
         {
             if (orderBy == "Added")
             {

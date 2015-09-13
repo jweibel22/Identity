@@ -132,7 +132,7 @@ namespace Identity.Infrastructure.Repositories
 
         public IEnumerable<RssFeeder> OutOfSyncRssFeeders(TimeSpan timeSpan)
         {
-            return con.Connection.Query<RssFeeder>("select RssFeeder.* from RssFeeder where LastFetch is null or DATEDIFF(mi, @Now, LastFetch) >= @TotalMinutes", new { DateTime.Now, timeSpan.TotalMinutes }, con);
+            return con.Connection.Query<RssFeeder>("select RssFeeder.* from RssFeeder where LastFetch is null or DATEDIFF(mi, LastFetch, @Now) >= @TotalMinutes", new { DateTimeOffset.Now, timeSpan.TotalMinutes }, con);
         }
 
         public void UpdateRssFeeder(RssFeeder rssFeeder)

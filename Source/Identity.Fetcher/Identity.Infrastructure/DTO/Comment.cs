@@ -10,10 +10,10 @@ namespace Identity.Infrastructure.DTO
 
         public string Author { get; set; }
 
-        public DateTime Created { get; set; }
+        public DateTimeOffset Created { get; set; }
 
         public long UserId { get; set; }
 
-        public int CreatedHoursAgo { get { return (int)DateTime.Now.Subtract(Created).TotalHours; }}
+        public int CreatedHoursAgo { get { return (int)DateTimeOffset.Now.Subtract(Created).TotalHours; } }
     }
 }

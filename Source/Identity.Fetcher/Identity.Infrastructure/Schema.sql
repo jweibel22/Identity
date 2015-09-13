@@ -2,7 +2,7 @@
 CREATE TABLE [dbo].[Channel](
 	[Id] [bigint] IDENTITY(1,1) NOT NULL,
 	[Name] [nchar](20) NOT NULL,
-	[Created] [datetime] NOT NULL,
+	[Created] [datetimeoffset] NOT NULL,
 	[IsPublic] [bit] NOT NULL,
  CONSTRAINT [PK_Channel] PRIMARY KEY CLUSTERED 
 (
@@ -15,7 +15,7 @@ CREATE TABLE [dbo].[ChannelItem](
 	[ChannelId] [bigint] NOT NULL,
 	[PostId] [bigint] NOT NULL,
 	[UserId] [bigint] NULL,
-	[Created] [datetime] NULL,
+	[Created] [datetimeoffset] NULL,
  CONSTRAINT [PK_ChannelItem] PRIMARY KEY CLUSTERED 
 (
 	[ChannelId] ASC, PostId ASC
@@ -39,7 +39,7 @@ CREATE TABLE [dbo].[Comment](
 	[UserId] [bigint] NOT NULL,
 	[PostId] [bigint] NOT NULL,
 	[Text] [text] NOT NULL,
-	[Created] [datetime] NOT NULL,
+	[Created] [datetimeoffset] NOT NULL,
 	[ReplyingTo] [bigint] NULL,
  CONSTRAINT [PK_Comment] PRIMARY KEY CLUSTERED 
 (
@@ -70,7 +70,7 @@ CREATE TABLE [dbo].[FeedInto](
 
 CREATE TABLE [dbo].[Post](
 	[Id] [bigint] IDENTITY(1,1) NOT NULL,
-	[Created] [datetime] NOT NULL,
+	[Created] [datetimeoffset] NOT NULL,
 	[Title] [nchar](255) NOT NULL,
 	[Description] [text] NOT NULL,
 	[Uri] [nchar](255) NOT NULL,
@@ -84,7 +84,7 @@ CREATE TABLE [dbo].[Post](
 CREATE TABLE [dbo].[ReadHistory](
 	[UserId] [bigint] NOT NULL,
 	[PostId] [bigint] NOT NULL,
-	[Timestamp] [datetime] NOT NULL,
+	[Timestamp] [datetimeoffset] NOT NULL,
  CONSTRAINT [PK_ReadHistory] PRIMARY KEY CLUSTERED 
 (
 	PostId ASC, UserId ASC
@@ -95,7 +95,7 @@ CREATE TABLE [dbo].[ReadHistory](
 CREATE TABLE [dbo].[RssFeeder](
 	[Id] [bigint] IDENTITY(1,1) NOT NULL,
 	[Url] [nchar](255) NOT NULL,
-	[LastFetch] [datetime] NULL,
+	[LastFetch] [datetimeoffset] NULL,
  CONSTRAINT [PK_RssFeeder] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC

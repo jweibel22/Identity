@@ -24,7 +24,7 @@ namespace Identity.Infrastructure.Services
         {            
             var posts = Enumerable.Range(0, 5)
                                   .SelectMany(
-                                    i => postRepo.PostsFromChannel(user.Id, false, user.StarredChannel, DateTime.Now, i*30, "Added"));
+                                    i => postRepo.PostsFromChannel(user.Id, false, user.StarredChannel, DateTimeOffset.Now, i*30, "Added"));
 
             var items = new List<SyndicationItem>();
 

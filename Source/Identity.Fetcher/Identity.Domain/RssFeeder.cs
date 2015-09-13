@@ -12,6 +12,6 @@ namespace Identity.Domain
 
         public string Url { get; set; }
 
-        public DateTime? LastFetch { get; set; }
+        public DateTimeOffset? LastFetch { get; set; }
     }
 }
