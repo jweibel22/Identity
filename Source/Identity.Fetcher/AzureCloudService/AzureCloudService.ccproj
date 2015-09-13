@@ -39,6 +39,7 @@
   <ItemGroup>
     <Folder Include="Identity.WebClientContent\" />
     <Folder Include="Identity.WebServerContent\" />
+    <Folder Include="Profiles" />
     <Folder Include="RssFeederContent\" />
   </ItemGroup>
   <ItemGroup>
@@ -47,22 +48,6 @@
     <DiagnosticsConfiguration Include="RssFeederContent\diagnostics.wadcfgx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Identity.OAuth\Identity.WebServer.csproj">
-      <Name>Identity.WebServer</Name>
-      <Project>{402ef8c0-ef82-4101-aad6-00e539621a16}</Project>
-      <Private>True</Private>
-      <RoleType>Web</RoleType>
-      <RoleName>Identity.WebServer</RoleName>
-      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
-    </ProjectReference>
-    <ProjectReference Include="..\Identity.Web\Identity.WebClient.csproj">
-      <Name>Identity.WebClient</Name>
-      <Project>{4f331350-93b4-4139-9491-08b7598cb084}</Project>
-      <Private>True</Private>
-      <RoleType>Web</RoleType>
-      <RoleName>Identity.WebClient</RoleName>
-      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
-    </ProjectReference>
     <ProjectReference Include="..\RssFeeder\RssFeeder.csproj">
       <Name>RssFeeder</Name>
       <Project>{b6fa9b35-c099-4aee-be09-d84fbc6c1fce}</Project>
@@ -71,6 +56,9 @@
       <RoleName>RssFeeder</RoleName>
       <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PublishProfile Include="Profiles\inspirerssfeederProduction.azurePubxml" />
   </ItemGroup>
   <!-- Import the target files for this project template -->
   <PropertyGroup>

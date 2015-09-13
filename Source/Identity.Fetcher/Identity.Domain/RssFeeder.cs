@@ -11,5 +11,7 @@ namespace Identity.Domain
         public long Id { get; set; }
 
         public string Url { get; set; }
+
+        public DateTime? LastFetch { get; set; }
     }
 }

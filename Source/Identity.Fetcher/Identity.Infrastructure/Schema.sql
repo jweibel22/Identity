@@ -95,6 +95,7 @@ CREATE TABLE [dbo].[ReadHistory](
 CREATE TABLE [dbo].[RssFeeder](
 	[Id] [bigint] IDENTITY(1,1) NOT NULL,
 	[Url] [nchar](255) NOT NULL,
+	[LastFetch] [datetime] NULL,
  CONSTRAINT [PK_RssFeeder] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC

@@ -3,7 +3,7 @@ using System.Net;
 using System.ServiceModel.Syndication;
 using System.Xml;
 
-namespace RssFeeder.Rss
+namespace Identity.Infrastructure.Rss
 {
     public class RssReader
     {

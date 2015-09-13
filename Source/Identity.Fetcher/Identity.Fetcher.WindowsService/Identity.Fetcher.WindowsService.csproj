@@ -59,8 +59,6 @@
     <Compile Include="ChannelAndTags.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rss\RssReader.cs" />
-    <Compile Include="Rss\RssFeedRefresher.cs" />
     <Compile Include="ServiceLifecycle.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -4,10 +4,10 @@ using System.Data.SqlClient;
 using System.Reflection;
 using System.Threading;
 using Identity.Infrastructure.Repositories;
+using Identity.Infrastructure.Rss;
 using Identity.Infrastructure.Services;
 using log4net;
 using log4net.Config;
-using RssFeeder.Rss;
 
 namespace RssFeeder
 {
@@ -22,7 +22,7 @@ namespace RssFeeder
 
             //WriteRss();
 
-            timer = new Timer(Run, null, TimeSpan.Zero, TimeSpan.FromHours(1));
+            timer = new Timer(Run, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
             log.Info("Service started");
         }
 

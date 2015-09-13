@@ -119,7 +119,7 @@ namespace Identity.Infrastructure.Repositories
                 {
                     Url = url
                 };
-                rssFeeder.Id = con.Connection.Query<int>("insert RssFeeder values (@Url); SELECT CAST(SCOPE_IDENTITY() as bigint)", rssFeeder, con).Single();
+                rssFeeder.Id = con.Connection.Query<int>("insert RssFeeder values (@Url,NULL); SELECT CAST(SCOPE_IDENTITY() as bigint)", rssFeeder, con).Single();
             }
 
             return rssFeeder;
@@ -128,6 +128,16 @@ namespace Identity.Infrastructure.Repositories
         public IEnumerable<RssFeeder> AllRssFeeders()
         {
             return con.Connection.Query<RssFeeder>("select RssFeeder.* from RssFeeder", null, con);
+        }
+
+        public IEnumerable<RssFeeder> OutOfSyncRssFeeders(TimeSpan timeSpan)
+        {
+            return con.Connection.Query<RssFeeder>("select RssFeeder.* from RssFeeder where LastFetch is null or DATEDIFF(mi, @Now, LastFetch) >= @TotalMinutes", new { DateTime.Now, timeSpan.TotalMinutes }, con);
+        }
+
+        public void UpdateRssFeeder(RssFeeder rssFeeder)
+        {
+            con.Connection.Execute("update RssFeeder set LastFetch=@LastFetch, Url=@Url where Id=@Id", rssFeeder, con);
         }
 
         public IEnumerable<RssFeeder> GetRssFeedersForChannel(long channelId)
