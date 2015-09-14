@@ -1,52 +1,16 @@
-
-
-<div style="position:fixed;top:45px;z-index:1000;background: white;width:100%">
-    
-    <table>
-        <tr>
-            <td>
-                <h3>Channel: {{channel.Name}}</h3>
-            </td>
-            <td>
-                <jqcloud words="channel.TagCloud" width="400" height="100" delay="10" steps="7" font-size="{from:0.09, to:0.04}"></jqcloud>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <button class="btn btn-default" ng-show="channelOwned" ng-click="addLink()">Add link</button>
-                <button class="btn btn-default" ng-show="channelOwned" ng-click="addPost()">Add post</button>
-                <button class="btn btn-default" ng-show="channelFollowed" ng-click="unsubscribe()">Unsubscribe</button>
-                <button class="btn btn-default" ng-show="!channelFollowed" ng-click="subscribe()">Subscribe</button>
-                <button class="btn btn-default" ng-show="channelOwned" ng-click="leave()">Leave</button>
-                <a ng-show="channelOwned" href="#/editchannel/{{channel.Id}}" class="btn btn-default">Edit</a>
-                <span ng-show="!channelOwned">
-                    <span>Only show unread</span> <input type="checkbox" ng-model="showOnlyUnread" ng-change="showOnlyUnreadChanged()" />
-                </span>
-
-            </td>
-        </tr>
-    </table>
-</div>
-
-
-
-<stream posts="posts" user="user" showonlyunread="true" channel="channel" />
-
-<script type="text/ng-template" id="channelSelector.html">
-    <div class="modal-header">
-        <button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title" id="myModalLabel">Select a channel</h4>
+﻿<div style="margin-top:50px">
+    <h3>Top Channels</h3>
+    <div ng-repeat="channel in contents.Channels" style="margin-left: 20px">
+        <a href="#/home/{{channel.Id}}">
+            {{channel.Name}}
+        </a>
     </div>
-    <form ng-submit="submit()">
-        <div class="modal-body">
-            <div class="form-group">
-                <select class="form-control" data-ng-options="c.Name for c in windowdata.channels" data-ng-model="windowdata.selectedChannel"></select>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-default">Close</button>
-            <input type="submit" class="btn btn-primary" value="Submit" />
-        </div>
-    </form>
-</script>
-
+</div>
+<div style="margin-top:50px">
+    <h3>Top Tags</h3>
+    <jqcloud words="contents.TagCloud" width="400" height="100" delay="10" steps="7" font-size="{from:0.09, to:0.04}"></jqcloud>
+</div>
+<div style="margin-top:50px">
+    <h3>Top Posts</h3>
+    <stream posts="contents.Posts" user="user" showonlyunread="false" />
+</div>

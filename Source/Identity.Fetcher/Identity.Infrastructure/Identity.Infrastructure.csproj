@@ -56,6 +56,7 @@
     <Compile Include="Client.cs" />
     <Compile Include="DTO\Channel.cs" />
     <Compile Include="DTO\Comment.cs" />
+    <Compile Include="DTO\HomeScreen.cs" />
     <Compile Include="DTO\Post.cs" />
     <Compile Include="DTO\RssFeeder.cs" />
     <Compile Include="DTO\User.cs" />

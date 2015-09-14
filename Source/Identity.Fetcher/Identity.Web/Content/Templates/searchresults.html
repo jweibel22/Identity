@@ -1,24 +1,4 @@
 <h3>Results for: {{query}}</h3>
 
-<div ng-repeat="post in posts | orderBy:'-created'">
-    <span class="glyphicon glyphicon-thumbs-up" ng-click="incrementUpvotes(post)"></span>
-    {{post.Upvotes}}
-        <span style="font-size:20px; margin-left:10px;">
-          <a ng-show="post.Uri" href="{{post.Uri}}">
-              {{post.Title}}
-          </a>
-          <span ng-hide="post.uri">
-            {{post.Title}}
-          </span>
-        </span>
-    <div ng-bind-html="post.Description" style="margin-left:40px;" />
-    <div style="margin-left:40px;">
-        <span style="font-weight: bold" ng-repeat="tag in post.Tags">{{tag}} <a href="" ng-show="!follows(tag)" ng-click="follow(tag)">[+]</a> <a href="" ng-show="follows(tag)" ng-click="unfollow(tag)">[-]</a></span>
-    </div>
-    <div style="margin-left:40px;">
-        <span>{{post.Created | date:'dd/MM/yyyy'}} </span>
-    </div>
-    <div style="margin-left:40px;">
-        <a href="#" ng-click="savePost(post)">Save</a>
-    </div>
-</div>
+    <stream posts="posts" user="user" showonlyunread="false" autoloadonscroll="false" showcontrols="true" />
+

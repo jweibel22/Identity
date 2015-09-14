@@ -29,6 +29,17 @@ namespace Identity.Infrastructure.Repositories
             return con.Connection.Query<Post>("select * from Post where Uri=@Uri", new { Uri = uri }, con).SingleOrDefault();
         }
 
+        public IEnumerable<Post> TopPosts(int count)
+        {
+            var sql = @"select * from Post where Id in 
+  (select top {0} ci.PostId from ChannelItem ci
+  where Created > @Timestamp and ci.UserId <> 2 and ci.UserId <> 5
+  group by ci.PostId
+  order by count(*) desc)";
+
+            return con.Connection.Query<Post>(String.Format(sql, count), new { Timestamp = DateTimeOffset.Now.Subtract(TimeSpan.FromDays(7)) }, con);
+        }
+
         public void AddPost(Post post)
         {
             post.Id = con.Connection.Query<long>("insert Post values(@Created,@Title,@Description,@Uri); SELECT CAST(SCOPE_IDENTITY() as bigint)", post, con).Single();
@@ -135,6 +146,17 @@ where Post.Id = @Id
             left join Subscription s on s.ChannelId = Channel.Id
             group by Channel.Id
             order by COUNT(*))", new { PostId = postId }, con);
+        }
+
+        public IEnumerable<WeightedTag> TopTags(int count)
+        {
+            var sql = @"select top {0} count(*) as Weight, Tag as Text from Tagged 
+                        join ChannelItem ci on ci.PostId = Tagged.PostId
+                        where ci.Created > @Timestamp and ci.UserId <> 2 and ci.UserId <> 5
+                        group by Tag
+                        order by count(*) desc";
+
+            return con.Connection.Query<WeightedTag>(String.Format(sql, count), new { Timestamp = DateTimeOffset.Now.Subtract(TimeSpan.FromDays(7)) }, con);
         }
 
         public void Dispose()

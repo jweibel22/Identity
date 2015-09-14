@@ -6,7 +6,9 @@
                 posts: "=",
                 user: "=",
                 channel: "=",
-                showonlyunread: "="
+                showonlyunread: "=",
+                showcontrols: "=",
+                autoloadonscroll: "="              
             },
             templateUrl: 'Content/templates/stream.html',
             controller: function ($scope) {
@@ -87,21 +89,24 @@
 
                 $scope.loadMorePosts = function () {
 
-                    if (!$scope.channel) {
-                        if (!$scope.loading) {
-                            $scope.loading = true;
+                    if ($scope.autoloadonscroll) {
 
-                            feedService.loadMorePosts($scope.selectedSortType).then(function (data) {
-                                $scope.loading = false;
-                            });
-                        }
-                    } else {
-                        if (!$scope.loading) {
-                            $scope.loading = true;
+                        if (!$scope.channel) {
+                            if (!$scope.loading) {
+                                $scope.loading = true;
 
-                            postService.loadMorePosts($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType).then(function (data) {
-                                $scope.loading = false;
-                            });
+                                feedService.loadMorePosts($scope.selectedSortType).then(function(data) {
+                                    $scope.loading = false;
+                                });
+                            }
+                        } else {
+                            if (!$scope.loading) {
+                                $scope.loading = true;
+
+                                postService.loadMorePosts($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType).then(function(data) {
+                                    $scope.loading = false;
+                                });
+                            }
                         }
                     }
                 }

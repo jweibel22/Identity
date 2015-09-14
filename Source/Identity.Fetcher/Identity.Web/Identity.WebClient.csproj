@@ -88,6 +88,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\Templates\home.html" />
     <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\WebClient.pubxml" />
     <None Include="Web.Debug.config">
@@ -118,7 +119,7 @@
     <Content Include="Content\Templates\editpost.html" />
     <Content Include="Content\Templates\editrssfeeder.html" />
     <Content Include="Content\Templates\feed.html" />
-    <Content Include="Content\Templates\home.html" />
+    <Content Include="Content\Templates\channel.html" />
     <Content Include="Content\Templates\login.html" />
     <Content Include="Content\Templates\menu.html" />
     <Content Include="Content\Templates\profile.html" />
@@ -133,10 +134,11 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\Controllers\associate.js" />
-    <Content Include="Scripts\Controllers\channel.js" />
+    <Content Include="Scripts\Controllers\editchannel.js" />
     <Content Include="Scripts\Controllers\channels.js" />
     <Content Include="Scripts\Controllers\channelSearchResults.js" />
     <Content Include="Scripts\Controllers\feed.js" />
+    <Content Include="Scripts\Controllers\channel.js" />
     <Content Include="Scripts\Controllers\home.js" />
     <Content Include="Scripts\Controllers\login.js" />
     <Content Include="Scripts\Controllers\navigator.js" />
@@ -162,6 +164,7 @@
     <Content Include="Scripts\Services\channels.js" />
     <Content Include="Scripts\Services\channelSelector.js" />
     <Content Include="Scripts\Services\feeds.js" />
+    <Content Include="Scripts\Services\home.js" />
     <Content Include="Scripts\Services\posts.js" />
     <Content Include="Scripts\Services\rssFeeders.js" />
     <Content Include="Scripts\Services\tags.js" />

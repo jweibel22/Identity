@@ -1,38 +1,39 @@
 ﻿
-<div style="margin-top:160px">
-    <table>
-        <tr>
-            <td>
-                <span>Sort by</span>
-                <div class="btn-group">
-                    <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{selectedSortType}}  <span class="caret"></span></button>
-                    <ul class="dropdown-menu">
-                        <li ng-repeat="item in sortTypes">
-                            <a ng-click="changeSortBy(item)">
-                                {{item}}
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+<div>
+    <div ng-show="showcontrols">
+        <table>
+            <tr>
+                <td>
+                    <span>Sort by</span>
+                    <div class="btn-group">
+                        <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{selectedSortType}}  <span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat="item in sortTypes">
+                                <a ng-click="changeSortBy(item)">
+                                    {{item}}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
 
-            </td>
-            <td>
-                <span>List by</span>
-                <div class="btn-group">
-                    <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{selectedListType}}  <span class="caret"></span></button>
-                    <ul class="dropdown-menu">
-                        <li ng-repeat="item in listTypes">
-                            <a ng-click="changeListBy(item)">
-                                {{item}}
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                </td>
+                <td>
+                    <span>List by</span>
+                    <div class="btn-group">
+                        <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{selectedListType}}  <span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat="item in listTypes">
+                                <a ng-click="changeListBy(item)">
+                                    {{item}}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
 
-            </td>
-        </tr>
-    </table>
-
+                </td>
+            </tr>
+        </table>
+    </div>
 
     <div style="margin-top:10px" scroll infinite-scroll="loadMorePosts()" infinite-scroll-distance="2">
         <div ng-repeat="post in posts " style="margin-top: 20px" class="readable">

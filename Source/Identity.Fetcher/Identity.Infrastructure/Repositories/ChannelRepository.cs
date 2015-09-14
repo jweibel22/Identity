@@ -32,6 +32,17 @@ namespace Identity.Infrastructure.Repositories
             return con.Connection.Query<Channel>("select * from Channel where Name like @Name", new { Name = encoded }, con);
         }
 
+        public IEnumerable<Channel> TopChannels(int count)
+        {
+            var sql = @"select * from Channel where Id in 
+  (select top {0} ci.ChannelId from ChannelItem ci
+  where Created > @Timestamp and ci.UserId <> 2 and ci.UserId <> 5
+  group by ci.ChannelId
+  order by count(*) desc)";
+
+            return con.Connection.Query<Channel>(String.Format(sql, count), new { Timestamp = DateTimeOffset.Now.Subtract(TimeSpan.FromDays(7)) }, con);
+        }
+
         public IEnumerable<Channel> All()
         {
             return con.Connection.Query<Channel>("select * from Channel", null, con);

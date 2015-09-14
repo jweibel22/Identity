@@ -60,8 +60,8 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                     url: '/home/{channelId}',
                     views: {
                         'container@': {
-                            templateUrl: 'Content/templates/home.html',
-                            controller: 'MainCtrl',
+                            templateUrl: 'Content/templates/channel.html',
+                            controller: 'ChannelController',
                             resolve: {
                                 channelPromise: ['$stateParams', 'postService', function($stateParams, postService) { return postService.getFromChannel($stateParams.channelId, true, 'Added'); }],
                                 userPromise: ['userService', function(userService) { return userService.getCurrentUser(); }]
@@ -74,10 +74,10 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                     views: {
                         'container@': {
                             templateUrl: 'Content/templates/home.html',
-                            controller: 'MainCtrl',
+                            controller: 'HomeController',
                             resolve: {
-                                channelPromise: ['$stateParams', 'postService', function($stateParams, postService) { return postService.getFromDefaultChannel(); }],
-                                userPromise: ['userService', function(userService) { return userService.getCurrentUser(); }]
+                                homePromise: ['$stateParams', 'homeService', function ($stateParams, homeService) { return homeService.getHomeScreenContents(); }],
+                                userPromise: ['userService', function (userService) { return userService.getCurrentUser(); }]
                             }
                         }
                     }
@@ -91,16 +91,6 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                             resolve: {
                                 _: ['channelService', function(channelService) { return channelService.allPublic(); }]
                             }
-                        }
-                    }
-                })
-                .state('root.archive', {
-                    url: '/archive',
-                    views: {
-                        'container@': {
-                            templateUrl: 'Content/templates/archive.html',
-                            controller: 'MainCtrl',
-                            resolve: { _: ['postService', function(postService) { return postService.getAll(); }] }
                         }
                     }
                 })
@@ -205,7 +195,7 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                     views: {
                         'container@': {
                             templateUrl: 'Content/templates/editchannel.html',
-                            controller: 'ChannelController',
+                            controller: 'EditChannelController',
                             resolve: {
                                 userPromise: ['userService', function(userService) { return userService.getCurrentUser(); }],
                                 _: ['$stateParams', 'channelService', function($stateParams, channelService) { return channelService.getById($stateParams.id); }]
