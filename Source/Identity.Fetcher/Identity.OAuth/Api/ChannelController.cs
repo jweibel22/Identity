@@ -14,6 +14,7 @@ using CsQuery;
 using Identity.Infrastructure.DTO;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
+using Identity.OAuth;
 using log4net;
 
 namespace Identity.Rest.Api
@@ -28,12 +29,11 @@ namespace Identity.Rest.Api
         private readonly PostRepository postRepo;
         private readonly UserRepository userRepo;
         private readonly ILoadDtos dtoLoader;
-        private readonly StarredChannelRssWriter rssWriter;
 
         private Domain.User user;
 
-        public ChannelController(ILoadDtos dtoLoader, ChannelRepository channelRepo, PostRepository postRepo, 
-            UserRepository userRepo, StarredChannelRssWriter rssWriter)
+        public ChannelController(ILoadDtos dtoLoader, ChannelRepository channelRepo, PostRepository postRepo,
+            UserRepository userRepo)
         {
             var identity = User.Identity as ClaimsIdentity;
             user = userRepo.FindByName(identity.Name);
@@ -42,7 +42,6 @@ namespace Identity.Rest.Api
             this.channelRepo = channelRepo;
             this.postRepo = postRepo;
             this.userRepo = userRepo;
-            this.rssWriter = rssWriter;
         }
 
         [HttpGet]
@@ -62,6 +61,22 @@ namespace Identity.Rest.Api
         public Channel GetById(long id)
         {
             return dtoLoader.LoadChannel(user, channelRepo.GetById(id));           
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public HttpResponseMessage Rss(long id)
+        {
+            var channel = channelRepo.GetById(id);
+            var rssFeeder = userRepo.FindByName("rssfeeder");
+
+            var posts = Enumerable.Range(0, 5)
+                      .SelectMany(i => postRepo.PostsFromChannel(rssFeeder.Id, false, channel.Id, DateTimeOffset.Now, i * 30, "Added"))
+                      .Select(Mapper.Map<Post>)
+                      .ToList()
+                      .AsEnumerable();
+
+            return Request.CreateResponse(HttpStatusCode.OK, posts, new SyndicationFeedFormatter());
         }
 
         [HttpPut]

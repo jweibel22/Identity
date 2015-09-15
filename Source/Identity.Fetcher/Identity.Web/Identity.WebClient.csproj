@@ -88,6 +88,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\rss-feed-icone-7025-96.png" />
     <Content Include="Content\Templates\home.html" />
     <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\WebClient.pubxml" />

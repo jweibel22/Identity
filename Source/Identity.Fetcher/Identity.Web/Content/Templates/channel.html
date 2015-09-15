@@ -10,6 +10,9 @@
             <td>
                 <jqcloud words="channel.TagCloud" width="400" height="100" delay="10" steps="7" font-size="{from:0.09, to:0.04}"></jqcloud>
             </td>
+            <td>
+                <a ng-show="channelOwned" href="{{rssUrl}}"><img src="../Content/rss-feed-icone-7025-96.png"></a>
+            </td>
         </tr>
         <tr>
             <td>
@@ -29,7 +32,11 @@
 </div>
 
 
+
+
 <div style="margin-top:160px">
+    <!--<button class="btn btn-default" ng-show="channelOwned" ng-click="rss()">RSS</button>-->
+    
     <stream posts="posts" user="user" showonlyunread="true" channel="channel" autoloadonscroll="true" showcontrols="true" />
 </div>
 

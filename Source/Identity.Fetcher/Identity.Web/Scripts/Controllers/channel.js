@@ -1,10 +1,12 @@
 angular.module('inspire')
 .controller('ChannelController', [
-    '$scope', '$modal', '$http', '$stateParams', '$location', '$filter', 'postService', 'channelService', 'tagService', 'channelPromise', 'userPromise', 
-    function($scope, $modal, $http, $stateParams, $location, $filter, postService, channelService, tagService, channelPromise, userPromise){
+    '$scope', '$modal', '$http', '$stateParams', '$location', 'ngSettings', '$filter', 'postService', 'channelService', 'tagService', 'channelPromise', 'userPromise', 
+    function($scope, $modal, $http, $stateParams, $location, ngSettings, $filter, postService, channelService, tagService, channelPromise, userPromise){
 
         $scope.user = userPromise.data;        
         $scope.posts = postService.posts[channelPromise.data.Id];
+
+        $scope.rssUrl = ngSettings.baseUrl + "/Api/Channel/" + channelPromise.data.Id + "/Rss";
 
         //we want the $scope.channel to point to the same channel object that is used in the channel list, such that the unread counter gets updated
         var x = $filter('filter')($scope.user.Owns, { Id: channelPromise.data.Id }, true)[0];

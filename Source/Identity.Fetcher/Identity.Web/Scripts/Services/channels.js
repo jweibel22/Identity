@@ -12,6 +12,10 @@ angular.module('inspire').factory('channelService', ['$http', 'ngSettings', func
         });
     };
 
+    o.rss = function (channelId) {
+        return $http.get(ngSettings.baseUrl + '/Api/Channel/' + channelId + "/Rss");
+    };
+
     o.subscribe = function(channelId) {
         return $http.put(ngSettings.baseUrl + '/Api/Channel/' + channelId + "/Subscribe");
     };
