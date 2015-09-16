@@ -86,7 +86,7 @@ namespace Identity.Infrastructure.Repositories
             var postIds = @"select ci.PostId, count(*) as pop, min(ci.Created) as Added
 from Post 
 join ChannelItem ci on ci.PostId = Post.Id 
-join [User] u on u.Id = 1
+join [User] u on u.Id = @UserId
 left join ChannelLink cl on cl.ChildId = ci.ChannelId and cl.ParentId = @ChannelId
 where ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId
 group by ci.PostId";
