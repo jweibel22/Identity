@@ -1,21 +1,28 @@
 
-    <h3>Private channels</h3>
-<div ng-repeat="channel in user.Owns" style="margin-left: 20px">    
-    <a ng-show="channel.IsPrivate" href="#/home/{{channel.Id}}">
-        {{channel.Name}} ({{channel.UnreadCount}})
-    </a>
-</div>
-
-<h3>Public channels</h3>
+<h4>Channels</h4>    
 <div ng-repeat="channel in user.Owns" style="margin-left: 20px">
-    <a ng-show="!channel.IsPrivate" href="#/home/{{channel.Id}}">
-        {{channel.Name}} ({{channel.UnreadCount}})
-    </a>
+    <div ng-show="channel.IsLocked">
+        <a href="#/home/{{channel.Id}}">
+            {{channel.Name}} ({{channel.UnreadCount}})
+        </a>
+        <div ng-repeat="sub in channel.Subscriptions" style="margin-left: 10px">
+            <a href="#/home/{{sub.Id}}">
+                {{sub.Name}}
+            </a>
+        </div>
+    </div>    
 </div>
 
-<h3>Subscriptions</h3>
-<div ng-repeat="channel in user.FollowsChannels" style="margin-left: 20px">
-    <a href="#/home/{{channel.Id}}">
-        {{channel.Name}} ({{channel.UnreadCount}})
-    </a>
+<div style="margin-top:50px">
+    <div ng-repeat="channel in user.Owns" style="margin-left: 20px">
+        <div ng-show="!channel.IsLocked">
+            <a href="#/home/{{channel.Id}}">
+                {{channel.Name}} ({{channel.UnreadCount}})
+            </a>
+            <div ng-repeat="sub in channel.Subscriptions" style="margin-left: 10px">
+                <a href="#/home/{{sub.Id}}">
+                    {{sub.Name}}
+                </a>
+            </div>
+        </div>        </div>
 </div>

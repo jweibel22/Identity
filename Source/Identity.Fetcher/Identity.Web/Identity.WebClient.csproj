@@ -119,7 +119,6 @@
     <Content Include="Content\Templates\editchannel.html" />
     <Content Include="Content\Templates\editpost.html" />
     <Content Include="Content\Templates\editrssfeeder.html" />
-    <Content Include="Content\Templates\feed.html" />
     <Content Include="Content\Templates\channel.html" />
     <Content Include="Content\Templates\login.html" />
     <Content Include="Content\Templates\menu.html" />
@@ -138,7 +137,6 @@
     <Content Include="Scripts\Controllers\editchannel.js" />
     <Content Include="Scripts\Controllers\channels.js" />
     <Content Include="Scripts\Controllers\channelSearchResults.js" />
-    <Content Include="Scripts\Controllers\feed.js" />
     <Content Include="Scripts\Controllers\channel.js" />
     <Content Include="Scripts\Controllers\home.js" />
     <Content Include="Scripts\Controllers\login.js" />
@@ -164,7 +162,6 @@
     <Content Include="Scripts\Services\authorization.js" />
     <Content Include="Scripts\Services\channels.js" />
     <Content Include="Scripts\Services\channelSelector.js" />
-    <Content Include="Scripts\Services\feeds.js" />
     <Content Include="Scripts\Services\home.js" />
     <Content Include="Scripts\Services\posts.js" />
     <Content Include="Scripts\Services\rssFeeders.js" />

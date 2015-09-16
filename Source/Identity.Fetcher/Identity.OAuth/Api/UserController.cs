@@ -35,7 +35,8 @@ namespace Identity.Rest.Api
                 return null;
             }
 
-            return Map(user);
+            var u = Map(user);
+            return u;
         }
 
         private User Map(Domain.User user)
@@ -45,12 +46,13 @@ namespace Identity.Rest.Api
                 Id = user.Id,
                 DisplayName = user.Username,
                 Feed = new List<Post>(),
-                FollowsChannels = userRepo.Follows(user.Id).Select(c => Mapper.Map<Channel>(c)).ToList(),
+                FollowsChannels = channelRepo.GetSubscriptions(user.SubscriptionChannel).Select(c => Mapper.Map<Channel>(c)).ToList(),
                 FollowsTags = new List<string>(),
                 Owns = userRepo.Owns(user.Id).Select(c =>
                 {
                     var channel = Mapper.Map<Channel>(c);
                     channel.UnreadCount = channelRepo.UnreadCount(user.Id, channel.Id);
+                    channel.Subscriptions = channelRepo.GetSubscriptions(channel.Id).Select(Mapper.Map<Channel>).ToList();
                     return channel;
                 }).ToList(),
                 SavedChannel = user.SavedChannel,
@@ -70,7 +72,8 @@ namespace Identity.Rest.Api
                 return null;
             }
 
-            return Map(user);
+            var u = Map(user);
+            return u;
         }
 
         [HttpGet]

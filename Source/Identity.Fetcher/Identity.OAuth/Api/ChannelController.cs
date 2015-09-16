@@ -81,13 +81,15 @@ namespace Identity.Rest.Api
         [HttpPut]
         public void Subscribe(long id)
         {
-            userRepo.Subscribe(user.Id, id);
+            channelRepo.AddSubscription(user.SubscriptionChannel, id);
+            //userRepo.Subscribe(user.Id, id);
         }
 
         [HttpPut]
         public void Unsubscribe(long id)
         {
-            userRepo.Unsubscribe(user.Id, id);
+            channelRepo.RemoveSubscription(user.SubscriptionChannel, id);
+            //userRepo.Unsubscribe(user.Id, id);
         }
 
         [HttpPut]
@@ -132,6 +134,18 @@ namespace Identity.Rest.Api
             channelRepo.UpdateChannel(id, !channel.IsPrivate, channel.Name, channel.RssFeeders.Select(f => f.Url).ToList());
 
             return dtoLoader.LoadChannel(user, channelRepo.GetById(id));
+        }
+
+        [HttpPut]
+        public void RemoveSubscription(long id, long childId)
+        {
+            channelRepo.RemoveSubscription(id, childId);
+        }
+
+        [HttpPut]
+        public void AddSubscription(long id, long childId)
+        {
+            channelRepo.AddSubscription(id, childId);
         }
 
         [HttpDelete]

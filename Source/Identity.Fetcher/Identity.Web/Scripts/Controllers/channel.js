@@ -1,7 +1,7 @@
 angular.module('inspire')
 .controller('ChannelController', [
-    '$scope', '$modal', '$http', '$stateParams', '$location', 'ngSettings', '$filter', 'postService', 'channelService', 'tagService', 'channelPromise', 'userPromise', 
-    function($scope, $modal, $http, $stateParams, $location, ngSettings, $filter, postService, channelService, tagService, channelPromise, userPromise){
+    '$scope', '$modal', '$http', '$stateParams', '$location', 'ngSettings', '$filter', 'postService', 'channelService', 'tagService', 'channelSelectorService', 'channelPromise', 'userPromise', 
+    function($scope, $modal, $http, $stateParams, $location, ngSettings, $filter, postService, channelService, tagService, channelSelectorService, channelPromise, userPromise){
 
         $scope.user = userPromise.data;        
         $scope.posts = postService.posts[channelPromise.data.Id];
@@ -41,6 +41,11 @@ angular.module('inspire')
             channelService.subscribe($scope.channel.Id).success(function (data) {
                 $scope.channelFollowed = true;
             });
+        };
+
+        $scope.createLink = function () {
+            channelSelectorService.selectChannel($scope.user.Owns, function (id) { channelService.addSubscription(id, $scope.channel.Id); });
+            
         };
 
         $scope.unsubscribe = function () {

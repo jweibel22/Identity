@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
@@ -50,29 +51,19 @@ namespace Identity.Infrastructure.Repositories
 
         public IEnumerable<WeightedTag> GetTagCloud(long channelId)
         {
-            return con.Connection.Query<WeightedTag>(@"select top 20 count(*) as Weight, Tag as Text from Tagged join ChannelItem ci on ci.PostId = Tagged.PostId and ci.ChannelId = @ChannelId
-                                            group by Tag order by COUNT(*) desc", new { ChannelId = channelId }, con);
-        }
-
-        public IEnumerable<long> History(long userId, long channelId)
-        {
-            return con.Connection.Query<long>(@"select ReadHistory.PostId from ReadHistory  
-                                    join ChannelItem on ChannelItem.PostId = ReadHistory.PostId and ChannelItem.ChannelId = @ChannelId and ReadHistory.UserId=@UserId", 
-                                                                                                                                        new { UserId = userId, ChannelId = channelId }, con);
-        }
-
-        public IEnumerable<long> Intersection(long channel1Id, long channel2Id)
-        {
-            return con.Connection.Query<long>(@"select PostId from ChannelItem where ChannelId=@Channel1Id intersect
-                                    select PostId from ChannelItem where ChannelId=@Channel2Id ",
-                                                                                                new { Channel1Id = channel1Id, Channel2Id = channel2Id }, con);
+            return con.Connection.Query<WeightedTag>(@" select top 20 count(*) as Weight, Tag as Text from Tagged 
+                                                        join ChannelLink cl on cl.ParentId = @ChannelId
+                                                        join ChannelItem ci on ci.PostId = Tagged.PostId and (ci.ChannelId = @ChannelId or ci.ChannelId = cl.ChildId)
+                                                        group by Tag order by COUNT(*) desc", 
+                                                                                            new { ChannelId = channelId }, con);
         }
 
         public int UnreadCount(long userId, long channelId)
         {
             return con.Connection.Query<int>(@"select COUNT(*) from ChannelItem
                                     left join ReadHistory on ChannelItem.PostId = ReadHistory.PostId and ReadHistory.UserId = @UserId
-                                    where ChannelItem.ChannelId = @ChannelId and ReadHistory.UserId IS NULL", 
+                                    join ChannelLink cl on cl.ParentId = @ChannelId
+                                    where (ChannelItem.ChannelId = cl.ChildId or ChannelItem.ChannelId = @ChannelId) and ReadHistory.UserId IS NULL", 
                                                                                                    new { UserId = userId, ChannelId = channelId }, con).Single();
         }
 
@@ -93,12 +84,6 @@ namespace Identity.Infrastructure.Repositories
             }
         }
 
-        public bool PartOf(long channelId, long postId)
-        {
-            return con.Connection.Query<int>("select count(*) from ChannelItem where ChannelId=@ChannelId and PostId=@PostId",
-                    new {ChannelId = channelId, PostId = postId}, con).Single() > 0;
-        }
-
         public void Delete(long userId, long channelId)
         {
             var cnt = con.Connection.Query<int>("select count(*) from ChannelOwner where UserId=@UserId and ChannelId=@ChannelId and IsLocked=false",
@@ -109,10 +94,25 @@ namespace Identity.Infrastructure.Repositories
                 throw new Exception("Access denied, you're not allowed to delete this channel");
             }
             
-            con.Connection.Execute("delete from Subscription where ChannelId=@Id", new { Id = channelId }, con);
+            con.Connection.Execute("delete from ChannelLink where ParentId=@Id or ChildId=@Id", new { Id = channelId }, con);
             con.Connection.Execute("delete from ChannelOwner where ChannelId=@Id", new { Id = channelId }, con);
             con.Connection.Execute("delete from ChannelItem where ChannelId=@Id", new { Id = channelId }, con);
             con.Connection.Execute("delete from Channel where Id=@Id", new { Id = channelId }, con);
+        }
+
+        public IEnumerable<Channel> GetSubscriptions(long channelId)
+        {
+            return con.Connection.Query<Channel>("select c.* from ChannelLink cl join Channel c on c.Id = cl.ChildId where cl.ParentId = @ChannelId", new { ChannelId = channelId }, con).ToList();
+        }
+
+        public void RemoveSubscription(long parentId, long childId)
+        {
+            con.Connection.Execute("delete from ChannelLink where ParentId = @ParentId and ChildId = @ChildId", new { ParentId = parentId, ChildId = childId }, con);
+        }
+
+        public void AddSubscription(long parentId, long childId)
+        {
+            con.Connection.Execute("update ChannelLink set ChildId=@ChildId where ChildId=@ChildId and ParentId=@ParentId if @@rowcount = 0 insert ChannelLink values(@ParentId, @ChildId)", new { ParentId = parentId, ChildId = childId }, con);
         }
 
         public RssFeeder RssFeederById(long id)

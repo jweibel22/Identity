@@ -27,3 +27,11 @@
 
 
 </div>
+
+
+<div style="margin-top:50px">
+    <h4>Subscriptions</h4>
+    <div ng-repeat="child in channel.Subscriptions">
+        {{child.Name}} <a ng-click="removeSubscription(child)">Remove</a>
+    </div>
+</div>

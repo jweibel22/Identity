@@ -1,7 +1,7 @@
 ﻿
 CREATE TABLE [dbo].[Channel](
 	[Id] [bigint] IDENTITY(1,1) NOT NULL,
-	[Name] [nchar](20) NOT NULL,
+	[Name] [nchar](128) NOT NULL,
 	[Created] [datetimeoffset] NOT NULL,
 	[IsPublic] [bit] NOT NULL,
  CONSTRAINT [PK_Channel] PRIMARY KEY CLUSTERED 
@@ -131,6 +131,7 @@ CREATE TABLE [dbo].[User](
 	[LikedChannel] [bigint] NOT NULL,
 	[IdentityId] [nchar](64) NULL,
 	[Inbox] [bigint] NOT NULL,
+	[SubscriptionChannel] [bigint] NOT NULL,
  CONSTRAINT [PK_User] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -152,6 +153,17 @@ CREATE TABLE [dbo].[UserLogins](
 ) ON [PRIMARY]
 
 
+CREATE TABLE [dbo].[ChannelLink](
+	[ParentId] [bigint] NOT NULL,
+	[ChildId] [bigint] NOT NULL,
+ CONSTRAINT [PK_ChannelLink] PRIMARY KEY CLUSTERED 
+(
+	[ParentId] ASC,
+	[ChildId] ASC
+)
+) ON [PRIMARY]
+
+
 CREATE VIEW [dbo].[Popularity] as
 select xx.PostId, COUNT(*) as Popularity from 
 (select Post.Id as PostId
@@ -162,16 +174,3 @@ from Post join ChannelItem ci on ci.PostId = Post.Id join ChannelOwner co on co.
 group by PostId
 
 
-CREATE VIEW [dbo].[UserSpecificPopularity]
-AS
-SELECT     PostId, UserId, COUNT(*) AS Popularity
-FROM         (SELECT     dbo.Post.Id AS PostId, s.UserId
-                       FROM          dbo.Post INNER JOIN
-                                              dbo.ChannelItem AS ci ON ci.PostId = dbo.Post.Id INNER JOIN
-                                              dbo.Subscription AS s ON s.ChannelId = ci.ChannelId
-                       UNION ALL
-                       SELECT     Post_1.Id AS PostId, co.UserId
-                       FROM         dbo.Post AS Post_1 INNER JOIN
-                                             dbo.ChannelItem AS ci ON ci.PostId = Post_1.Id INNER JOIN
-                                             dbo.ChannelOwner AS co ON co.ChannelId = ci.ChannelId) AS xx
-GROUP BY PostId, UserId

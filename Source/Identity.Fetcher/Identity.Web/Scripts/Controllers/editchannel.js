@@ -24,4 +24,16 @@
                 });
             }
 
+            $scope.removeSubscription = function (child) {
+
+                var index = $scope.channel.Subscriptions.indexOf(child);
+                if (index > -1) {
+                    $scope.channel.Subscriptions.splice(index, 1);
+                }
+
+                channelService.removeSubscription($scope.channel, child).then(function (res) {
+                    $scope.channel = res.data;
+                });
+            }
+
         }]);

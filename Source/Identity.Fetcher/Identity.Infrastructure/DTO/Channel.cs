@@ -12,9 +12,13 @@ namespace Identity.Infrastructure.DTO
 
         public bool IsPrivate { get; set; }
 
+        public bool IsLocked { get; set; }
+
         public int UnreadCount { get; set; }
 
         public IList<RssFeeder> RssFeeders { get; set; }
+
+        public IEnumerable<Channel> Subscriptions { get; set; }
 
         public IList<WeightedTag> TagCloud { get; set; }
     }

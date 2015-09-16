@@ -94,19 +94,6 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                         }
                     }
                 })
-                .state('root.feed', {
-                    url: '/feed',
-                    views: {
-                        'container@': {
-                            templateUrl: 'Content/templates/feed.html',
-                            controller: 'FeedController',
-                            resolve: {
-                                posts: ['feedService', function(feedService) { return feedService.getFeed('Added'); }],
-                                userPromise: ['userService', function(userService) { return userService.getCurrentUser(); }]
-                            }
-                        }
-                    }
-                })
                 .state('root.search', {
                     url: '/search?query',
                     views: {

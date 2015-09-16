@@ -185,7 +185,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\ChannelController.cs" />
-    <Compile Include="Api\FeedController.cs" />
     <Compile Include="Api\HomeController.cs" />
     <Compile Include="Api\PostController.cs" />
     <Compile Include="Api\RssFeederController.cs" />

@@ -135,11 +135,19 @@ namespace Identity.OAuth.Api
                 Created = DateTimeOffset.Now,
                 Name = String.Format("{0}'s inbox", username)
             };
+
+            var subscriptionChannel = new Channel
+            {
+                Created = DateTimeOffset.Now,
+                Name = String.Format("{0}'s subscriptions", username)
+            };
                 
             channelRepository.AddChannel(starredChannel);
             channelRepository.AddChannel(savedChannel);
             channelRepository.AddChannel(likedChannel);
             channelRepository.AddChannel(inbox);
+            channelRepository.AddChannel(subscriptionChannel);
+            
 
             var user = new User
             {
@@ -148,7 +156,8 @@ namespace Identity.OAuth.Api
                 StarredChannel = starredChannel.Id,
                 LikedChannel = likedChannel.Id,
                 SavedChannel = savedChannel.Id,
-                Inbox = inbox.Id
+                Inbox = inbox.Id,
+                SubscriptionChannel = subscriptionChannel.Id
             };
 
             userRepository.AddUser(user);
@@ -157,6 +166,7 @@ namespace Identity.OAuth.Api
             userRepository.Owns(user.Id, savedChannel.Id, true);
             userRepository.Owns(user.Id, likedChannel.Id, true);
             userRepository.Owns(user.Id, inbox.Id, true);
+            userRepository.Owns(user.Id, subscriptionChannel.Id, true);
 
             return user;
         }

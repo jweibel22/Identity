@@ -20,6 +20,7 @@
                 <button class="btn btn-default" ng-show="channelOwned" ng-click="addPost()">Add post</button>
                 <button class="btn btn-default" ng-show="channelFollowed" ng-click="unsubscribe()">Unsubscribe</button>
                 <button class="btn btn-default" ng-show="!channelFollowed" ng-click="subscribe()">Subscribe</button>
+                <button class="btn btn-default" ng-click="createLink()">Link to ...</button>
                 <button class="btn btn-default" ng-show="channelOwned" ng-click="leave()">Leave</button>
                 <a ng-show="channelOwned" href="#/editchannel/{{channel.Id}}" class="btn btn-default">Edit</a>
                 <span ng-show="!channelOwned">

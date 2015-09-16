@@ -85,9 +85,10 @@ namespace Identity.Infrastructure.Services
             foreach (var channel in result)
             {
                 channel.UnreadCount = channelRepo.UnreadCount(user.Id, channel.Id);
+                channel.Subscriptions = channelRepo.GetSubscriptions(channel.Id).Select(Mapper.Map<DTO.Channel>).ToList();
             }
 
-            return result;
+             return result;
         }
 
         public IEnumerable<DTO.Post> LoadChannelPosts(User user, Channel channel, bool onlyUnread, DateTimeOffset timestamp, int fromIndex, string orderBy)
@@ -129,6 +130,7 @@ namespace Identity.Infrastructure.Services
             result.UnreadCount = channelRepo.UnreadCount(user.Id, result.Id);
             result.RssFeeders = channelRepo.GetRssFeedersForChannel(channel.Id).Select(Mapper.Map<DTO.RssFeeder>).ToList();
             result.TagCloud = channelRepo.GetTagCloud(channel.Id).Select(Mapper.Map<DTO.WeightedTag>).ToList();
+            result.Subscriptions = channelRepo.GetSubscriptions(channel.Id).Select(Mapper.Map<DTO.Channel>).ToList();
 
             return result;
         }

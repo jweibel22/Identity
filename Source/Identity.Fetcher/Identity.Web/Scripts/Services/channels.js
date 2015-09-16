@@ -54,7 +54,7 @@ angular.module('inspire').factory('channelService', ['$http', 'ngSettings', func
     };
 
     o.getById = function(id) {
-        return $http.get(ngSettings.baseUrl + '/Api/Channel/' + id).success(function (data) {
+        return $http.get(ngSettings.baseUrl + '/Api/Channel/' + id + "/GetById").success(function (data) {
             o.editchannel = data;
         });
     }
@@ -64,6 +64,14 @@ angular.module('inspire').factory('channelService', ['$http', 'ngSettings', func
             angular.copy(data, o.searchResult);
         });
     }
+
+    o.removeSubscription = function (channel, child) {
+        return $http.put(ngSettings.baseUrl + '/Api/Channel/' + channel.Id + '/RemoveSubscription?childId=' + child.Id);
+    };
+
+    o.addSubscription = function (channelId, childId) {
+        return $http.put(ngSettings.baseUrl + '/Api/Channel/' + channelId + '/AddSubscription?childId=' + childId);
+    };
 
     return o;
 }]);

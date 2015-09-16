@@ -1,4 +1,4 @@
-﻿angular.module('inspire').directive("stream", ['$window', '$location', '$rootScope', '$modal', 'postService', 'feedService', 'userService', 'channelSelectorService', function ($window, $location, $rootScope, $modal, postService, feedService, userService, channelSelectorService) {
+﻿angular.module('inspire').directive("stream", ['$window', '$location', '$rootScope', '$modal', 'postService', 'userService', 'channelSelectorService', function ($window, $location, $rootScope, $modal, postService, userService, channelSelectorService) {
 
         return {
             restrict: 'E',
@@ -68,15 +68,6 @@
 
                 $scope.reloadPosts = function() {
 
-                    if (!$scope.channel) {
-                        if (!$scope.loading) {
-                            $scope.loading = true;
-
-                            feedService.getFeed($scope.selectedSortType).then(function (data) {
-                                $scope.loading = false;
-                            });
-                        }
-                    } else {
                         if (!$scope.loading) {
                             $scope.loading = true;
 
@@ -84,22 +75,12 @@
                                 $scope.loading = false;
                             });
                         }
-                    }
                 }
 
                 $scope.loadMorePosts = function () {
 
                     if ($scope.autoloadonscroll) {
 
-                        if (!$scope.channel) {
-                            if (!$scope.loading) {
-                                $scope.loading = true;
-
-                                feedService.loadMorePosts($scope.selectedSortType).then(function(data) {
-                                    $scope.loading = false;
-                                });
-                            }
-                        } else {
                             if (!$scope.loading) {
                                 $scope.loading = true;
 
@@ -107,7 +88,6 @@
                                     $scope.loading = false;
                                 });
                             }
-                        }
                     }
                 }
 

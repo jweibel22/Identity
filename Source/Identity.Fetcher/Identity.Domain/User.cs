@@ -14,6 +14,8 @@
 
         public long Inbox { get; set; }
 
+        public long SubscriptionChannel { get; set; }
+
         public string IdentityId { get; set; }
     }
 }

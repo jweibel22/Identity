@@ -16,6 +16,8 @@ namespace Identity.Domain
 
         public bool IsPublic { get; set; }
 
+        public bool IsLocked { get; set; }
+
         public Channel()
         {
         }
