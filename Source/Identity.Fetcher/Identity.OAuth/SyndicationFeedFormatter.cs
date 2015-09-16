@@ -32,7 +32,7 @@ namespace Identity.OAuth
 
         Func<Type, bool> SupportedType = (type) =>
         {
-            if (type == typeof(Post) || type == typeof(IEnumerable<Post>))
+            if (type == typeof(Channel))
                 return true;
             else
                 return false;
@@ -52,30 +52,25 @@ namespace Identity.OAuth
         {
             return Task.Factory.StartNew(() =>
             {
-                if (type == typeof(Post) || type == typeof(IEnumerable<Post>))
+                if (type == typeof(Channel))
                     BuildSyndicationFeed(value, writeStream, content.Headers.ContentType.MediaType);
             });
         }
 
         private void BuildSyndicationFeed(object models, Stream stream, string contenttype)
         {
-            List<SyndicationItem> items = new List<SyndicationItem>();
+            var channel = ((Channel)models);
+
+            var items = new List<SyndicationItem>();
             var feed = new SyndicationFeed()
             {
-                Title = new TextSyndicationContent("My Feed")
-            };
-
-            if (models is IEnumerable<Post>)
+                Title = new TextSyndicationContent(channel.Name)
+            };          
+                
+            var enumerator = channel.Posts.GetEnumerator();
+            while (enumerator.MoveNext())
             {
-                var enumerator = ((IEnumerable<Post>)models).GetEnumerator();
-                while (enumerator.MoveNext())
-                {
-                    items.Add(BuildSyndicationItem(enumerator.Current));
-                }
-            }
-            else
-            {
-                items.Add(BuildSyndicationItem((Post)models));
+                items.Add(BuildSyndicationItem(enumerator.Current));
             }
 
             feed.Items = items;
@@ -84,12 +79,12 @@ namespace Identity.OAuth
             {
                 if (string.Equals(contenttype, atom))
                 {
-                    Atom10FeedFormatter atomformatter = new Atom10FeedFormatter(feed);
+                    var atomformatter = new Atom10FeedFormatter(feed);
                     atomformatter.WriteTo(writer);
                 }
                 else
                 {
-                    Rss20FeedFormatter rssformatter = new Rss20FeedFormatter(feed);
+                    var rssformatter = new Rss20FeedFormatter(feed);
                     rssformatter.WriteTo(writer);
                 }
             }
@@ -109,18 +104,5 @@ namespace Identity.OAuth
 
             return item;
         }
-
-        //private SyndicationItem BuildSyndicationItem(Url u)
-        //{
-        //    var item = new SyndicationItem()
-        //    {
-        //        Title = new TextSyndicationContent(u.Title),
-        //        BaseUri = new Uri(u.Address),
-        //        LastUpdatedTime = u.CreatedAt,
-        //        Content = new TextSyndicationContent(u.Description)
-        //    };
-        //    item.Authors.Add(new SyndicationPerson() { Name = u.CreatedBy });
-        //    return item;
-        //}
     }
 }

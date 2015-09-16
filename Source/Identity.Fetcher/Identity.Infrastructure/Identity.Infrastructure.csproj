@@ -68,7 +68,6 @@
     <Compile Include="Rss\RssFeedRefresher.cs" />
     <Compile Include="Rss\RssReader.cs" />
     <Compile Include="Services\DtoLoader.cs" />
-    <Compile Include="Services\StarredChannelRssWriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Identity.Domain\Identity.Domain.csproj">

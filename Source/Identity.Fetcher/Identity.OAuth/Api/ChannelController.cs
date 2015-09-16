@@ -67,16 +67,15 @@ namespace Identity.Rest.Api
         [HttpGet]
         public HttpResponseMessage Rss(long id)
         {
-            var channel = channelRepo.GetById(id);
+            var channel = Mapper.Map<Channel>(channelRepo.GetById(id));
             var rssFeeder = userRepo.FindByName("rssfeeder");
 
-            var posts = Enumerable.Range(0, 5)
+            channel.Posts = Enumerable.Range(0, 5)
                       .SelectMany(i => postRepo.PostsFromChannel(rssFeeder.Id, false, channel.Id, DateTimeOffset.Now, i * 30, "Added"))
                       .Select(Mapper.Map<Post>)
-                      .ToList()
-                      .AsEnumerable();
+                      .ToList();
 
-            return Request.CreateResponse(HttpStatusCode.OK, posts, new SyndicationFeedFormatter());
+            return Request.CreateResponse(HttpStatusCode.OK, channel, new SyndicationFeedFormatter());
         }
 
         [HttpPut]
@@ -107,11 +106,6 @@ namespace Identity.Rest.Api
         public void Posts(long id, long postId)
         {
             userRepo.Publish(user.Id, id, postId);
-
-            //if (user.StarredChannel == id)
-            //{
-            //    rssWriter.Write(user);
-            //}
         }
 
         [HttpDelete]

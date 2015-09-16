@@ -32,25 +32,6 @@ namespace Identity.Fetcher.WindowsService
             log.Info("Service stopped");
         }
 
-        private void WriteRss()
-        {
-            using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString))
-            {
-                con.Open();
-                using (var transaction = con.BeginTransaction())
-                {
-                    var postRepo = new PostRepository(transaction);
-                    var userRepo = new UserRepository(transaction);
-
-                    var feedWriter = new StarredChannelRssWriter(postRepo, userRepo);
-
-                    feedWriter.Write(userRepo.FindByName("jimmy"));
-
-                    transaction.Commit();
-                }
-            }
-        }
-
         private void Run(object state)
         {
             using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString))
