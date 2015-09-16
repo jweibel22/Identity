@@ -93,7 +93,7 @@ namespace Identity.Infrastructure.Services
 
         public IEnumerable<DTO.Post> LoadChannelPosts(User user, Channel channel, bool onlyUnread, DateTimeOffset timestamp, int fromIndex, string orderBy)
         {
-            var posts = postRepo.PostsFromChannel(user.Id, onlyUnread, channel.Id, timestamp, fromIndex, orderBy);
+            var posts = postRepo.PostsFromChannel(user.Id, onlyUnread, channel.Id, timestamp, fromIndex, orderBy).ToList();
             var commentCounts = commentRepo.CommentCounts(channel.Id);
             var xx = posts.Select(p => Mapper.Map<DTO.Post>(p)).ToList();
 
@@ -104,6 +104,7 @@ namespace Identity.Infrastructure.Services
                 var commentCount = commentCounts.SingleOrDefault(cc => cc.Id == p.Id);
                 p.CommentCount = commentCount != null ? commentCount.Count : 0;
                 p.IsCollapsed = p.Description.Length >= 500; //p.Teaser != null;
+                p.PublishedIn = postRepo.PublishedIn(p.Id).Select(c => Mapper.Map<DTO.Channel>(c)).ToList();
             }
 
             return xx;
