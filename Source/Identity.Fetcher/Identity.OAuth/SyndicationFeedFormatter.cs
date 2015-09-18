@@ -92,15 +92,13 @@ namespace Identity.OAuth
 
         private SyndicationItem BuildSyndicationItem(Post p)
         {
-            
-                var item = new SyndicationItem
-                {
-                    Title = new TextSyndicationContent(p.Title),
-                    Summary = new TextSyndicationContent(p.Description),
-                    PublishDate = DateTime.Now
-
-                };
-                item.Links.Add(new SyndicationLink(new Uri(p.Uri)));
+            var item = new SyndicationItem
+            {
+                Title = new TextSyndicationContent(p.Title),
+                Summary = new TextSyndicationContent(p.Description),
+                PublishDate = p.Added
+            };
+            item.Links.Add(new SyndicationLink(new Uri(p.Uri)));
 
             return item;
         }
