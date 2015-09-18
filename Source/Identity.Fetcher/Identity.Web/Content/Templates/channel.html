@@ -20,7 +20,7 @@
                 <button class="btn btn-default" ng-show="channelOwned" ng-click="addPost()">Add post</button>
                 <button class="btn btn-default" ng-show="channelFollowed" ng-click="unsubscribe()">Unsubscribe</button>
                 <button class="btn btn-default" ng-show="!channelFollowed" ng-click="subscribe()">Subscribe</button>
-                <button class="btn btn-default" ng-click="createLink()">Link to ...</button>
+                <button class="btn btn-default" ng-click="createLink()">Forward to ...</button>
                 <button class="btn btn-default" ng-show="channelOwned" ng-click="leave()">Leave</button>
                 <a ng-show="channelOwned" href="#/editchannel/{{channel.Id}}" class="btn btn-default">Edit</a>
                 <span ng-show="!channelOwned">
@@ -38,7 +38,7 @@
 <div style="margin-top:160px">
     <!--<button class="btn btn-default" ng-show="channelOwned" ng-click="rss()">RSS</button>-->
     
-    <stream posts="posts" user="user" showonlyunread="true" channel="channel" autoloadonscroll="true" showcontrols="true" />
+    <stream posts="posts" user="user" showonlyunread="showOnlyUnread" channel="channel" autoloadonscroll="true" showcontrols="true" />
 </div>
 
     <script type="text/ng-template" id="channelSelector.html">

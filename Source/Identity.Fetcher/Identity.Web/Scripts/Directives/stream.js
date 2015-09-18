@@ -72,6 +72,7 @@
                             $scope.loading = true;
 
                             postService.getFromChannel($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType).then(function (data) {
+                                angular.copy(data.data.Posts, $scope.posts);
                                 $scope.loading = false;
                             });
                         }
@@ -84,7 +85,8 @@
                             if (!$scope.loading) {
                                 $scope.loading = true;
 
-                                postService.loadMorePosts($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType).then(function(data) {
+                                postService.loadMorePosts($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType).then(function (data) {
+                                    angular.copy($scope.posts.concat(data.data.Posts), $scope.posts);
                                     $scope.loading = false;
                                 });
                             }
@@ -149,6 +151,11 @@
 
                     channelSelectorService.selectChannel($scope.user.Owns, function(id) { postService.savePost(id, post); });
                 }
+
+                if ($scope.channel) {
+                    $scope.reloadPosts();
+                }
+                
 
                 //$scope.incrementUpvotes = function (post) {
                 //    postService.upvote(post);

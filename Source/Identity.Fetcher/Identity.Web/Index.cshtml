@@ -28,7 +28,6 @@
     <script src="/Scripts/Controllers/home.js"></script>
     <script src="/Scripts/Controllers/posts.js"></script>
     <script src="/Scripts/Controllers/navigator.js"></script>
-    <script src="/Scripts/Controllers/feed.js"></script>
     <script src="/Scripts/Controllers/channels.js"></script>
     <script src="/Scripts/Controllers/searchresults.js"></script>
     <script src="/Scripts/Controllers/channelSearchResults.js"></script>
@@ -41,7 +40,6 @@
     <script src="/Scripts/Services/tags.js"></script>
     <script src="/Scripts/Services/posts.js"></script>
     <script src="/Scripts/Services/users.js"></script>
-    <script src="/Scripts/Services/feeds.js"></script>
     <script src="/Scripts/Services/channels.js"></script>
     <script src="/Scripts/Services/home.js"></script>
     <script src="/Scripts/Services/rssFeeders.js"></script>
@@ -106,8 +104,8 @@
                         <div ui-view="container"></div>
                     </div>
                     <div id="loading">
-                        <img src="Content/ajax-loader.gif" class="ajax-loader" />
-                    </div>
+                        <img src="Content/ajax-loader.gif" class="ajax-loader" style="position:fixed;top:50%;left:50%" /> 
+                    </div>                        
                 </div>
             </div>
             <hr />

@@ -63,7 +63,7 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                             templateUrl: 'Content/templates/channel.html',
                             controller: 'ChannelController',
                             resolve: {
-                                channelPromise: ['$stateParams', 'postService', function($stateParams, postService) { return postService.getFromChannel($stateParams.channelId, true, 'Added'); }],
+                                channelPromise: ['$stateParams', 'channelService', function ($stateParams, channelService) { return channelService.getById($stateParams.channelId); }],
                                 userPromise: ['userService', function(userService) { return userService.getCurrentUser(); }]
                             }
                         }

@@ -68,6 +68,8 @@ namespace Identity.Infrastructure.Repositories
 
         public IEnumerable<Post> PostsFromChannel(long userId, bool onlyUnread, long channelId, DateTimeOffset timestamp, int fromIndex, string orderBy)
         {
+            const int pageSize = 30;
+
             if (orderBy == "Added")
             {
                 orderBy = "XX.Added desc";
@@ -83,7 +85,7 @@ namespace Identity.Infrastructure.Repositories
 
 
 
-            var postIds = @"select ci.PostId, count(*) as pop, min(ci.Created) as Added
+            const string postIds = @"select ci.PostId, count(*) as pop, min(ci.Created) as Added
 from Post 
 join ChannelItem ci on ci.PostId = Post.Id 
 join [User] u on u.Id = @UserId
@@ -91,9 +93,9 @@ left join ChannelLink cl on cl.ChildId = ci.ChannelId and cl.ParentId = @Channel
 where ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId
 group by ci.PostId";
 
-            var postData = @"
+            const string postData = @"
 select Post.*,
-XX.pop as CPop,
+XX.pop as UserSpecificPopularity,
 XX.Added as Added,
 CASE WHEN liked.Created IS NULL THEN 'false' ELSE 'true' END as Liked, 
 CASE WHEN saved.Created IS NULL THEN 'false' ELSE 'true' END as Saved, 
@@ -112,38 +114,9 @@ left join ReadHistory on ReadHistory.PostId = Post.Id and ReadHistory.UserId = @
 left join Popularity pop on pop.PostId = Post.Id
 where Post.Created < @Timestamp {1}";
 
-            var paged = @"select * from ({0}) as TBL where TBL.RowNum BETWEEN (@FromIndex+1) AND (@FromIndex+30)";
+            const string paged = @"select * from ({0}) as TBL where TBL.RowNum BETWEEN (@FromIndex+1) AND (@FromIndex+{1})";
 
-            var sql = String.Format(paged, String.Format(postData, postIds, onlyUnread ? " and ReadHistory.Timestamp IS NULL" : "", orderBy));
-
-
-
-
-//            var sql = @"select * from 
-//(select Post.*, poster.Id as PosterId, poster.Username as PosterUserName,
-//CASE WHEN liked.Created IS NULL THEN 'false' ELSE 'true' END as Liked, 
-//CASE WHEN saved.Created IS NULL THEN 'false' ELSE 'true' END as Saved, 
-//CASE WHEN starred.Created IS NULL THEN 'false' ELSE 'true' END as Starred, 
-//CASE WHEN ReadHistory.Timestamp IS NULL THEN 'false' ELSE 'true' END as [Read],
-//dateadd(mi, datediff(mi, 0, ci.Created), 0) as Added, 
-//CASE WHEN pop.Popularity IS NULL THEN 0 ELSE pop.Popularity END as Popularity,
-//CASE WHEN userpop.Popularity IS NULL THEN 0 ELSE userpop.Popularity END as UserSpecificPopularity,
-//ROW_NUMBER() OVER (ORDER BY {1}) AS RowNum
-//from Post 
-//join ChannelItem ci on ci.PostId = Post.Id 
-//join [User] poster on poster.Id = ci.UserId 
-//join [User] u on u.Id = @UserId 
-//left join ChannelLink cl on cl.ChildId = ci.ChannelId and cl.ParentId = @ChannelId
-//left join ChannelItem liked on liked.ChannelId = u.LikedChannel and liked.PostId = Post.Id
-//left join ChannelItem saved on saved.ChannelId = u.SavedChannel and saved.PostId = Post.Id
-//left join ChannelItem starred on starred.ChannelId = u.StarredChannel and starred.PostId = Post.Id
-//left join ReadHistory on ReadHistory.PostId = Post.Id and ReadHistory.UserId = @UserId 
-//left join Popularity pop on pop.PostId = Post.Id
-//left join UserSpecificPopularity userpop on userpop.PostId = Post.Id and userpop.UserId=@UserId
-//where (ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId)and Post.Created < @Timestamp {0}) as TBL
-//where TBL.RowNum BETWEEN (@FromIndex+1) AND (@FromIndex+30)";
-
-            //sql = String.Format(sql, onlyUnread ? " and ReadHistory.Timestamp IS NULL" : "", orderBy);
+            var sql = String.Format(paged, String.Format(postData, postIds, onlyUnread ? " and ReadHistory.Timestamp IS NULL" : "", orderBy), pageSize);
 
             return con.Connection.Query<Post>(sql, new { ChannelId = channelId, UserId = userId, Timestamp = timestamp, FromIndex = fromIndex}, con);                
         }

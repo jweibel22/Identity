@@ -4,7 +4,7 @@ angular.module('inspire')
     function($scope, $modal, $http, $stateParams, $location, ngSettings, $filter, postService, channelService, tagService, channelSelectorService, channelPromise, userPromise){
 
         $scope.user = userPromise.data;        
-        $scope.posts = postService.posts[channelPromise.data.Id];
+        $scope.posts = [];
 
         $scope.rssUrl = ngSettings.baseUrl + "/Api/Channel/" + channelPromise.data.Id + "/Rss";
 
@@ -64,7 +64,7 @@ angular.module('inspire')
         $scope.showOnlyUnreadChanged = function() {
 
             postService.getFromChannel($scope.channel.Id, $scope.showOnlyUnread).success(function(data) {
-                $scope.posts = postService.posts[$scope.channel.Id];
+                angular.copy(data.data.Posts, $scope.posts);
             });
         }
 
