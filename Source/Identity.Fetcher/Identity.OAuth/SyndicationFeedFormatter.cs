@@ -96,7 +96,8 @@ namespace Identity.OAuth
             {
                 Title = new TextSyndicationContent(p.Title),
                 Summary = new TextSyndicationContent(p.Description),
-                PublishDate = p.Added
+                PublishDate = p.Added,
+                LastUpdatedTime = p.Added
             };
             item.Links.Add(new SyndicationLink(new Uri(p.Uri)));
 
