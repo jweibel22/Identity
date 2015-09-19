@@ -32,7 +32,7 @@ namespace Identity.Infrastructure.Repositories
         public Post GetFeedItem(string uri, string title, DateTimeOffset created, long rssFeederId)
         {
             return con.Connection.Query<Post>(@"select * from Post join FeedItem fi on fi.PostId = Post.Id 
-                                                where (Uri=@Uri or (Title=@Title and Created=@Created)) and fi.RssFeederId=@RssFeederId", new
+                                                where (Uri=@Uri or (Title=@Title and Post.Created=@Created)) and fi.RssFeederId=@RssFeederId", new
             {
                 Uri = uri, 
                 Title = title, 
