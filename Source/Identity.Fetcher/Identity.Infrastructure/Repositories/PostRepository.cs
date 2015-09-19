@@ -29,6 +29,18 @@ namespace Identity.Infrastructure.Repositories
             return con.Connection.Query<Post>("select * from Post where Uri=@Uri", new { Uri = uri }, con).SingleOrDefault();
         }
 
+        public Post GetFeedItem(string uri, string title, DateTimeOffset created, long rssFeederId)
+        {
+            return con.Connection.Query<Post>(@"select * from Post join FeedItem fi on fi.PostId = Post.Id 
+                                                where (Uri=@Uri or (Title=@Title and Created=@Created)) and fi.RssFeederId=@RssFeederId", new
+            {
+                Uri = uri, 
+                Title = title, 
+                Created = created, 
+                RssFeederId = rssFeederId
+            }, con).FirstOrDefault();
+        }
+
         public IEnumerable<Post> TopPosts(int count)
         {
             var sql = @"select * from Post where Id in 

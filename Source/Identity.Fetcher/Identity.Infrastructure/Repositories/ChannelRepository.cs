@@ -185,6 +185,11 @@ namespace Identity.Infrastructure.Repositories
             }
         }
 
+        public void AddFeedItem(long rssFeederId, long postId)
+        {
+            con.Connection.Execute("update FeedItem set PostId=@PostId where PostId=@PostId and RssFeederId=@RssFeederId if @@rowcount = 0 insert FeedItem values(@RssFeederId, @PostId, @Created)", new { RssFeederId = rssFeederId, PostId = postId, Created = DateTimeOffset.Now }, con);
+        }
+
         public void Dispose()
         {
             

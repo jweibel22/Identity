@@ -164,6 +164,17 @@ CREATE TABLE [dbo].[ChannelLink](
 ) ON [PRIMARY]
 
 
+CREATE TABLE [dbo].[FeedItem](
+	[RssFeederId] [bigint] NOT NULL,
+	[PostId] [bigint] NOT NULL,
+	[Created] [datetimeoffset] NULL,
+ CONSTRAINT [PK_FeedItem] PRIMARY KEY CLUSTERED 
+(
+	[RssFeederId] ASC, PostId ASC
+)
+) ON [PRIMARY]
+
+
 CREATE VIEW [dbo].[Popularity] as
 select xx.PostId, COUNT(*) as Popularity from 
 (select Post.Id as PostId

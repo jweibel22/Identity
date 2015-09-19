@@ -73,8 +73,10 @@ namespace Identity.Infrastructure.Rss
                 try
                 {
                     var url = t.Item2.Links.First().Uri.ToString();
+                    var created = GetCreatedTime(t.Item2);
+                    var title = t.Item2.Title.Text;
 
-                    var post = postRepo.GetByUrl(url);
+                    var post = postRepo.GetFeedItem(url, title, created, t.Item1.RssFeeder.Id);
 
                     if (post == null)
                     {
@@ -82,15 +84,17 @@ namespace Identity.Infrastructure.Rss
 
                         post = new Post
                         {
-                            Created = GetCreatedTime(t.Item2),
+                            Created = created,
                             Description = GetDescription(t.Item2),
-                            Title = t.Item2.Title.Text,
+                            Title = title,
                             Uri = url,
                         };
 
                         postRepo.AddPost(post);
 
                         postRepo.TagPost(post.Id, t.Item2.Categories.Select(c => c.Name).Union(t.Item1.Tags));
+
+                        channelRepo.AddFeedItem(t.Item1.RssFeeder.Id, post.Id);
                     }
 
                     foreach (var channelId in t.Item1.ChannelIds)
