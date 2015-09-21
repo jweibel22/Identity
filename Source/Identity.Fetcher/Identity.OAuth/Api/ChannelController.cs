@@ -131,7 +131,14 @@ namespace Identity.Rest.Api
         [HttpPut]
         public Channel Update(long id, Channel channel)
         {
-            channelRepo.UpdateChannel(id, !channel.IsPrivate, channel.Name, channel.RssFeeders.Select(f => f.Url).ToList());
+            var c = channelRepo.GetById(channel.Id);
+
+            c.IsPublic = !channel.IsPrivate;
+            c.Name = channel.Name;
+            c.ListType = channel.ListType;
+            c.OrderBy = channel.OrderBy;
+
+            channelRepo.UpdateChannel(c, channel.RssFeeders.Select(f => f.Url).ToList());
 
             return dtoLoader.LoadChannel(user, channelRepo.GetById(id));
         }
@@ -225,7 +232,7 @@ namespace Identity.Rest.Api
             var owns = userRepo.Owns(user.Id);
 
             var result = dtoLoader.LoadChannel(user, channel);
-            result.Posts = dtoLoader.LoadChannelPosts(user, channel, !owns.Any(c => c.Id == id) && onlyUnread, timestamp, fromIndex, orderBy).ToList();
+            result.Posts = dtoLoader.LoadChannelPosts(user, channel, onlyUnread, timestamp, fromIndex, orderBy).ToList();
 
             log.Debug("Items from channel " + id + " was fetched");
 

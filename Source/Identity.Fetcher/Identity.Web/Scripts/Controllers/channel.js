@@ -16,7 +16,7 @@ angular.module('inspire')
 
         $scope.channelFollowed = $filter('filter')($scope.user.FollowsChannels, {Id: $scope.channel.Id}, true).length > 0;
         $scope.channelOwned = $filter('filter')($scope.user.Owns, { Id: $scope.channel.Id }, true).length > 0;
-        $scope.showOnlyUnread = true;
+        $scope.showOnlyUnread = !$scope.channel.ShowOnlyUnread;
 
         for (var i = 0; i < $scope.channel.TagCloud.length; i++) {
             $scope.channel.TagCloud[i].link = "#/search?query=" + $scope.channel.TagCloud[i].text;

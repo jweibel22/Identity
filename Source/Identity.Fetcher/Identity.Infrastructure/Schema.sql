@@ -4,6 +4,9 @@ CREATE TABLE [dbo].[Channel](
 	[Name] [nchar](128) NOT NULL,
 	[Created] [datetimeoffset] NOT NULL,
 	[IsPublic] [bit] NOT NULL,
+	ShowOnlyUnread bit NOT NULL default 1,
+	OrderBy nchar (128) NOT NULL default 'Added',
+	ListType nchar (128) NOT NULL default 'Full',
  CONSTRAINT [PK_Channel] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -32,7 +35,6 @@ CREATE TABLE [dbo].[ChannelOwner](
 	[ChannelId] ASC, UserId ASC
 )
 ) ON [PRIMARY]
-
 
 CREATE TABLE [dbo].[Comment](
 	[Id] [bigint] IDENTITY(1,1) NOT NULL,
@@ -80,6 +82,11 @@ CREATE TABLE [dbo].[Post](
 )
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 
+CREATE UNIQUE NONCLUSTERED INDEX [Post_Uri_Index] ON [dbo].[Post]
+(
+	[Uri] ASC
+)
+
 
 CREATE TABLE [dbo].[ReadHistory](
 	[UserId] [bigint] NOT NULL,
@@ -99,16 +106,6 @@ CREATE TABLE [dbo].[RssFeeder](
  CONSTRAINT [PK_RssFeeder] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
-)
-) ON [PRIMARY]
-
-
-CREATE TABLE [dbo].[Subscription](
-	[ChannelId] [bigint] NOT NULL,
-	[UserId] [bigint] NOT NULL,
- CONSTRAINT [PK_Subscription] PRIMARY KEY CLUSTERED 
-(
-	[ChannelId] ASC, UserId ASC
 )
 ) ON [PRIMARY]
 

@@ -16,6 +16,12 @@ namespace Identity.Infrastructure.DTO
 
         public int UnreadCount { get; set; }
 
+        public bool ShowOnlyUnread { get; set; }
+
+        public string OrderBy { get; set; }
+
+        public string ListType { get; set; }
+
         public IList<RssFeeder> RssFeeders { get; set; }
 
         public IEnumerable<Channel> Subscriptions { get; set; }

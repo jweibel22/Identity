@@ -76,7 +76,10 @@ namespace Identity.Infrastructure.Rss
                     var created = GetCreatedTime(t.Item2);
                     var title = t.Item2.Title.Text;
 
-                    var post = postRepo.GetFeedItem(url, title, created, t.Item1.RssFeeder.Id);
+
+                    if (postRepo.AlreadyPosted(title, created, t.Item1.RssFeeder.Id)) return;
+
+                    var post = postRepo.GetByUrl(url);
 
                     if (post == null)
                     {
@@ -93,9 +96,11 @@ namespace Identity.Infrastructure.Rss
                         postRepo.AddPost(post);
 
                         postRepo.TagPost(post.Id, t.Item2.Categories.Select(c => c.Name).Union(t.Item1.Tags));
-
-                        channelRepo.AddFeedItem(t.Item1.RssFeeder.Id, post.Id);
                     }
+
+                    //TODO: we should probably add this feeds tags to the post
+
+                    channelRepo.AddFeedItem(t.Item1.RssFeeder.Id, post.Id, created);
 
                     foreach (var channelId in t.Item1.ChannelIds)
                     {

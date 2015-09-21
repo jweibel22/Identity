@@ -8,7 +8,7 @@
                 channel: "=",
                 showonlyunread: "=",
                 showcontrols: "=",
-                autoloadonscroll: "="              
+                autoloadonscroll: "=",
             },
             templateUrl: 'Content/templates/stream.html',
             controller: function ($scope) {
@@ -16,11 +16,11 @@
                 $scope.loading = false;
 
                 $scope.sortTypes = ["Popularity", "Added"];
-                $scope.selectedSortType = "Added";
+                $scope.selectedSortType = $scope.channel ? $scope.channel.OrderBy : "Added";
                 $scope.reverse = true;
 
                 $scope.listTypes = ["Full", "List"];
-                $scope.selectedListType = "Full";
+                $scope.selectedListType = $scope.channel ? $scope.channel.ListType : "Full";
 
                 $scope.publishOnChannelWindowdata = {
                     user: $scope.user,

@@ -69,18 +69,18 @@ namespace Identity.Infrastructure.Repositories
 
         public void AddChannel(Channel channel)
         {
-            channel.Id = con.Connection.Query<int>("insert Channel values (@Name, @Created, @IsPublic); SELECT CAST(SCOPE_IDENTITY() as bigint)", channel, con).Single();
+            channel.Id = con.Connection.Query<int>("insert Channel values (@Name, @Created, @IsPublic, @ShowOnlyUnread, @OrderBy, @ListType); SELECT CAST(SCOPE_IDENTITY() as bigint)", channel, con).Single();
         }
 
-        public void UpdateChannel(long channelId, bool isPublic, string name, IList<string> rssFeeders)
+        public void UpdateChannel(Channel channel, IList<string> rssFeeders)
         {
-            con.Connection.Execute("update Channel set Name=@Name, IsPublic=@IsPublic where Id=@Id", new { Id = channelId, IsPublic = isPublic, Name = name }, con);
+            con.Connection.Execute("update Channel set Name=@Name, IsPublic=@IsPublic, ShowOnlyUnread=@ShowOnlyUnread, OrderBy=@OrderBy, ListType=@ListType where Id=@Id", channel, con);
 
-            RemoveAllFeeders(channelId);
+            RemoveAllFeeders(channel.Id);
 
             foreach (var url in rssFeeders)
             {
-                FeedInto(RssFeederByUrl(url).Id, channelId);
+                FeedInto(RssFeederByUrl(url).Id, channel.Id);
             }
         }
 
@@ -185,9 +185,9 @@ namespace Identity.Infrastructure.Repositories
             }
         }
 
-        public void AddFeedItem(long rssFeederId, long postId)
+        public void AddFeedItem(long rssFeederId, long postId, DateTimeOffset created)
         {
-            con.Connection.Execute("update FeedItem set PostId=@PostId where PostId=@PostId and RssFeederId=@RssFeederId if @@rowcount = 0 insert FeedItem values(@RssFeederId, @PostId, @Created)", new { RssFeederId = rssFeederId, PostId = postId, Created = DateTimeOffset.Now }, con);
+            con.Connection.Execute("update FeedItem set PostId=@PostId where PostId=@PostId and RssFeederId=@RssFeederId if @@rowcount = 0 insert FeedItem values(@RssFeederId, @PostId, @Created)", new { RssFeederId = rssFeederId, PostId = postId, Created = created }, con);
         }
 
         public void Dispose()
