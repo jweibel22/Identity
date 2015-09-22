@@ -28,10 +28,23 @@ namespace Identity.Domain
         {
         }
 
-        public Channel(string name)
+        private Channel(string name)
         {
             Created = DateTimeOffset.Now;
             Name = name;
+        }
+
+        public static Channel New(string name)
+        {
+            return new Channel
+            {
+                Created = DateTimeOffset.Now,
+                IsLocked = false,
+                IsPublic = false,
+                ListType = "Full",
+                OrderBy = "Added",
+                ShowOnlyUnread = false
+            };
         }
 
         public static Channel Standard(string name, bool streaming)

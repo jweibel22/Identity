@@ -119,7 +119,7 @@ namespace Identity.Rest.Api
         [HttpPost]
         public Channel Create(Channel channel)
         {
-            var x = new Domain.Channel(channel.Name);
+            var x = Domain.Channel.New(channel.Name);
             channelRepo.AddChannel(x);
             userRepo.Owns(user.Id, x.Id, false);
 
