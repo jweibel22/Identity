@@ -1,7 +1,7 @@
 angular.module('inspire')
     .controller('SearchController', [
-        '$scope', '$http', '$stateParams', 'postService', 'feedService','tagService', 'userPromise',
-        function($scope, $http, $stateParams, postService, feedService, tagService, userPromise ){
+        '$scope', '$http', '$stateParams', 'postService', 'userPromise',
+        function($scope, $http, $stateParams, postService, userPromise ){
 
             $scope.query = $stateParams.query;
             $scope.user = userPromise.data;

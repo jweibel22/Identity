@@ -41,8 +41,8 @@ namespace Identity.OAuth.Api
         {
             return new HomeScreen
             {
-                Channels = dtoLoader.LoadChannelList(user, channelRepo.TopChannels(10)).ToList(),
-                Posts = dtoLoader.LoadPosts(postRepo.TopPosts(10)).ToList(),
+                Channels = dtoLoader.LoadChannelList(user, channelRepo.TopChannels(10, user.Id)).ToList(),
+                Posts = dtoLoader.LoadPosts(user, postRepo.TopPosts(10, user.Id)).ToList(),
                 TagCloud = postRepo.TopTags(20).Select(Mapper.Map<Infrastructure.DTO.WeightedTag>).ToList()
             };
         }

@@ -11,7 +11,7 @@ namespace Identity.Infrastructure.Services
 {
     public interface ILoadDtos
     {
-        IEnumerable<DTO.Post> LoadPosts(IEnumerable<Post> post);
+        IEnumerable<DTO.Post> LoadPosts(User user, IEnumerable<Post> post);
         DTO.Post LoadPost(User user, Post post);
 
         IEnumerable<DTO.Post> LoadChannelPosts(User user, Channel channel, bool onlyUnread, DateTimeOffset timestamp, int fromIndex, string orderBy);
@@ -35,7 +35,7 @@ namespace Identity.Infrastructure.Services
             this.channelRepo = channelRepo;
         }
 
-        public IEnumerable<DTO.Post> LoadPosts(IEnumerable<Post> post)
+        public IEnumerable<DTO.Post> LoadPosts(User user, IEnumerable<Post> post)
         {
             var posts = post.Select(Mapper.Map<DTO.Post>).ToList();
             //var history = userRepo.History(user.Id);
@@ -45,7 +45,7 @@ namespace Identity.Infrastructure.Services
                 LoadTags(p);
                 p.CommentCount = commentRepo.CommentCount(p.Id);
                 p.IsCollapsed = p.Description.Length >= 500; //p.Teaser != null;
-                p.PublishedIn = postRepo.PublishedIn(p.Id).Select(c => Mapper.Map<DTO.Channel>(c)).ToList();
+                p.PublishedIn = postRepo.PublishedIn(p.Id, user.Id).Select(c => Mapper.Map<DTO.Channel>(c)).ToList();
                 //p.Read = history.Contains(p.Id);
             }
 
@@ -74,7 +74,7 @@ namespace Identity.Infrastructure.Services
             //result.Saved = channelRepo.PartOf(user.SavedChannel, result.Id);
             result.Comments = commentRepo.CommentsForPost(post.Id).Select(c => Mapper.Map<DTO.Comment>(c)).ToList();
             result.CommentCount = result.Comments.Count;
-            result.PublishedIn = postRepo.PublishedIn(post.Id).Select(c => Mapper.Map<DTO.Channel>(c)).ToList();
+            result.PublishedIn = postRepo.PublishedIn(post.Id, user.Id).Select(c => Mapper.Map<DTO.Channel>(c)).ToList();
             return result;            
         }
 
@@ -104,7 +104,7 @@ namespace Identity.Infrastructure.Services
                 var commentCount = commentCounts.SingleOrDefault(cc => cc.Id == p.Id);
                 p.CommentCount = commentCount != null ? commentCount.Count : 0;
                 p.IsCollapsed = p.Description.Length >= 500; //p.Teaser != null;
-                p.PublishedIn = postRepo.PublishedIn(p.Id).Select(c => Mapper.Map<DTO.Channel>(c)).ToList();
+                p.PublishedIn = postRepo.PublishedIn(p.Id, user.Id).Select(c => Mapper.Map<DTO.Channel>(c)).ToList();
             }
 
             return xx;

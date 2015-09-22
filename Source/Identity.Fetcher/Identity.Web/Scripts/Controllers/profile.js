@@ -16,16 +16,6 @@
                 });
             }
 
-            $scope.makePublic = function(channel) {
-                channel.IsPrivate = false;
-                channelService.update(channel);
-            }
-
-            $scope.makePrivate = function (channel) {
-                channel.IsPrivate = true;
-                channelService.update(channel);
-            }
-
             $scope.addChannel = function() {
                 channelService.create({ Name: $scope.newChannelName }).success(function(data) {
                     $scope.profile.Owns.push(data);

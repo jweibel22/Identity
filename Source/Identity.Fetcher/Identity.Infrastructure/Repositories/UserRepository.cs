@@ -132,10 +132,15 @@ namespace Identity.Infrastructure.Repositories
             return con.Connection.Query<Channel>("select c.*, s.IsLocked from Channel c join ChannelOwner s on c.Id = s.ChannelId where s.UserId = @UserId", new { UserId = userId }, con);
         }
 
-        public IEnumerable<WeightedTag> GetTagCloud(long userId)
+        public IEnumerable<WeightedTag> GetTagCloud(long userId, long forUserId)
         {
-            return con.Connection.Query<WeightedTag>(@"select top 20 count(*) as Weight, Tag as Text from Tagged join ChannelItem ci on ci.PostId = Tagged.PostId and ci.UserId = @UserId
-                                            group by Tag order by COUNT(*) desc", new { UserId = userId }, con);
+            return con.Connection.Query<WeightedTag>(@"
+                        select top 20 count(*) as Weight, Tag as Text from Tagged 
+                        join ChannelItem ci on ci.PostId = Tagged.PostId and ci.UserId = @UserId                         
+                        join Channel c on c.Id = ci.ChannelId
+                        left join ChannelOwner co on co.ChannelId = c.Id and co.UserId = @ForUserId
+                        where co.ChannelId is not null or c.IsPublic = 1                                            
+                        group by Tag order by COUNT(*) desc", new { UserId = userId, ForUserId = forUserId }, con);
         }
 
         public void Dispose()

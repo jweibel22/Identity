@@ -4,34 +4,100 @@
     </h3>
 </div>
 
-<div>
-    <h4>RSS Feeders</h4>
-    <div ng-repeat="feeder in channel.RssFeeders">
-        {{feeder.Url}} <a href="#/editrssfeeder/{{feeder.Id}}">Edit</a> <a ng-click="removeRssFeeder(feeder)">Remove</a>
+<div style="margin-bottom:50px">
+    <h4>Privacy</h4>
+    <div class="row">
+        <div class="col-md-2">
+            <span>Private</span>
+        </div>
+        <div class="col-md-2">
+            <input type="checkbox" ng-model="channel.IsPrivate">
+        </div>
     </div>
 </div>
 
-<div>
-  <form ng-submit="addRssFeeder()"
-      style="margin-top:30px;">
-    <h4>Add a new RSS feeder</h4>
-
-    <div class="form-group">
-      <input type="text"
-             class="form-control"
-             placeholder="Url"
-             ng-model="rssfeederUrl"></input>
+<div style="margin-bottom:50px">
+    <h4>Display settings</h4>
+    <div class="row">
+        <div class="col-md-2">
+            <span>Show only unread</span>
+        </div>
+        <div class="col-md-2">
+            <input type="checkbox" ng-model="channel.ShowOnlyUnread">            
+        </div>
     </div>
-    <button type="submit" class="btn btn-primary">Add</button>
-  </form>
+
+    <div class="row">
+        <div class="col-md-2">
+            <span>Sort by</span>
+        </div>
+        <div class="col-md-2">
+            <div class="btn-group">
+                <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{channel.OrderBy}}  <span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                    <li ng-repeat="item in sortTypes">
+                        <a ng-click="changeSortBy(item)">
+                            {{item}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <span>List by</span>
+        </div>
+        <div class="col-md-2">
+            <div class="btn-group">
+                <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{channel.ListType}}  <span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                    <li ng-repeat="item in listTypes">
+                        <a ng-click="changeListBy(item)">
+                            {{item}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="margin-bottom:50px">
+    <div>
+        <h4>RSS Feeders</h4>
+        <div ng-repeat="feeder in channel.RssFeeders">
+            {{feeder.Url}} <a href="#/editrssfeeder/{{feeder.Id}}">Edit</a> <a ng-click="removeRssFeeder(feeder)">Remove</a>
+        </div>
+    </div>
+
+    <div>
+        <form ng-submit="addRssFeeder()" style="margin-top:30px;">
+            <h5>Add a new RSS feeder</h5>
+
+            <div class="form-group">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Url"
+                       ng-model="rssfeederUrl"></input>
+            </div>
+            <button type="submit" class="btn">Add</button>
+        </form>
 
 
+    </div>
 </div>
 
 
-<div style="margin-top:50px">
+<div style="margin-bottom:50px">
     <h4>Subscriptions</h4>
     <div ng-repeat="child in channel.Subscriptions">
         {{child.Name}} <a ng-click="removeSubscription(child)">Remove</a>
     </div>
+</div>
+
+<div>
+    <button class="btn btn-primary" ng-click="saveChanges()">Save changes</button>
+    <a href="#/editchannel/{{channel.Id}}" class="btn btn-default">Cancel</a>
 </div>

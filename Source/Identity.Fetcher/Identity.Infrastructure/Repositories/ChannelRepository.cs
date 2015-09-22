@@ -27,21 +27,23 @@ namespace Identity.Infrastructure.Repositories
             return con.Connection.Query<Channel>("select * from Channel where Id=@Id", new { Id = id }, con).SingleOrDefault();
         }
 
-        public IEnumerable<Channel> FindChannelsByName(string name)
+        public IEnumerable<Channel> FindPublicChannelsByName(string name)
         {
             var encoded = "%" + name.Replace("%", "[%]").Replace("[", "[[]").Replace("]", "[]]") + "%";
-            return con.Connection.Query<Channel>("select * from Channel where Name like @Name", new { Name = encoded }, con);
+            return con.Connection.Query<Channel>("select * from Channel where IsPublic = 1 and Name like @Name", new { Name = encoded }, con);
         }
 
-        public IEnumerable<Channel> TopChannels(int count)
+        public IEnumerable<Channel> TopChannels(int count, long userId)
         {
             var sql = @"select * from Channel where Id in 
   (select top {0} ci.ChannelId from ChannelItem ci
-  where Created > @Timestamp and ci.UserId <> 2 and ci.UserId <> 5
+    join Channel c on c.Id = ci.ChannelId
+    left join ChannelOwner co on co.ChannelId = c.Id and co.UserId = @UserId
+  where (co.ChannelId is not null or c.IsPublic = 1) and ci.Created > @Timestamp and ci.UserId <> 2 and ci.UserId <> 5
   group by ci.ChannelId
   order by count(*) desc)";
 
-            return con.Connection.Query<Channel>(String.Format(sql, count), new { Timestamp = DateTimeOffset.Now.Subtract(TimeSpan.FromDays(7)) }, con);
+            return con.Connection.Query<Channel>(String.Format(sql, count), new { UserId = userId, Timestamp = DateTimeOffset.Now.Subtract(TimeSpan.FromDays(7)) }, con);
         }
 
         public IEnumerable<Channel> All()
@@ -72,7 +74,7 @@ namespace Identity.Infrastructure.Repositories
             channel.Id = con.Connection.Query<int>("insert Channel values (@Name, @Created, @IsPublic, @ShowOnlyUnread, @OrderBy, @ListType); SELECT CAST(SCOPE_IDENTITY() as bigint)", channel, con).Single();
         }
 
-        public void UpdateChannel(Channel channel, IList<string> rssFeeders)
+        public void UpdateChannel(Channel channel, IEnumerable<string> rssFeeders, IEnumerable<long> subscriptions)
         {
             con.Connection.Execute("update Channel set Name=@Name, IsPublic=@IsPublic, ShowOnlyUnread=@ShowOnlyUnread, OrderBy=@OrderBy, ListType=@ListType where Id=@Id", channel, con);
 
@@ -82,6 +84,14 @@ namespace Identity.Infrastructure.Repositories
             {
                 FeedInto(RssFeederByUrl(url).Id, channel.Id);
             }
+
+            con.Connection.Execute("delete from ChannelLink where ParentId = @ParentId ", new { ParentId = channel.Id }, con);
+
+            foreach (var childId in subscriptions)
+            {
+                con.Connection.Execute("update ChannelLink set ChildId=@ChildId where ChildId=@ChildId and ParentId=@ParentId if @@rowcount = 0 insert ChannelLink values(@ParentId, @ChildId)", new { ParentId = channel.Id, ChildId = childId }, con);    
+            }
+            
         }
 
         public void Delete(long userId, long channelId)

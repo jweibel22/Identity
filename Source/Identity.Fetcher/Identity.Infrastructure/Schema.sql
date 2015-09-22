@@ -1,7 +1,7 @@
 ﻿
 CREATE TABLE [dbo].[Channel](
 	[Id] [bigint] IDENTITY(1,1) NOT NULL,
-	[Name] [nchar](128) NOT NULL,
+	[Name] [nvarchar](128) NOT NULL,
 	[Created] [datetimeoffset] NOT NULL,
 	[IsPublic] [bit] NOT NULL,
 	ShowOnlyUnread bit NOT NULL default 1,
@@ -52,7 +52,7 @@ CREATE TABLE [dbo].[Comment](
 
 CREATE TABLE [dbo].[FeederTags](
 	[RssFeederId] [bigint] NOT NULL,
-	[Tag] [nchar](255) NOT NULL,
+	[Tag] [nvarchar](255) NOT NULL,
  CONSTRAINT [PK_FeederTags] PRIMARY KEY CLUSTERED 
 (
 	[RssFeederId] ASC
@@ -73,9 +73,9 @@ CREATE TABLE [dbo].[FeedInto](
 CREATE TABLE [dbo].[Post](
 	[Id] [bigint] IDENTITY(1,1) NOT NULL,
 	[Created] [datetimeoffset] NOT NULL,
-	[Title] [nchar](255) NOT NULL,
+	[Title] [nvarchar](255) NOT NULL,
 	[Description] [text] NOT NULL,
-	[Uri] [nchar](255) NOT NULL,
+	[Uri] [nvarchar](255) NOT NULL,
  CONSTRAINT [PK_Post] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -101,7 +101,7 @@ CREATE TABLE [dbo].[ReadHistory](
 
 CREATE TABLE [dbo].[RssFeeder](
 	[Id] [bigint] IDENTITY(1,1) NOT NULL,
-	[Url] [nchar](255) NOT NULL,
+	[Url] [nvarchar](255) NOT NULL,
 	[LastFetch] [datetimeoffset] NULL,
  CONSTRAINT [PK_RssFeeder] PRIMARY KEY CLUSTERED 
 (
@@ -112,7 +112,7 @@ CREATE TABLE [dbo].[RssFeeder](
 
 CREATE TABLE [dbo].[Tagged](
 	[PostId] [bigint] NOT NULL,
-	[Tag] [nchar](64) NOT NULL,
+	[Tag] [nvarchar](64) NOT NULL,
  CONSTRAINT [PK_Tagged] PRIMARY KEY CLUSTERED 
 (
 	PostId ASC, Tag ASC
@@ -126,7 +126,7 @@ CREATE TABLE [dbo].[User](
 	[SavedChannel] [bigint] NOT NULL,
 	[StarredChannel] [bigint] NOT NULL,
 	[LikedChannel] [bigint] NOT NULL,
-	[IdentityId] [nchar](64) NULL,
+	[IdentityId] [nvarchar](64) NULL,
 	[Inbox] [bigint] NOT NULL,
 	[SubscriptionChannel] [bigint] NOT NULL,
  CONSTRAINT [PK_User] PRIMARY KEY CLUSTERED 
@@ -141,8 +141,8 @@ ALTER TABLE [dbo].[User] ADD  CONSTRAINT [DF_User_Inbox]  DEFAULT ((0)) FOR [Inb
 
 CREATE TABLE [dbo].[UserLogins](
 	[UserId] [bigint] NOT NULL,
-	[ProviderKey] [nchar](64) NOT NULL,
-	[LoginProvider] [nchar](64) NOT NULL,
+	[ProviderKey] [nvarchar](64) NOT NULL,
+	[LoginProvider] [nvarchar](64) NOT NULL,
  CONSTRAINT [PK_UserLogins] PRIMARY KEY CLUSTERED 
 (
 	UserId ASC, LoginProvider ASC

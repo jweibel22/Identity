@@ -40,15 +40,17 @@ namespace Identity.Infrastructure.Repositories
             }, con).Any();
         }
 
-        public IEnumerable<Post> TopPosts(int count)
+        public IEnumerable<Post> TopPosts(int count, long userId)
         {
             var sql = @"select * from Post where Id in 
   (select top {0} ci.PostId from ChannelItem ci
-  where Created > @Timestamp and ci.UserId <> 2 and ci.UserId <> 5
+    join Channel c on c.Id = ci.ChannelId
+    left join ChannelOwner co on co.ChannelId = ci.ChannelId and co.UserId = @UserId
+  where (co.ChannelId is not null or c.IsPublic = 1) and ci.Created > @Timestamp and ci.UserId <> 2 and ci.UserId <> 5
   group by ci.PostId
   order by count(*) desc)";
 
-            return con.Connection.Query<Post>(String.Format(sql, count), new { Timestamp = DateTimeOffset.Now.Subtract(TimeSpan.FromDays(7)) }, con);
+            return con.Connection.Query<Post>(String.Format(sql, count), new { UserId = userId, Timestamp = DateTimeOffset.Now.Subtract(TimeSpan.FromDays(7)) }, con);
         }
 
         public void AddPost(Post post)
@@ -70,11 +72,12 @@ namespace Identity.Infrastructure.Repositories
             }
         }
 
+        //TODO: add paging here
         public IEnumerable<Post> FindByTag(string tag)
         {
             var encodedTag = "%" + tag.Replace("%", "[%]").Replace("[", "[[]").Replace("]", "[]]") + "%";
 
-            return con.Connection.Query<Post>(@"select Post.* from Post join Tagged t on t.PostId = Post.Id where t.Tag like @Tag", new { Tag = encodedTag }, con);
+            return con.Connection.Query<Post>(@"select top 100 Post.* from Post join Tagged t on t.PostId = Post.Id where t.Tag like @Tag", new { Tag = encodedTag }, con);
         }
 
         public IEnumerable<Post> PostsFromChannel(long userId, bool onlyUnread, long channelId, DateTimeOffset timestamp, int fromIndex, string orderBy)
@@ -101,7 +104,9 @@ from Post
 join ChannelItem ci on ci.PostId = Post.Id 
 join [User] u on u.Id = @UserId
 left join ChannelLink cl on cl.ChildId = ci.ChannelId and cl.ParentId = @ChannelId
-where ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId
+left join ChannelOwner co on co.ChannelId = ci.ChannelId and co.UserId = @UserId
+join Channel c on c.Id = ci.ChannelId
+where (ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId) and (co.ChannelId is not null or c.IsPublic = 1)
 group by ci.PostId";
 
             const string postData = @"
@@ -161,14 +166,16 @@ where Post.Id = @Id
             return con.Connection.Query<Tagged>("select * from Tagged where PostId=@PostId", new { PostId = postId }, con);
         }
 
-        public IEnumerable<Channel> PublishedIn(long postId)
+        public IEnumerable<Channel> PublishedIn(long postId, long userId)
         {
             return con.Connection.Query<Channel>(@"
             select * from Channel where Id in (select top 5 Id from Channel 
             join ChannelItem ci on ci.ChannelId = Channel.Id and ci.PostId = @PostId
+            left join ChannelOwner co on co.ChannelId = Channel.Id and co.UserId = @UserId
             left join Subscription s on s.ChannelId = Channel.Id
+            where co.ChannelId is not null or Channel.IsPublic = 1
             group by Channel.Id
-            order by COUNT(*))", new { PostId = postId }, con);
+            order by COUNT(*))", new { PostId = postId, UserId = userId }, con);
         }
 
         public IEnumerable<WeightedTag> TopTags(int count)

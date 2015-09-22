@@ -53,7 +53,7 @@ namespace Identity.Rest.Api
         [HttpGet]
         public IEnumerable<Channel> Get(string query)
         {
-            var channels = channelRepo.FindChannelsByName(query);
+            var channels = channelRepo.FindPublicChannelsByName(query);
             return dtoLoader.LoadChannelList(user, channels);
         }
 
@@ -138,7 +138,7 @@ namespace Identity.Rest.Api
             c.ListType = channel.ListType;
             c.OrderBy = channel.OrderBy;
 
-            channelRepo.UpdateChannel(c, channel.RssFeeders.Select(f => f.Url).ToList());
+            channelRepo.UpdateChannel(c, channel.RssFeeders.Select(f => f.Url), channel.Subscriptions.Select(x => x.Id));
 
             return dtoLoader.LoadChannel(user, channelRepo.GetById(id));
         }
@@ -228,8 +228,6 @@ namespace Identity.Rest.Api
             {
                 return null;
             }
-
-            var owns = userRepo.Owns(user.Id);
 
             var result = dtoLoader.LoadChannel(user, channel);
             result.Posts = dtoLoader.LoadChannelPosts(user, channel, onlyUnread, timestamp, fromIndex, orderBy).ToList();

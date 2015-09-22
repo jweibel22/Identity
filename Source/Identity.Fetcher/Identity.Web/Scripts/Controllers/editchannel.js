@@ -4,12 +4,19 @@
 
             $scope.channel = channelService.editchannel;
 
+            $scope.sortTypes = ["Popularity", "Added"];
+            $scope.listTypes = ["Full", "List"];
+
+            $scope.changeSortBy = function (sortBy) {
+                $scope.channel.OrderBy = sortBy;
+            }
+
+            $scope.changeListBy = function (listBy) {
+                $scope.channel.ListType = listBy;
+            }
+
             $scope.addRssFeeder = function() {
                 $scope.channel.RssFeeders.push({ Url: $scope.rssfeederUrl });
-
-                channelService.update($scope.channel).then(function(res) {
-                    $scope.channel = res.data;
-                });
             }
 
             $scope.removeRssFeeder = function (rssFeeder) {
@@ -17,11 +24,7 @@
                 var index = $scope.channel.RssFeeders.indexOf(rssFeeder);
                 if (index > -1) {
                     $scope.channel.RssFeeders.splice(index, 1);
-                }
-                
-                channelService.update($scope.channel).then(function (res) {
-                    $scope.channel = res.data;
-                });
+                }                
             }
 
             $scope.removeSubscription = function (child) {
@@ -30,8 +33,11 @@
                 if (index > -1) {
                     $scope.channel.Subscriptions.splice(index, 1);
                 }
+            }
 
-                channelService.removeSubscription($scope.channel, child).then(function (res) {
+            $scope.saveChanges = function() {
+
+                channelService.update($scope.channel).then(function (res) {
                     $scope.channel = res.data;
                 });
             }

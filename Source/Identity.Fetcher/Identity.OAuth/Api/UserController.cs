@@ -28,6 +28,9 @@ namespace Identity.Rest.Api
 
         public User Get(int id)
         {
+            var identity = User.Identity as ClaimsIdentity;
+            var loggedInUser = userRepo.FindByName(identity.Name);
+
             var user = userRepo.GetById(id);
 
             if (user == null)
@@ -35,11 +38,11 @@ namespace Identity.Rest.Api
                 return null;
             }
 
-            var u = Map(user);
+            var u = Map(user, loggedInUser);
             return u;
         }
 
-        private User Map(Domain.User user)
+        private User Map(Domain.User user, Domain.User loggedInUser)
         {
             return new User
             {
@@ -58,7 +61,7 @@ namespace Identity.Rest.Api
                 SavedChannel = user.SavedChannel,
                 StarredChannel = user.StarredChannel,
                 LikedChannel = user.LikedChannel,
-                TagCloud = userRepo.GetTagCloud(user.Id).Select(Mapper.Map<Infrastructure.DTO.WeightedTag>).ToList()
+                TagCloud = userRepo.GetTagCloud(user.Id, loggedInUser.Id).Select(Mapper.Map<Infrastructure.DTO.WeightedTag>).ToList()
             };
         }
 
@@ -72,14 +75,17 @@ namespace Identity.Rest.Api
                 return null;
             }
 
-            var u = Map(user);
+            var u = Map(user, user);
             return u;
         }
 
         [HttpGet]
         public IEnumerable<User> Get(string query)
         {
-            return userRepo.SearchByName(query).Select(Map).ToList();
+            var identity = User.Identity as ClaimsIdentity;
+            var user = userRepo.FindByName(identity.Name);
+
+            return userRepo.SearchByName(query).Select(x => Map(x, user)).ToList();
         }
     }
 }

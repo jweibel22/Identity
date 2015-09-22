@@ -101,7 +101,7 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                             templateUrl: 'Content/templates/searchresults.html',
                             controller: 'SearchController',
                             resolve: {
-                                posts: ['$stateParams', 'postService', function($stateParams, postService) { return postService.getByTag($stateParams.query) }],
+                                posts: ['$stateParams', 'postService', function($stateParams, postService) { return postService.getByTag($stateParams.query); }],
                                 userPromise: ['userService', function(userService) { return userService.getCurrentUser(); }]
                             }
                         }
