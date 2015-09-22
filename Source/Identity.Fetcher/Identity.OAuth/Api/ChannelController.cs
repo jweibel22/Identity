@@ -133,6 +133,7 @@ namespace Identity.Rest.Api
         {
             var c = channelRepo.GetById(channel.Id);
 
+            c.ShowOnlyUnread = channel.ShowOnlyUnread;
             c.IsPublic = !channel.IsPrivate;
             c.Name = channel.Name;
             c.ListType = channel.ListType;
