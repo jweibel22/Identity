@@ -38,6 +38,7 @@ namespace Identity.Domain
         {
             return new Channel
             {
+                Name = name,
                 Created = DateTimeOffset.Now,
                 IsLocked = false,
                 IsPublic = false,

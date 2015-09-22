@@ -71,7 +71,7 @@ namespace Identity.Infrastructure.Repositories
 
         public void AddChannel(Channel channel)
         {
-            channel.Id = con.Connection.Query<int>("insert Channel values (@Name, @Created, @IsPublic, @ShowOnlyUnread, @OrderBy, @ListType); SELECT CAST(SCOPE_IDENTITY() as bigint)", channel, con).Single();
+            channel.Id = con.Connection.Query<int>("insert Channel values (@Name, @Created, @IsPublic, @OrderBy, @ListType, @ShowOnlyUnread); SELECT CAST(SCOPE_IDENTITY() as bigint)", channel, con).Single();
         }
 
         public void UpdateChannel(Channel channel, IEnumerable<string> rssFeeders, IEnumerable<long> subscriptions)
