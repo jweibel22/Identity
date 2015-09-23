@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Web;
@@ -15,6 +16,7 @@ using Microsoft.Owin.Security.Facebook;
 using Microsoft.Owin.Security.Google;
 using Microsoft.Owin.Security.OAuth;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
+using Microsoft.WindowsAzure.Diagnostics;
 using Ninject;
 using Ninject.Activation;
 using Ninject.Web.Common;
@@ -40,19 +42,18 @@ namespace Identity.OAuth
         {
             var config = new HttpConfiguration();
 
-            app.Use(async (context, next) =>
-            {
-                RequestScope.Scope.Value = new ScopeObject();
-                //log.Debug("request: " + RequestScope.Scope + ". " + context.Request.Uri.AbsoluteUri);
-                await next();  
-            });
+            //app.Use(async (context, next) =>
+            //{
+            //    RequestScope.Scope.Value = new ScopeObject();
+            //    await next();  
+            //});
 
-            ConfigureOAuth(app);          
+            //ConfigureOAuth(app);          
 
             WebApiConfig.Register(config);
             app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
-            app.UseNinjectMiddleware(CreateKernel);
-            app.UseNinjectWebApi(config);
+            //app.UseNinjectMiddleware(CreateKernel);
+            //app.UseNinjectWebApi(config);
             app.UseWebApi(config);
 
 
@@ -60,6 +61,10 @@ namespace Identity.OAuth
             AutoMapperConfiguration.Configure();
 
             XmlConfigurator.Configure();
+
+            Trace.TraceInformation("An Information");
+            Trace.WriteLine("Starting up man...");
+            log.Info("log4net started up....");
         }
 
         private static IKernel CreateKernel()

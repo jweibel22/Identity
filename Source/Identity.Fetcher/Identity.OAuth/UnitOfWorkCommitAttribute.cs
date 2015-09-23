@@ -27,33 +27,28 @@ namespace Identity.Rest
 
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
         {                        
-            var uoW = actionExecutedContext.Request.GetDependencyScope().GetService(typeof(IDbTransaction)) as IDbTransaction;
-            var con = actionExecutedContext.Request.GetDependencyScope().GetService(typeof(IDbConnection)) as IDbConnection;
+            //var uoW = actionExecutedContext.Request.GetDependencyScope().GetService(typeof(IDbTransaction)) as IDbTransaction;
+            //var con = actionExecutedContext.Request.GetDependencyScope().GetService(typeof(IDbConnection)) as IDbConnection;
 
-            //log.Info(String.Format("Action: {0}.{1}", actionExecutedContext.ActionContext.ActionDescriptor.ControllerDescriptor.ControllerName, 
-            //    actionExecutedContext.ActionContext.ActionDescriptor.ActionName));
-
-            //log.Debug(actionExecutedContext.ActionContext.ActionDescriptor.ActionName + " executed");            
-
-            try
-            {
-                if (actionExecutedContext.Exception == null)
-                {
-                    uoW.Commit();
-                }
-                else
-                {
-                    uoW.Rollback();
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error("Failed to commit", ex);
-            }
-            finally
-            {
-                con.Dispose();                
-            }
+            //try
+            //{
+            //    if (actionExecutedContext.Exception == null)
+            //    {
+            //        uoW.Commit();
+            //    }
+            //    else
+            //    {
+            //        uoW.Rollback();
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    log.Error("Failed to commit", ex);
+            //}
+            //finally
+            //{
+            //    con.Dispose();                
+            //}
         }
     }
 }
