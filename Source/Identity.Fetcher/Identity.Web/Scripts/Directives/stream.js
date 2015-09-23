@@ -1,4 +1,4 @@
-﻿angular.module('inspire').directive("stream", ['$window', '$location', '$rootScope', '$modal', 'postService', 'userService', 'channelSelectorService', function ($window, $location, $rootScope, $modal, postService, userService, channelSelectorService) {
+﻿angular.module('inspire').directive("stream", ['$window', '$location', '$rootScope', '$modal', '$filter', 'postService', 'userService', 'channelSelectorService', function ($window, $location, $rootScope, $modal, $filter, postService, userService, channelSelectorService) {
 
         return {
             restrict: 'E',
@@ -21,6 +21,8 @@
 
                 $scope.listTypes = ["Full", "List"];
                 $scope.selectedListType = $scope.channel ? $scope.channel.ListType : "Full";
+
+                $scope.channelOwned = $filter('filter')($scope.user.Owns, { Id: $scope.channel.Id }, true).length > 0;
 
                 $scope.publishOnChannelWindowdata = {
                     user: $scope.user,
