@@ -67,20 +67,20 @@ namespace Identity.Rest.Api
 
         public User Get()
         {
-            var identity = User.Identity as ClaimsIdentity;
-            var user = userRepo.FindByName(identity.Name);
+            //var identity = User.Identity as ClaimsIdentity;
+            //var user = userRepo.FindByName(identity.Name);
 
-            if (user == null)
-            {
-                return null;
-            }
-
-            var u = Map(user, user);
-            return u;
-            //return new User
+            //if (user == null)
             //{
-            //    DisplayName = "Hello Joe"
-            //};
+            //    return null;
+            //}
+
+            //var u = Map(user, user);
+            //return u;
+            return new User
+            {
+                DisplayName = "Hello Joe"
+            };
         }
 
         //[HttpGet]
