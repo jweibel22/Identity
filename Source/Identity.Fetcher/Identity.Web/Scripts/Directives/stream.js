@@ -22,7 +22,7 @@
                 $scope.listTypes = ["Full", "List"];
                 $scope.selectedListType = $scope.channel ? $scope.channel.ListType : "Full";
 
-                $scope.channelOwned = $filter('filter')($scope.user.Owns, { Id: $scope.channel.Id }, true).length > 0;
+                $scope.channelOwned = $scope.channel && $filter('filter')($scope.user.Owns, { Id: $scope.channel.Id }, true).length > 0;
 
                 $scope.publishOnChannelWindowdata = {
                     user: $scope.user,
