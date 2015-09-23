@@ -41,18 +41,18 @@ namespace Identity.OAuth
         {
             var config = new HttpConfiguration();
 
-            //app.Use(async (context, next) =>
-            //{
-            //    RequestScope.Scope.Value = new ScopeObject();
-            //    await next();  
-            //});
+            app.Use(async (context, next) =>
+            {
+                RequestScope.Scope.Value = new ScopeObject();
+                await next();
+            });
 
-            //ConfigureOAuth(app);          
+            ConfigureOAuth(app);          
 
             WebApiConfig.Register(config);
             app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
-            //app.UseNinjectMiddleware(CreateKernel);
-            //app.UseNinjectWebApi(config);
+            app.UseNinjectMiddleware(CreateKernel);
+            app.UseNinjectWebApi(config);
             app.UseWebApi(config);
 
 
