@@ -26,21 +26,21 @@ namespace Identity.Rest.Api
             this.channelRepo = channelRepo;
         }
 
-        //public User Get(int id)
-        //{
-        //    var identity = User.Identity as ClaimsIdentity;
-        //    var loggedInUser = userRepo.FindByName(identity.Name);
+        public User Get(int id)
+        {
+            var identity = User.Identity as ClaimsIdentity;
+            var loggedInUser = userRepo.FindByName(identity.Name);
 
-        //    var user = userRepo.GetById(id);
+            var user = userRepo.GetById(id);
 
-        //    if (user == null)
-        //    {
-        //        return null;
-        //    }
+            if (user == null)
+            {
+                return null;
+            }
 
-        //    var u = Map(user, loggedInUser);
-        //    return u;
-        //}
+            var u = Map(user, loggedInUser);
+            return u;
+        }
 
         private User Map(Domain.User user, Domain.User loggedInUser)
         {
@@ -67,29 +67,25 @@ namespace Identity.Rest.Api
 
         public User Get()
         {
-            //var identity = User.Identity as ClaimsIdentity;
-            //var user = userRepo.FindByName(identity.Name);
+            var identity = User.Identity as ClaimsIdentity;
+            var user = userRepo.FindByName(identity.Name);
 
-            //if (user == null)
-            //{
-            //    return null;
-            //}
-
-            //var u = Map(user, user);
-            //return u;
-            return new User
+            if (user == null)
             {
-                DisplayName = "Hello Joe"
-            };
+                return null;
+            }
+
+            var u = Map(user, user);
+            return u;
         }
 
-        //[HttpGet]
-        //public IEnumerable<User> Get(string query)
-        //{
-        //    var identity = User.Identity as ClaimsIdentity;
-        //    var user = userRepo.FindByName(identity.Name);
+        [HttpGet]
+        public IEnumerable<User> Get(string query)
+        {
+            var identity = User.Identity as ClaimsIdentity;
+            var user = userRepo.FindByName(identity.Name);
 
-        //    return userRepo.SearchByName(query).Select(x => Map(x, user)).ToList();
-        //}
+            return userRepo.SearchByName(query).Select(x => Map(x, user)).ToList();
+        }
     }
 }
