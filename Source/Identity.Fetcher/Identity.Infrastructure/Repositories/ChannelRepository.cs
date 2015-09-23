@@ -54,7 +54,7 @@ namespace Identity.Infrastructure.Repositories
         public IEnumerable<WeightedTag> GetTagCloud(long channelId)
         {
             return con.Connection.Query<WeightedTag>(@" select top 20 count(*) as Weight, Tag as Text from Tagged 
-                                                        join ChannelLink cl on cl.ParentId = @ChannelId
+                                                        left join ChannelLink cl on cl.ParentId = @ChannelId
                                                         join ChannelItem ci on ci.PostId = Tagged.PostId and (ci.ChannelId = @ChannelId or ci.ChannelId = cl.ChildId)
                                                         group by Tag order by COUNT(*) desc", 
                                                                                             new { ChannelId = channelId }, con);
@@ -64,7 +64,7 @@ namespace Identity.Infrastructure.Repositories
         {
             return con.Connection.Query<int>(@"select COUNT(*) from ChannelItem
                                     left join ReadHistory on ChannelItem.PostId = ReadHistory.PostId and ReadHistory.UserId = @UserId
-                                    join ChannelLink cl on cl.ParentId = @ChannelId
+                                    left join ChannelLink cl on cl.ParentId = @ChannelId
                                     where (ChannelItem.ChannelId = cl.ChildId or ChannelItem.ChannelId = @ChannelId) and ReadHistory.UserId IS NULL", 
                                                                                                    new { UserId = userId, ChannelId = channelId }, con).Single();
         }
