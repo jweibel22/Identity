@@ -26,29 +26,29 @@ namespace Identity.Rest
         }
 
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
-        {                        
-            //var uoW = actionExecutedContext.Request.GetDependencyScope().GetService(typeof(IDbTransaction)) as IDbTransaction;
-            //var con = actionExecutedContext.Request.GetDependencyScope().GetService(typeof(IDbConnection)) as IDbConnection;
+        {
+            var uoW = actionExecutedContext.Request.GetDependencyScope().GetService(typeof(IDbTransaction)) as IDbTransaction;
+            var con = actionExecutedContext.Request.GetDependencyScope().GetService(typeof(IDbConnection)) as IDbConnection;
 
-            //try
-            //{
-            //    if (actionExecutedContext.Exception == null)
-            //    {
-            //        uoW.Commit();
-            //    }
-            //    else
-            //    {
-            //        uoW.Rollback();
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    log.Error("Failed to commit", ex);
-            //}
-            //finally
-            //{
-            //    con.Dispose();                
-            //}
+            try
+            {
+                if (actionExecutedContext.Exception == null)
+                {
+                    uoW.Commit();
+                }
+                else
+                {
+                    uoW.Rollback();
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Failed to commit", ex);
+            }
+            finally
+            {
+                con.Dispose();
+            }
         }
     }
 }
