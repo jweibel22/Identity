@@ -80,6 +80,14 @@ namespace Identity.Infrastructure.Repositories
             return con.Connection.Query<Post>(@"select top 100 Post.* from Post join Tagged t on t.PostId = Post.Id where t.Tag like @Tag", new { Tag = encodedTag }, con);
         }
 
+        //TODO: add paging here
+        public IEnumerable<Post> ReadHistory(long userId)
+        {
+            return con.Connection.Query<Post>(@"select top 100 Post.* from Post 
+                                                join ReadHistory h on h.PostId = Post.Id and h.UserId = @UserId 
+                                                order by h.Timestamp desc", new { UserId = userId }, con);
+        }
+
         public IEnumerable<Post> PostsFromChannel(long userId, bool onlyUnread, long channelId, DateTimeOffset timestamp, int fromIndex, string orderBy)
         {
             const int pageSize = 30;
@@ -96,8 +104,6 @@ namespace Identity.Infrastructure.Repositories
             {
                 throw new Exception("Unexpected orderby clause: " + orderBy);
             }
-
-
 
             const string postIds = @"select ci.PostId, count(*) as pop, min(ci.Created) as Added
 from Post 

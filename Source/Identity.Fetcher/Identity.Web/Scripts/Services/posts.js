@@ -20,6 +20,15 @@ angular.module('inspire').factory('postService', ['$http', '$q', 'ngSettings', f
         return promise;
     };
 
+    o.readHistory = function () {
+        var promise = $http.get(ngSettings.baseUrl + '/Api/Post/History');
+
+        promise.success(function (data) {
+            angular.copy(data, o.posts);
+        });
+        return promise;
+    };
+
     o.getFromChannel = function (channelId, onlyUnread, orderBy) {
         var fromIndex = 0;
         var promise = $http.get(ngSettings.baseUrl + '/Api/Channel/' + channelId + "?onlyUnread=" + onlyUnread + "&timestamp=" + o.formattedTimestamp() + "&fromIndex=" + fromIndex + "&orderBy=" + orderBy);

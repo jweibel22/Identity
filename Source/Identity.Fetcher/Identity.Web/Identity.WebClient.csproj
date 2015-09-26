@@ -91,6 +91,7 @@
     <Content Include="Content\rss-feed-icone-7025-96.png" />
     <Content Include="Content\Templates\help.html" />
     <Content Include="Content\Templates\home.html" />
+    <Content Include="Content\Templates\readHistory.html" />
     <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\WebClient.pubxml" />
     <None Include="Web.Debug.config">
@@ -144,6 +145,7 @@
     <Content Include="Scripts\Controllers\navigator.js" />
     <Content Include="Scripts\Controllers\posts.js" />
     <Content Include="Scripts\Controllers\profile.js" />
+    <Content Include="Scripts\Controllers\readHistory.js" />
     <Content Include="Scripts\Controllers\rssFeeder.js" />
     <Content Include="Scripts\Controllers\searchresults.js" />
     <Content Include="Scripts\Controllers\userSearchResults.js" />

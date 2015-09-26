@@ -5,9 +5,17 @@
 
 <jqcloud words="profile.TagCloud" width="500" height="150" delay="10" steps="7" font-size="{from:0.09, to:0.04}"></jqcloud>
 
-<button class="btn btn-default btn-xs" ng-click="grantaccess()">
-    <span class="glyphicon glyphicon-share"></span> Grant user access to ...
-</button>
+<div>
+    <h4>Privacy</h4>
+    <button class="btn btn-default btn-xs" ng-click="grantaccess()">
+        <span class="glyphicon glyphicon-share"></span> Grant user access to ...
+    </button>
+</div>
+
+<div ng-show="profile.Id == user.Id">
+    <h4>Read history</h4>
+    <a href="#/readhistory">See recent read history</a>
+</div>
 
 <h4>Public channels</h4>
 <div ng-repeat="channel in profile.Owns" style="margin-left: 20px; margin-top: 10px">

@@ -201,6 +201,19 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                             }
                         }
                     }
+                })
+                .state('root.readhistory', {
+                    url: '/readhistory',
+                    views: {
+                        'container@': {
+                            templateUrl: 'Content/templates/readhistory.html',
+                            controller: 'ReadHistoryController',
+                            resolve: {
+                                posts: ['$stateParams', 'postService', function ($stateParams, postService) { return postService.readHistory(); }],
+                                userPromise: ['userService', function (userService) { return userService.getCurrentUser(); }]
+                            }
+                        }
+                    }
                 });
 
             $urlRouterProvider.otherwise('/home');

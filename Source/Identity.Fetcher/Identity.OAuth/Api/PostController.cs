@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
 using System.Web.Http;
@@ -83,8 +84,14 @@ namespace Identity.Rest.Api
         [HttpPost]
         public void Read(long id, long userId)
         {
-         log.Info("read");   
             userRepo.Read(userId, id);
+        }
+
+        [HttpGet]
+        [Route("Api/Post/History")]
+        public IEnumerable<Post> History()
+        {
+            return dtoLoader.LoadPosts(user, postRepo.ReadHistory(user.Id));
         }
     }
 }
