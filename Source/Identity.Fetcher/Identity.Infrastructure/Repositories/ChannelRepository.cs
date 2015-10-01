@@ -130,6 +130,27 @@ namespace Identity.Infrastructure.Repositories
             return con.Connection.Query<RssFeeder>("select * from RssFeeder where Id=@Id", new { Id = id }, con).SingleOrDefault();
         }
 
+        public void MarkAllAsRead(long userId, long channelId)
+        {
+            const string postIds = @"select distinct @UserId, ci.PostId, @Timestamp
+from Post 
+join ChannelItem ci on ci.PostId = Post.Id 
+join [User] u on u.Id = @UserId
+left join ChannelLink cl on cl.ChildId = ci.ChannelId and cl.ParentId = @ChannelId
+left join ChannelOwner co on co.ChannelId = ci.ChannelId and co.UserId = @UserId
+join Channel c on c.Id = ci.ChannelId
+left join ReadHistory h on h.UserId=@UserId and h.PostId = ci.PostId
+where (ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId) and (co.ChannelId is not null or c.IsPublic = 1) and h.UserId is null
+";
+
+            con.Connection.Execute(String.Format("insert into ReadHistory (UserId,PostId,Timestamp) ({0})", postIds), new
+            {
+                UserId = userId, 
+                ChannelId = channelId, 
+                Timestamp = DateTimeOffset.Now
+            }, con);            
+        }
+
         public RssFeeder RssFeederByUrl(string url)
         {
             var rssFeeder = con.Connection.Query<RssFeeder>("select * from RssFeeder where Url=@Url", new { Url = url }, con).SingleOrDefault();

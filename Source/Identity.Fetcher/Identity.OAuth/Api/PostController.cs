@@ -78,7 +78,11 @@ namespace Identity.Rest.Api
             x.Description = post.Description;
 
             postRepo.UpdatePost(x);
-            postRepo.TagPost(x.Id, post.Tags);
+
+            if (post.Tags != null)
+            {
+                postRepo.TagPost(x.Id, post.Tags);    
+            }            
         }
 
         [HttpPost]

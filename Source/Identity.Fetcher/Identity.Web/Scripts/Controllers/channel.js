@@ -28,7 +28,8 @@ angular.module('inspire')
             user: $scope.user,
             channel: $scope.channel,
             link: '',
-            linktags: ''
+            linktags: '', 
+            posts : $scope.posts
         }
 
         $scope.addPostWindowdata = {
@@ -52,8 +53,16 @@ angular.module('inspire')
 
         $scope.unsubscribe = function () {
             channelService.unsubscribe($scope.channel.Id).success(function (data) {
-                console.log("done");
                 $scope.channelFollowed = false;
+            });
+        };
+
+        $scope.markAllAsRead = function () {
+            channelService.markAllAsRead($scope.channel.Id).success(function (data) {
+                for (var post in $scope.posts) {
+                    post.Read = true;
+                }
+                $scope.channel.UnreadCount = 0;
             });
         };
 
@@ -93,7 +102,9 @@ angular.module('inspire')
                             Type: "link",
                             Tags: $scope.windowdata.linktags ? $scope.windowdata.linktags.split(' ') : null,
                             Created: new Date()
-                        }, $scope.windowdata.channel.Id);
+                        }, $scope.windowdata.channel.Id).then(function(data) {
+                            windowdata.posts.push(data.data);
+                        });
 
                         $modalInstance.dismiss('cancel');
                     }

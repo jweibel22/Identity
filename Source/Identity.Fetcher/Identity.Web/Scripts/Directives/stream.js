@@ -61,8 +61,11 @@
                         postService.read(post.Id, $scope.user.Id)
                             .success(function () {
                                 if (!post.Read) {
-                                    console.log("post " + post.Id + " was read");
-                                    post.Read = true;                                    
+                                    post.Read = true;
+
+                                    if ($scope.channel) {
+                                        $scope.channel.UnreadCount = $scope.channel.UnreadCount - 1;
+                                    }
                                 }
                             });
                     }

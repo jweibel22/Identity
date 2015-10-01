@@ -22,13 +22,13 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                             templateUrl: 'Content/templates/channels.html',
                             controller: 'ChannelsController',
                             resolve: {
-                                userPromise: ['userService', function (userService) { return userService.getCurrentUser(); }]
+                                userPromise: ['userService', function (userService) { return userService.userPromise.promise; }]
                             }
                         },
                         'header': {
                             templateUrl: 'Content/templates/menu.html',
                             controller: 'NavigatorCtrl',
-                            resolve: { userPromise: ['userService', function(userService) { return userService.getCurrentUser(); }] }
+                            resolve: { userPromise: ['userService', function (userService) { return userService.userPromise.promise; }] }
                         }
                     }
                 })
@@ -64,7 +64,7 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                             controller: 'ChannelController',
                             resolve: {
                                 channelPromise: ['$stateParams', 'channelService', function ($stateParams, channelService) { return channelService.getById($stateParams.channelId); }],
-                                userPromise: ['userService', function(userService) { return userService.getCurrentUser(); }]
+                                userPromise: ['userService', function (userService) { return userService.userPromise.promise; }]
                             }
                         }
                     }
@@ -77,7 +77,7 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                             controller: 'HomeController',
                             resolve: {
                                 homePromise: ['$stateParams', 'homeService', function ($stateParams, homeService) { return homeService.getHomeScreenContents(); }],
-                                userPromise: ['userService', function (userService) { return userService.getCurrentUser(); }]
+                                userPromise: ['userService', function (userService) { return userService.userPromise.promise; }]
                             }
                         }
                     }
@@ -102,7 +102,7 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                             controller: 'SearchController',
                             resolve: {
                                 posts: ['$stateParams', 'postService', function($stateParams, postService) { return postService.getByTag($stateParams.query); }],
-                                userPromise: ['userService', function(userService) { return userService.getCurrentUser(); }]
+                                userPromise: ['userService', function (userService) { return userService.userPromise.promise; }]
                             }
                         }
                     }
@@ -154,7 +154,7 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                             templateUrl: 'Content/templates/profile.html',
                             controller: 'ProfileController',
                             resolve: {
-                                userPromise: ['userService', function (userService) { return userService.getCurrentUser(); }],
+                                userPromise: ['userService', function (userService) { return userService.userPromise.promise; }],
                                 profilePromise: ['$stateParams', 'userService', function ($stateParams, userService) { return userService.getUser($stateParams.id); }],
                                 _: ['channelService', function(channelService) { return channelService.allPublic(); }]
                             }
@@ -184,7 +184,7 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                             templateUrl: 'Content/templates/editchannel.html',
                             controller: 'EditChannelController',
                             resolve: {
-                                userPromise: ['userService', function(userService) { return userService.getCurrentUser(); }],
+                                userPromise: ['userService', function (userService) { return userService.userPromise.promise; }],
                                 _: ['$stateParams', 'channelService', function($stateParams, channelService) { return channelService.getById($stateParams.id); }]
                             }
                         }
@@ -210,7 +210,7 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                             controller: 'ReadHistoryController',
                             resolve: {
                                 posts: ['$stateParams', 'postService', function ($stateParams, postService) { return postService.readHistory(); }],
-                                userPromise: ['userService', function (userService) { return userService.getCurrentUser(); }]
+                                userPromise: ['userService', function (userService) { return userService.userPromise.promise; }]
                             }
                         }
                     }
@@ -220,9 +220,10 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
         }
     ])
 
-.run(['authService', function (authService) {
+.run(['authService', 'userService', function (authService, userService) {
     authService.fillAuthData();
-}])
+    var tmp = userService.getCurrentUser();
+        }])
     .config(function ($httpProvider) {
         $httpProvider.responseInterceptors.push('myHttpInterceptor');
         var spinnerFunction = function (data, headersGetter) {

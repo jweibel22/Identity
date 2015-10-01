@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.WebClient", "Ident
 EndProject
 Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "AzureCloudService", "AzureCloudService\AzureCloudService.ccproj", "{9B13702E-AF29-4D37-81D9-D38151DB577B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RssFeeder", "RssFeeder\RssFeeder.csproj", "{B6FA9B35-C099-4AEE-BE09-D84FBC6C1FCE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RssFeederJob", "RssFeederJob\RssFeederJob.csproj", "{77293177-0D17-4EC5-AA7B-F30AE6650EC3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,10 +47,10 @@ Global
 		{9B13702E-AF29-4D37-81D9-D38151DB577B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B13702E-AF29-4D37-81D9-D38151DB577B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B13702E-AF29-4D37-81D9-D38151DB577B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B6FA9B35-C099-4AEE-BE09-D84FBC6C1FCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B6FA9B35-C099-4AEE-BE09-D84FBC6C1FCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B6FA9B35-C099-4AEE-BE09-D84FBC6C1FCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B6FA9B35-C099-4AEE-BE09-D84FBC6C1FCE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77293177-0D17-4EC5-AA7B-F30AE6650EC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77293177-0D17-4EC5-AA7B-F30AE6650EC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77293177-0D17-4EC5-AA7B-F30AE6650EC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77293177-0D17-4EC5-AA7B-F30AE6650EC3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

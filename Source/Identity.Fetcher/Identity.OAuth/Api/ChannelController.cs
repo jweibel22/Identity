@@ -180,41 +180,63 @@ namespace Identity.Rest.Api
 
             postRepo.AddPost(p);
             userRepo.Publish(user.Id, id, p.Id);
-            postRepo.TagPost(p.Id, post.Tags);
+
+            if (post.Tags != null)
+            {
+                postRepo.TagPost(p.Id, post.Tags);    
+            }            
 
             return post;
         }
 
+        [HttpPut]
+        public void MarkAllAsRead(int id)
+        {
+            channelRepo.MarkAllAsRead(user.Id, id);
+        }
+
         private void PopulateMetaData(Domain.Post p)
         {
-            var req = WebRequest.CreateHttp(p.Uri);
-            using (var stream = req.GetResponse().GetResponseStream())
+            try
             {
-                CQ dom = new StreamReader(stream).ReadToEnd();
-                p.Title = dom["title"].Text();
-
-                var descr1 = dom["meta[name=description]"];
-
-                if (descr1.Elements.Any())
+                var req = WebRequest.CreateHttp(p.Uri);
+                using (var stream = req.GetResponse().GetResponseStream())
                 {
-                    if (descr1.Attr("content") != null)
+                    CQ dom = new StreamReader(stream).ReadToEnd();
+                    p.Title = dom["title"].Text();
+
+                    var descr1 = dom["meta[name=description]"];
+
+                    if (descr1.Elements.Any())
                     {
-                        p.Description = descr1.Attr("content");
+                        if (descr1.Attr("content") != null)
+                        {
+                            p.Description = descr1.Attr("content");
+                        }
+                        else if (descr1.Attr("value") != null)
+                        {
+                            p.Description = descr1.Attr("value");
+                        }
                     }
-                    else if (descr1.Attr("value") != null)
+                    else
                     {
-                        p.Description = descr1.Attr("value");
+                        var descr2 = dom["meta[itemprop=description]"];
+
+                        if (descr2.Elements.Any() && descr2.Attr("content") != null)
+                        {
+                            p.Description = descr2.Attr("content");
+                        }
                     }
                 }
-                else
-                {
-                    var descr2 = dom["meta[itemprop=description]"];
+            }
+            catch (Exception ex)
+            {
+                log.Error("Unable to extract meta data from link", ex);
 
-                    if (descr2.Elements.Any() && descr2.Attr("content") != null)
-                    {
-                        p.Description = descr2.Attr("content");
-                    }
-                }
+                if (p.Title == null)
+                {
+                    p.Title = p.Uri;                    
+                }                
             }
         }
 

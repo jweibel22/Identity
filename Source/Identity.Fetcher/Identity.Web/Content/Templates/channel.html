@@ -24,8 +24,9 @@
                 <button class="btn btn-default" ng-show="!channelFollowed" ng-click="subscribe()">Subscribe</button>
                 <button class="btn btn-default" ng-click="createLink()">Forward to ...</button>
                 <button class="btn btn-default" ng-show="channelOwned" ng-click="leave()">Leave</button>
+                <button class="btn btn-default" ng-click="markAllAsRead()">Mark all as read</button>
                 <a ng-show="channelOwned" href="#/editchannel/{{channel.Id}}" class="btn btn-default">Edit</a>
-                <span ng-show="!channelOwned">
+                <span>
                     <span>Only show unread</span> <input type="checkbox" ng-model="showOnlyUnread" ng-change="showOnlyUnreadChanged()" />
                 </span>
 

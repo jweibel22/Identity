@@ -24,6 +24,10 @@ angular.module('inspire').factory('channelService', ['$http', 'ngSettings', func
         return $http.put(ngSettings.baseUrl + '/Api/Channel/' + channelId + "/Unsubscribe");
     };
 
+    o.markAllAsRead = function (channelId) {
+        return $http.put(ngSettings.baseUrl + '/Api/Channel/' + channelId + "/MarkAllAsRead");
+    };
+
     o.leave = function (channelId) {
         return $http.put(ngSettings.baseUrl + '/Api/Channel/' + channelId + "/Leave");
     };

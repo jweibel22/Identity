@@ -48,16 +48,6 @@
     <DiagnosticsConfiguration Include="RssFeederContent\diagnostics.wadcfgx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RssFeeder\RssFeeder.csproj">
-      <Name>RssFeeder</Name>
-      <Project>{b6fa9b35-c099-4aee-be09-d84fbc6c1fce}</Project>
-      <Private>True</Private>
-      <RoleType>Worker</RoleType>
-      <RoleName>RssFeeder</RoleName>
-      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <PublishProfile Include="Profiles\inspirerssfeederProduction.azurePubxml" />
   </ItemGroup>
   <!-- Import the target files for this project template -->

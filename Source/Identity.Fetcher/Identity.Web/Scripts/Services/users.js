@@ -1,11 +1,21 @@
-angular.module('inspire').factory('userService', ['$http', 'ngSettings', function ($http, ngSettings) {
+angular.module('inspire').factory('userService', ['$http', '$q', 'ngSettings', function ($http, $q, ngSettings) {
 
     var o = {
-        searchResult: []
-    };
+        searchResult: [],
+        currentUser: null,
+        userPromise : null
+};
 
-    o.getCurrentUser = function() {
-        return $http.get(ngSettings.baseUrl + '/Api/User');
+    o.getCurrentUser = function () {
+
+        o.userPromise = $q.defer();
+
+        $http.get(ngSettings.baseUrl + '/Api/User').success(function(data) {
+                angular.copy(data, o.currentUser);
+                o.userPromise.resolve({ data: data });
+            });
+        
+        return o.userPromise.promise;
     };
 
     o.getUser = function (userId) {

@@ -1,5 +1,5 @@
 ﻿'use strict';
-angular.module('inspire').controller('LoginController', ['$scope', '$location', 'authService', 'ngSettings', function ($scope, $location, authService, ngSettings) {
+angular.module('inspire').controller('LoginController', ['$scope', '$location', 'authService', 'userService', 'ngSettings', function ($scope, $location, authService, userService, ngSettings) {
 
     $scope.loginData = {
         userName: "",
@@ -13,9 +13,10 @@ angular.module('inspire').controller('LoginController', ['$scope', '$location', 
 
         authService.login($scope.loginData).then(function (response) {
 
+            var tmp = userService.getCurrentUser();
             $location.replace().path('/#/home');
-
-        },
+                
+            },
          function (err) {
              $scope.message = err.error_description;
          });
