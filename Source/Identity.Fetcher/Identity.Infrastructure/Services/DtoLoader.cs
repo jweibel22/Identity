@@ -103,7 +103,7 @@ namespace Identity.Infrastructure.Services
 
                 var commentCount = commentCounts.SingleOrDefault(cc => cc.Id == p.Id);
                 p.CommentCount = commentCount != null ? commentCount.Count : 0;
-                p.IsCollapsed = p.Description.Length >= 500; //p.Teaser != null;
+                p.IsCollapsed = true;
                 p.PublishedIn = postRepo.PublishedIn(p.Id, user.Id).Select(c => Mapper.Map<DTO.Channel>(c)).ToList();
             }
 
