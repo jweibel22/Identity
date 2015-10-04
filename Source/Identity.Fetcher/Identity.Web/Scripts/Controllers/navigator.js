@@ -6,7 +6,6 @@ angular.module('inspire')
             $scope.user = userPromise.data;
             $scope.state = $state;
             $scope.searchFor = "";
-            $scope.channelsearchFor = "";            
 
             $scope.addLinkWindowdata = {
                 user: $scope.user,
@@ -118,18 +117,6 @@ angular.module('inspire')
             $scope.search = function(event) {
                 var url = "#/search?query="+ $scope.searchFor;
                 $scope.searchFor = "";
-                $window.location.href = url;
-            }
-
-            $scope.channelSearch = function (event) {
-                var url = "#/channelsearch?query=" + $scope.channelsearchFor;
-                $scope.channelsearchFor = "";
-                $window.location.href = url;
-            }
-
-            $scope.userSearch = function (event) {
-                var url = "#/usersearch?query=" + $scope.usersearchFor;
-                $scope.usersearchFor = "";
                 $window.location.href = url;
             }
         }

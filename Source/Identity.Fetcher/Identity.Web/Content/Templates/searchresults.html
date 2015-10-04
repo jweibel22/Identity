@@ -1,4 +1,28 @@
+
 <h3>Results for: {{query}}</h3>
+<div style="margin-top:50px">
+    <div ng-show="users.length > 0">
+        <h4>Found {{users.length}} user(s)</h4>
 
-    <stream posts="posts" user="user" showonlyunread="false" autoloadonscroll="false" showcontrols="true" />
+        <div ng-repeat="user in users" style="margin-left: 20px">
+            <a href="#/profile/{{user.Id}}">
+                {{user.DisplayName}}
+            </a>
+        </div>
+    </div>
 
+    <div ng-show="channels.length > 0">
+        <h4>Found {{channels.length}} channel(s)</h4>
+
+        <div ng-repeat="channel in channels" style="margin-left: 20px">
+            <a href="#/home/{{channel.Id}}">
+                {{channel.Name}}
+            </a>
+        </div>
+    </div>
+
+    <div ng-show="posts.length > 0">
+        <h4>Found {{posts.length}} post(s)</h4>
+        <stream posts="posts" user="user" showonlyunread="false" autoloadonscroll="false" showcontrols="true" />
+    </div>
+</div>
