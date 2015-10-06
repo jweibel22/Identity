@@ -101,32 +101,10 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                             templateUrl: 'Content/templates/searchresults.html',
                             controller: 'SearchController',
                             resolve: {
-                                posts: ['$stateParams', 'postService', function($stateParams, postService) { return postService.getByTag($stateParams.query); }],
+                                posts: ['$stateParams', 'postService', function ($stateParams, postService) { return postService.getByTag($stateParams.query); }],
+                                channels: ['$stateParams', 'channelService', function ($stateParams, channelService) { return channelService.findByName($stateParams.query); }],
+                                users: ['$stateParams', 'userService', function ($stateParams, userService) { return userService.findByName($stateParams.query); }],
                                 userPromise: ['userService', function (userService) { return userService.userPromise.promise; }]
-                            }
-                        }
-                    }
-                })
-                .state('root.channelsearch', {
-                    url: '/channelsearch?query',
-                    views: {
-                        'container@': {
-                            templateUrl: 'Content/templates/channelSearchResults.html',
-                            controller: 'ChannelSearchResultsController',
-                            resolve: {
-                                _: ['$stateParams', 'channelService', function($stateParams, channelService) { return channelService.findByName($stateParams.query); }]
-                            }
-                        }
-                    }
-                })
-                .state('root.usersearch', {
-                    url: '/usersearch?query',
-                    views: {
-                        'container@': {
-                            templateUrl: 'Content/templates/userSearchResults.html',
-                            controller: 'UserSearchResultsController',
-                            resolve: {
-                                _: ['$stateParams', 'userService', function ($stateParams, userService) { return userService.findByName($stateParams.query); }]
                             }
                         }
                     }
@@ -244,10 +222,12 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
             }, function (response) {
                 $('#loading').hide();
 
-                toasty.error({
-                    title: 'Error',
-                    msg: response.data.ExceptionMessage
-                });
+                if (response.status != 401) {
+                    toasty.error({
+                        title: 'Error',
+                        msg: response.data.ExceptionMessage
+                    });
+                }
 
                 return $q.reject(response);
             });

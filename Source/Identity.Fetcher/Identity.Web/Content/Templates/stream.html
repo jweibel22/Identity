@@ -1,7 +1,7 @@
 ﻿
 <div>
     <div ng-show="showcontrols">
-        <table>
+        <table style="border-spacing: 10px; border-collapse: separate">
             <tr>
                 <td>
                     <span>Sort by</span>
@@ -30,6 +30,9 @@
                         </ul>
                     </div>
 
+                </td>
+                <td>                                        
+                    <span>Only show unread</span> <input type="checkbox" ng-model="showonlyunread" ng-change="reloadPosts()" />                    
                 </td>
             </tr>
         </table>
@@ -62,14 +65,24 @@
                         </div>
                         <div style="margin-left:30px;">
                             <span style="cursor: pointer;" ng-show="post.CommentCount > 0" ng-click="loadComments(post)">{{post.CommentCount}} comments</span>
-                            <div ng-repeat="comment in post.Comments | orderBy:'Created'" style="background: #E8E8E8; margin-top: 1px;font-size: medium;">
-                                <div>
-                                    <a href="#/profile/{{comment.UserId}}">{{comment.Author}}</a>
-                                    <span style="font-size:medium; margin-left:2px;">
-                                        {{comment.Body}}
-                                    </span>
+                            <div ng-show="post.CommentCount > 0 && post.Comments" style="margin-top: 10px; margin-bottom: 10px">
+
+                                <div style="background: #E8E8E8; margin-top: 1px;font-size: medium;">
+                                    <div>
+                                        <input type="text" class="form-control col-lg-8" placeholder="Write a comment">
+                                    </div>
+
                                 </div>
-                                <div style="color: #888888; font-size: small">{{comment.CreatedHoursAgo}} hours ago <a>Reply</a></div>
+
+                                <div ng-repeat="comment in post.Comments | orderBy:'Created'" style="background: #E8E8E8; margin-top: 1px;font-size: medium;">
+                                    <div>
+                                        <a href="#/profile/{{comment.UserId}}">{{comment.Author}}</a>
+                                        <span style="font-size:medium; margin-left:2px;">
+                                            {{comment.Body}}
+                                        </span>
+                                    </div>
+                                    <div style="color: #888888; font-size: small">{{comment.CreatedHoursAgo}} hours ago <a>Reply</a></div>
+                                </div>
                             </div>
                         </div>
                         <div style="margin-left:30px;">
