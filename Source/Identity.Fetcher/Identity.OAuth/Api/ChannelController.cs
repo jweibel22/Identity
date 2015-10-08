@@ -165,20 +165,26 @@ namespace Identity.Rest.Api
         [HttpPost]
         public Post Posts(long id, Post post)
         {
-            var p = new Domain.Post
-            {
-                Created = post.Created,
-                Description = post.Description ?? "",
-                Title = post.Title,
-                Uri = post.Uri
-            };
+            var p = postRepo.GetByUrl(post.Uri);
 
-            if (p.Uri != null && p.Title == null)
+            if (p == null)
             {
-                PopulateMetaData(p);
+                p = new Domain.Post
+                {
+                    Created = post.Created,
+                    Description = post.Description ?? "",
+                    Title = post.Title,
+                    Uri = post.Uri
+                };
+
+                if (p.Uri != null && p.Title == null)
+                {
+                    PopulateMetaData(p);
+                }
+
+                postRepo.AddPost(p);
             }
-
-            postRepo.AddPost(p);
+            
             userRepo.Publish(user.Id, id, p.Id);
 
             if (post.Tags != null)
@@ -186,7 +192,7 @@ namespace Identity.Rest.Api
                 postRepo.TagPost(p.Id, post.Tags);    
             }            
 
-            return post;
+            return Mapper.Map<Post>(p);
         }
 
         [HttpPut]

@@ -54,6 +54,7 @@ namespace Identity.Rest.Api
         }
 
         [HttpPost]
+        [Route("Api/Post/{id}/Comments")]
         public Infrastructure.DTO.Comment Comments(long id, Infrastructure.DTO.Comment comment)
         {
             var newComment = new Comment

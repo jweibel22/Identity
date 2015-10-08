@@ -17,7 +17,7 @@ angular.module('inspire')
 
                 postService.editPost({Id: post.Id, Title: $scope.title, Description: $scope.description, Tags: $scope.tags})
                     .success(function(post) {
-                        $location.path("/home");
+                        
                     });
             }
 

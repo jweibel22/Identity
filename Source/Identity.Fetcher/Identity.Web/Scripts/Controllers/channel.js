@@ -47,8 +47,9 @@ angular.module('inspire')
         };
 
         $scope.createLink = function () {
-            channelSelectorService.selectChannel($scope.user.Owns, function (id) { channelService.addSubscription(id, $scope.channel.Id); });
-            
+            channelSelectorService.selectChannel($scope.user.Owns, function(id) {
+                 channelService.addSubscription(id, $scope.channel.Id);
+            });            
         };
 
         $scope.unsubscribe = function () {
@@ -73,7 +74,6 @@ angular.module('inspire')
         };
 
         $scope.showOnlyUnreadChanged = function() {
-
             postService.getFromChannel($scope.channel.Id, $scope.showOnlyUnread).success(function(data) {
                 angular.copy(data.data.Posts, $scope.posts);
             });
@@ -103,7 +103,7 @@ angular.module('inspire')
                             Tags: $scope.windowdata.linktags ? $scope.windowdata.linktags.split(' ') : null,
                             Created: new Date()
                         }, $scope.windowdata.channel.Id).then(function(data) {
-                            windowdata.posts.push(data.data);
+                            windowdata.posts.splice(0, 0, data.data);
                         });
 
                         $modalInstance.dismiss('cancel');
@@ -137,13 +137,15 @@ angular.module('inspire')
                         }
 
                         postService.create({
-                            title: $scope.windowdata.title,
-                            description: $scope.windowdata.description,
-                            uri: guid(),
-                            type: "userpost",
-                            tags: $scope.windowdata.tags ? $scope.windowdata.tags.split(' ') : null,
-                            created: new Date()
-                        }, $scope.windowdata.channel.Id);
+                            Title: $scope.windowdata.title,
+                            Description: $scope.windowdata.description,
+                            Uri: null,
+                            Type: "userpost",
+                            Tags: $scope.windowdata.tags ? $scope.windowdata.tags.split(' ') : null,
+                            Created: new Date()
+                        }, $scope.windowdata.channel.Id).then(function (data) {
+                            windowdata.posts.splice(0,0,data.data);
+                        });
 
                         $modalInstance.dismiss('cancel');
                     }
