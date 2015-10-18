@@ -38,7 +38,7 @@ namespace Identity.Rest.Api
 
         public IEnumerable<Post> Get(string tag)
         {
-            return dtoLoader.LoadPosts(user, postRepo.FindByTag(tag));
+            return dtoLoader.LoadPosts(user, postRepo.FindByTitleOrTag(tag));
         }
 
         [HttpPut]
