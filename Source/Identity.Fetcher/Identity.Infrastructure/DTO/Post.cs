@@ -50,5 +50,7 @@ namespace Identity.Infrastructure.DTO
         public int UserSpecificPopularity { get; set; }
 
         public IList<Channel> PublishedIn { get; set; }
+
+        public string EmbeddedUrl { get; set; }
     }
 }

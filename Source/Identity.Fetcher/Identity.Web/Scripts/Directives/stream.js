@@ -1,4 +1,4 @@
-﻿angular.module('inspire').directive("stream", ['$window', '$location', '$rootScope', '$modal', '$filter', 'postService', 'userService', 'channelSelectorService', function ($window, $location, $rootScope, $modal, $filter, postService, userService, channelSelectorService) {
+﻿angular.module('inspire').directive("stream", ['$window', '$location', '$rootScope', '$modal', '$filter', '$sce', 'postService', 'userService', 'channelSelectorService', function ($window, $location, $rootScope, $modal, $filter, $sce, postService, userService, channelSelectorService) {
 
         return {
             restrict: 'E',
@@ -29,7 +29,7 @@
                     channels: $scope.user.Owns,
                     selectedChannel: ''
                 }
-
+                
                 $scope.changeSortBy = function(sortBy) {
                     $scope.selectedSortType = sortBy;
                     $scope.reloadPosts();
@@ -79,6 +79,12 @@
                             postService.getFromChannel($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType).then(function (data) {
                                 angular.copy(data.data.Posts, $scope.posts);
                                 $scope.loading = false;
+
+                                for (var i = 0; i < $scope.posts.length; i++) {
+                                    if ($scope.posts[i].EmbeddedUrl) {
+                                        $scope.posts[i].TrustedEmbeddedUrl = $sce.trustAsResourceUrl($scope.posts[i].EmbeddedUrl);
+                                    }
+                                }
                             });
                         }
                 }
@@ -93,6 +99,12 @@
                                 postService.loadMorePosts($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType).then(function (data) {
                                     angular.copy($scope.posts.concat(data.data.Posts), $scope.posts);
                                     $scope.loading = false;
+
+                                    for (var i = 0; i < $scope.posts.length; i++) {
+                                        if ($scope.posts[i].EmbeddedUrl) {
+                                            $scope.posts[i].TrustedEmbeddedUrl = $sce.trustAsResourceUrl($scope.posts[i].EmbeddedUrl);
+                                        }
+                                    }
                                 });
                             }
                     }

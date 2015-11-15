@@ -12,6 +12,7 @@ namespace Identity.Rest
 
             AutoMapper.Mapper.CreateMap<Post, Infrastructure.DTO.Post>()
                 .ForMember(x => x.Type, _ => _.UseValue("link"))
+                .ForMember(x => x.EmbeddedUrl, _ => _.ResolveUsing(MapEmbeddedUrl))
                 .ForMember(x => x.IsCollapsed, _ => _.ResolveUsing(x => x.Description.Length >= 500))
                 .ForMember(x => x.Expandable, _ => _.ResolveUsing(x => x.Description.Length >= 500))
                 .ForMember(x => x.Teaser, _ => _.ResolveUsing(MapTeaser));
@@ -25,6 +26,26 @@ namespace Identity.Rest
                 .ForMember(x => x.weight, _ => _.MapFrom(src => src.Weight))
                 .ForMember(x => x.text, _ => _.MapFrom(src => src.Text));
 
+        }
+
+        private static string MapEmbeddedUrl(Post post)
+        {
+            var url = post.Uri.Trim();
+
+            if (!url.Contains("youtube.com"))
+            {
+                return null;
+            }
+
+            var idx = url.LastIndexOf("?v=");
+
+            if (idx == -1)
+            {
+                return null;
+            }
+
+            var id = url.Substring(idx + 3);
+            return String.Format("https://www.youtube.com/embed/{0}", id);
         }
 
         private static string MapTeaser(Post post)
