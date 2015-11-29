@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
@@ -21,16 +22,18 @@ namespace Identity.OAuth.Api
     {
         private readonly ChannelRepository channelRepository;
         private readonly UserRepository userRepository;
+        private readonly IDbTransaction con;
 
         private IAuthenticationManager Authentication
         {
             get { return Request.GetOwinContext().Authentication; }
         }
 
-        public AccountController(ChannelRepository channelRepository, UserRepository userRepository)
+        public AccountController(ChannelRepository channelRepository, UserRepository userRepository, IDbTransaction con)
         {
             this.channelRepository = channelRepository;
             this.userRepository = userRepository;
+            this.con = con;
         }
 
         // POST api/Account/Register
@@ -194,6 +197,8 @@ namespace Identity.OAuth.Api
 
             //generate access token response
             var accessTokenResponse = GenerateLocalAccessTokenResponse(model.UserName);
+
+            con.Commit(); //TODO: Find out why the UnitOfWorkCommitAttribute doesn't commit the transaction correctly here!
 
             return Ok(accessTokenResponse);
         }

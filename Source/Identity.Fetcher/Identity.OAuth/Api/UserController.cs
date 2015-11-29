@@ -68,7 +68,7 @@ namespace Identity.Rest.Api
         public User Get()
         {
             var identity = User.Identity as ClaimsIdentity;
-            var user = userRepo.FindByName(identity.Name);
+            var user = userRepo.TryFindByName(identity.Name);
 
             if (user == null)
             {

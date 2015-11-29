@@ -47,7 +47,7 @@ namespace Identity.Rest.Api
         [HttpGet]
         public IEnumerable<Channel> Get()
         {
-            return dtoLoader.LoadChannelList(user, channelRepo.All());    
+            return dtoLoader.LoadChannelList(user, channelRepo.AllPublic());    
         }
 
         [HttpGet]
