@@ -1,6 +1,6 @@
 ﻿'use strict';
 angular.module('inspire')
-    .factory('authService', ['$http', '$q', 'localStorageService', 'ngSettings', function ($http, $q, localStorageService, ngSettings) {
+    .factory('authService', ['$http', '$q', 'localStorageService', 'ngSettings', 'userService', function ($http, $q, localStorageService, ngSettings, userService) {
 
         var serviceBase = ngSettings.baseUrl;
     var authServiceFactory = {};
@@ -145,6 +145,7 @@ angular.module('inspire')
             _authentication.userName = response.userName;
             _authentication.useRefreshTokens = false;
 
+            var tmp = userService.getCurrentUser(); //this ensures that the user is loaded in the UserService
             deferred.resolve(response);
 
         }).error(function (err, status) {

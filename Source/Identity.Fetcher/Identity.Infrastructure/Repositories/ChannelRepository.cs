@@ -46,9 +46,9 @@ namespace Identity.Infrastructure.Repositories
             return con.Connection.Query<Channel>(String.Format(sql, count), new { UserId = userId, Timestamp = DateTimeOffset.Now.Subtract(TimeSpan.FromDays(7)) }, con);
         }
 
-        public IEnumerable<Channel> All()
+        public IEnumerable<Channel> AllPublic()
         {
-            return con.Connection.Query<Channel>("select * from Channel", null, con);
+            return con.Connection.Query<Channel>("select top 1000 * from Channel where IsPublic = 1", null, con);
         }
 
         public IEnumerable<WeightedTag> GetTagCloud(long channelId)
@@ -97,7 +97,7 @@ namespace Identity.Infrastructure.Repositories
         public void Delete(long userId, long channelId)
         {
             var cnt = con.Connection.Query<int>("select count(*) from ChannelOwner where UserId=@UserId and ChannelId=@ChannelId and IsLocked=false",
-                new{ UserId = userId, ChannelId = channelId }).Single();
+                new{ UserId = userId, ChannelId = channelId }, con).Single();
 
             if (cnt == 0)
             {

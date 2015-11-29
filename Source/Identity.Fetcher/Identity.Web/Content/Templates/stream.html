@@ -40,7 +40,7 @@
 
     <div style="margin-top:10px" scroll infinite-scroll="loadMorePosts()" infinite-scroll-distance="2">
         <div ng-repeat="post in posts " style="margin-top: 20px" class="readable">
-            <div ng-if="postVisible(post)">
+            <div ng-show="postVisible(post)">
                 
                 <div ng-show="selectedListType == 'Full' || !post.IsCollapsed">
                     <span style="font-size:20px; margin-left:10px;">

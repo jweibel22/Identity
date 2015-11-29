@@ -30,7 +30,7 @@ angular.module('inspire')
 
             $scope.logOut = function () {
                 authService.logOut();
-                //window.location = '#/home';
+                $location.replace().path('/#/home');
             }
 
             $scope.authentication = authService.authentication;

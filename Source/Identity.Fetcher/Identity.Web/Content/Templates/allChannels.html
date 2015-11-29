@@ -1,0 +1,12 @@
+﻿<h4>Channel list</h4>
+<div ng-repeat="channel in channels" style="margin-left: 20px">
+        <a href="#/home/{{channel.Id}}">
+            {{channel.Name}} <span ng-show="channel.ShowOnlyUnread"> ({{channel.UnreadCount}})</span>
+        </a>
+        <div ng-repeat="sub in channel.Subscriptions" style="margin-left: 10px">
+            <a href="#/home/{{sub.Id}}">
+                {{sub.Name}}
+            </a>
+        </div>
+</div>
+

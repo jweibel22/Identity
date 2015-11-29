@@ -94,6 +94,18 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                         }
                     }
                 })
+                .state('root.allchannels', {
+                    url: '/allchannels',
+                    views: {
+                        'container@': {
+                            templateUrl: 'Content/templates/allChannels.html',
+                            controller: 'AllChannelsController',
+                            resolve: {
+                                _: ['channelService', function (channelService) { return channelService.allPublic(); }]
+                            }
+                        }
+                    }
+                })
                 .state('root.search', {
                     url: '/search?query',
                     views: {
@@ -200,7 +212,7 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
 
 .run(['authService', 'userService', function (authService, userService) {
     authService.fillAuthData();
-    var tmp = userService.getCurrentUser();
+    var tmp = userService.getCurrentUser(); //this ensures that the user is loaded in the UserService
         }])
     .config(function ($httpProvider) {
         $httpProvider.responseInterceptors.push('myHttpInterceptor');

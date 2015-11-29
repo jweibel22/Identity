@@ -79,9 +79,21 @@ namespace Identity.Infrastructure.Repositories
             return con.Connection.Query<User>("select * from [User] where Id=@Id", new { Id = userId }, con).SingleOrDefault();
         }
 
-        public User FindByName(string username)
+        public User TryFindByName(string username)
         {
             return con.Connection.Query<User>("select * from [User] where Username=@Username", new { Username = username }, con).SingleOrDefault();
+        }
+
+        public User FindByName(string username)
+        {
+            var user = TryFindByName(username);
+
+            //if (user == null)
+            //{
+            //    throw new Exception("No user with username " + username + " exist");
+            //}
+
+            return user;
         }
 
         public IEnumerable<User> SearchByName(string username)

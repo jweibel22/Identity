@@ -89,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\rss-feed-icone-7025-96.png" />
+    <Content Include="Content\Templates\allChannels.html" />
     <Content Include="Content\Templates\help.html" />
     <Content Include="Content\Templates\home.html" />
     <Content Include="Content\Templates\readHistory.html" />
@@ -133,6 +134,7 @@
     <Content Include="Scripts\authComplete.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\Controllers\allChannels.js" />
     <Content Include="Scripts\Controllers\associate.js" />
     <Content Include="Scripts\Controllers\editchannel.js" />
     <Content Include="Scripts\Controllers\channels.js" />
