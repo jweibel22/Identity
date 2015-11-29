@@ -20,6 +20,8 @@ namespace Identity.Infrastructure.DTO
 
         public long LikedChannel { get; set; }
 
+        public long SubscriptionChannel { get; set; }
+
         public IList<Post> Feed { get; set; }
 
         public IList<WeightedTag> TagCloud { get; set; }

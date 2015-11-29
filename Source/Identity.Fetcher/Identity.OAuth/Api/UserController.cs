@@ -61,6 +61,7 @@ namespace Identity.Rest.Api
                 SavedChannel = user.SavedChannel,
                 StarredChannel = user.StarredChannel,
                 LikedChannel = user.LikedChannel,
+                SubscriptionChannel = user.SubscriptionChannel,
                 TagCloud = userRepo.GetTagCloud(user.Id, loggedInUser.Id).Select(Mapper.Map<Infrastructure.DTO.WeightedTag>).ToList()
             };
         }

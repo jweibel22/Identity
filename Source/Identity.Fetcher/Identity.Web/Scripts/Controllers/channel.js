@@ -43,6 +43,9 @@ angular.module('inspire')
         $scope.subscribe = function () {
             channelService.subscribe($scope.channel.Id).success(function (data) {
                 $scope.channelFollowed = true;
+
+                var subscriptionChannel = $filter('filter')($scope.user.Owns, { Id: $scope.user.SubscriptionChannel }, true)[0];
+                subscriptionChannel.Subscriptions.push($scope.channel);
             });
         };
 
@@ -55,6 +58,13 @@ angular.module('inspire')
         $scope.unsubscribe = function () {
             channelService.unsubscribe($scope.channel.Id).success(function (data) {
                 $scope.channelFollowed = false;
+
+                var subscriptionChannel = $filter('filter')($scope.user.Owns, { Id: $scope.user.SubscriptionChannel }, true)[0];
+                var channelToRemove = $filter('filter')(subscriptionChannel.Subscriptions, { Id: $scope.channel.Id }, true)[0];
+                var index = subscriptionChannel.Subscriptions.indexOf(channelToRemove);
+                if (index > -1) {
+                    subscriptionChannel.Subscriptions.splice(index, 1);
+                }                
             });
         };
 
