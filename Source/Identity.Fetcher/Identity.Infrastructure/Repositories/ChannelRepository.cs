@@ -48,7 +48,23 @@ namespace Identity.Infrastructure.Repositories
 
         public IEnumerable<Channel> AllPublic()
         {
-            return con.Connection.Query<Channel>("select top 1000 * from Channel where IsPublic = 1", null, con);
+            return new int[]
+            {
+                2,5,6,7,8,9
+            }.Select(i =>            
+                new Channel
+                {
+                    Id = i,
+                    Name = "a",
+                    ListType = "List",
+                    IsPublic = true,
+                    Created = DateTimeOffset.Now,
+                    OrderBy = "Added"
+
+                }
+            );
+
+            //return con.Connection.Query<Channel>("select top 1000 * from Channel where IsPublic = 1", null, con);
         }
 
         public IEnumerable<WeightedTag> GetTagCloud(long channelId)
