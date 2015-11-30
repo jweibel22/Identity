@@ -84,8 +84,8 @@ namespace Identity.Infrastructure.Services
 
             foreach (var channel in result)
             {
-                channel.UnreadCount = channelRepo.UnreadCount(user.Id, channel.Id);
-                channel.Subscriptions = channelRepo.GetSubscriptions(channel.Id).Select(Mapper.Map<DTO.Channel>).ToList();
+                //channel.UnreadCount = channelRepo.UnreadCount(user.Id, channel.Id);
+                //channel.Subscriptions = channelRepo.GetSubscriptions(channel.Id).Select(Mapper.Map<DTO.Channel>).ToList();
             }
 
              return result;
