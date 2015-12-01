@@ -169,19 +169,26 @@ where Post.Id = @Id
 
         public IEnumerable<Tagged> Tags(long postId)
         {
-            return con.Connection.Query<Tagged>("select * from Tagged where PostId=@PostId", new { PostId = postId }, con);
+            using (var pc = new PerfCounter("Tags"))
+            {
+                return con.Connection.Query<Tagged>("select * from Tagged where PostId=@PostId", new {PostId = postId},
+                    con);
+            }
         }
 
         public IEnumerable<Channel> PublishedIn(long postId, long userId)
         {
-            return con.Connection.Query<Channel>(@"
+            using (var pc = new PerfCounter("PublishedIn"))
+            {
+                return con.Connection.Query<Channel>(@"
             select * from Channel where Id in (select top 5 Id from Channel 
             join ChannelItem ci on ci.ChannelId = Channel.Id and ci.PostId = @PostId
             left join ChannelOwner co on co.ChannelId = Channel.Id and co.UserId = @UserId
             left join Subscription s on s.ChannelId = Channel.Id
             where co.ChannelId is not null or Channel.IsPublic = 1
             group by Channel.Id
-            order by COUNT(*))", new { PostId = postId, UserId = userId }, con);
+            order by COUNT(*))", new {PostId = postId, UserId = userId}, con);
+            }
         }
 
         public IEnumerable<WeightedTag> TopTags(int count)

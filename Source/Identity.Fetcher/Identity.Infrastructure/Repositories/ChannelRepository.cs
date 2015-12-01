@@ -2,21 +2,24 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Identity.Domain;
+using log4net;
 using Channel = Identity.Domain.Channel;
 using RssFeeder = Identity.Domain.RssFeeder;
 
 namespace Identity.Infrastructure.Repositories
 {
     public class ChannelRepository : IDisposable
-    {
+    {        
         private readonly IDbTransaction con;
-
+     
         public ChannelRepository(IDbTransaction con)
         {
             this.con = con;
@@ -48,41 +51,48 @@ namespace Identity.Infrastructure.Repositories
 
         public IEnumerable<Channel> AllPublic()
         {
-            return new int[]
-            {
-                2,5,6,7,8,9
-            }.Select(i =>            
-                new Channel
-                {
-                    Id = i,
-                    Name = "a",
-                    ListType = "List",
-                    IsPublic = true,
-                    Created = DateTimeOffset.Now,
-                    OrderBy = "Added"
+            //return new int[]
+            //{
+            //    2,5,6,7,8,9
+            //}.Select(i =>            
+            //    new Channel
+            //    {
+            //        Id = i,
+            //        Name = "a",
+            //        ListType = "List",
+            //        IsPublic = true,
+            //        Created = DateTimeOffset.Now,
+            //        OrderBy = "Added"
 
-                }
-            );
+            //    }
+            //);
 
-            //return con.Connection.Query<Channel>("select top 1000 * from Channel where IsPublic = 1", null, con);
+            return con.Connection.Query<Channel>("select top 1000 * from Channel where IsPublic = 1", null, con);
         }
 
         public IEnumerable<WeightedTag> GetTagCloud(long channelId)
         {
-            return con.Connection.Query<WeightedTag>(@" select top 20 count(*) as Weight, Tag as Text from Tagged 
+            using (var pc = new PerfCounter("GetTagCloud"))
+            {
+                return 
+                    con.Connection.Query<WeightedTag>(@" select top 20 count(*) as Weight, Tag as Text from Tagged 
                                                         left join ChannelLink cl on cl.ParentId = @ChannelId
                                                         join ChannelItem ci on ci.PostId = Tagged.PostId and (ci.ChannelId = @ChannelId or ci.ChannelId = cl.ChildId)
-                                                        group by Tag order by COUNT(*) desc", 
-                                                                                            new { ChannelId = channelId }, con);
+                                                        group by Tag order by COUNT(*) desc",
+                        new {ChannelId = channelId}, con);
+            }
         }
 
         public int UnreadCount(long userId, long channelId)
         {
-            return con.Connection.Query<int>(@"select COUNT(*) from ChannelItem
+            using (var pc = new PerfCounter("UnreadCount"))
+            {
+                return con.Connection.Query<int>(@"select COUNT(*) from ChannelItem
                                     left join ReadHistory on ChannelItem.PostId = ReadHistory.PostId and ReadHistory.UserId = @UserId
                                     left join ChannelLink cl on cl.ParentId = @ChannelId
-                                    where (ChannelItem.ChannelId = cl.ChildId or ChannelItem.ChannelId = @ChannelId) and ReadHistory.UserId IS NULL", 
-                                                                                                   new { UserId = userId, ChannelId = channelId }, con).Single();
+                                    where (ChannelItem.ChannelId = cl.ChildId or ChannelItem.ChannelId = @ChannelId) and ReadHistory.UserId IS NULL",
+                    new {UserId = userId, ChannelId = channelId}, con).Single();
+            }
         }
 
         public void AddChannel(Channel channel)
@@ -128,7 +138,13 @@ namespace Identity.Infrastructure.Repositories
 
         public IEnumerable<Channel> GetSubscriptions(long channelId)
         {
-            return con.Connection.Query<Channel>("select c.* from ChannelLink cl join Channel c on c.Id = cl.ChildId where cl.ParentId = @ChannelId", new { ChannelId = channelId }, con).ToList();
+            using (var pc = new PerfCounter("GetSubscriptions"))
+            {
+                return
+                    con.Connection.Query<Channel>(
+                        "select c.* from ChannelLink cl join Channel c on c.Id = cl.ChildId where cl.ParentId = @ChannelId",
+                        new {ChannelId = channelId}, con).ToList();
+            }
         }
 
         public void RemoveSubscription(long parentId, long childId)
@@ -200,7 +216,10 @@ where (ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId) and (co.ChannelId is n
 
         public IEnumerable<RssFeeder> GetRssFeedersForChannel(long channelId)
         {
-            return con.Connection.Query<RssFeeder>("select RssFeeder.* from RssFeeder join FeedInto on FeedInto.RssFeederId = RssFeeder.Id and FeedInto.ChannelId=@Id", new { Id = channelId }, con);
+            using (var pc = new PerfCounter("GetRssFeedersForChannel"))
+            { 
+                return con.Connection.Query<RssFeeder>("select RssFeeder.* from RssFeeder join FeedInto on FeedInto.RssFeederId = RssFeeder.Id and FeedInto.ChannelId=@Id", new { Id = channelId }, con);
+            }           
         }
 
         public IEnumerable<long> GetChannelsForRssFeeder(long rssFeederId)

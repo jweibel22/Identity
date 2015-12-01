@@ -54,7 +54,7 @@ namespace Identity.Rest.Api
                 Owns = userRepo.Owns(user.Id).Select(c =>
                 {
                     var channel = Mapper.Map<Channel>(c);
-                    channel.UnreadCount = channelRepo.UnreadCount(user.Id, channel.Id);
+                    //channel.UnreadCount = channelRepo.UnreadCount(user.Id, channel.Id);
                     channel.Subscriptions = channelRepo.GetSubscriptions(channel.Id).Select(Mapper.Map<Channel>).ToList();
                     return channel;
                 }).ToList(),

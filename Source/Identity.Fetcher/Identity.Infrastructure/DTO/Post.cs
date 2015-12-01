@@ -5,6 +5,13 @@ namespace Identity.Infrastructure.DTO
 {
     public class Post
     {
+        public Post()
+        {
+            Tags = new List<string>();
+            Comments = new List<Comment>();
+            PublishedIn = new List<Channel>();
+        }
+
         public long Id { get; set; }
 
         public string Title { get; set; }

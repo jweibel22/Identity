@@ -258,8 +258,11 @@ namespace Identity.Rest.Api
                 return null;
             }
 
-            var result = dtoLoader.LoadChannel(user, channel);
+            //var result = dtoLoader.LoadChannel(user, channel);
+            var result = Mapper.Map<Channel>(channel);
+            log.Debug("Channel loaded");
             result.Posts = dtoLoader.LoadChannelPosts(user, channel, onlyUnread, timestamp, fromIndex, orderBy).ToList();
+            log.Debug("Posts loaded");
 
             log.Debug("Items from channel " + id + " was fetched");
 
