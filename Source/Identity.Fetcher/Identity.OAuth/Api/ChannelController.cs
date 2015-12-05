@@ -265,7 +265,10 @@ namespace Identity.Rest.Api
             log.Debug("Channel loaded");
             var posts = postRepo.PostsFromChannel(user.Id, onlyUnread, channel.Id, timestamp, fromIndex, orderBy).ToList();
             var result = dtoLoader.LoadPosts(user, posts).ToList();
-            log.Debug("Posts loaded");
+            foreach (var p in result)
+            {
+                p.IsCollapsed = true;
+            }
 
             log.Debug("Items from channel " + id + " was fetched");
 
