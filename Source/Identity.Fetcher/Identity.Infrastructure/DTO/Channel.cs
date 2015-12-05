@@ -9,14 +9,11 @@ namespace Identity.Infrastructure.DTO
             Subscriptions = new List<DTO.Channel>();
             TagCloud = new List<WeightedTag>();
             RssFeeders = new List<RssFeeder>();
-            Posts = new List<Post>();
         }
 
         public long Id { get; set; }
         
         public string Name { get; set; }
-
-        public IList<Post> Posts { get; set; }
 
         public bool IsPrivate { get; set; }
 

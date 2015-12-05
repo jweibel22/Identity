@@ -171,6 +171,16 @@ CREATE TABLE [dbo].[FeedItem](
 )
 ) ON [PRIMARY]
 
+CREATE TABLE [dbo].[ChannelTag](
+	[ChannelId] [bigint] NOT NULL,
+	[Tag] [bigint] NOT NULL,
+	[Count] [bigint] NULL,
+ CONSTRAINT [PK_ChannelTag] PRIMARY KEY CLUSTERED 
+(
+	[ChannelId] ASC, Tag ASC
+)
+) ON [PRIMARY]
+
 
 CREATE VIEW [dbo].[Popularity] as
 select xx.PostId, COUNT(*) as Popularity from 

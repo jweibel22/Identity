@@ -17,6 +17,11 @@ namespace Identity.Rest
                 .ForMember(x => x.Expandable, _ => _.ResolveUsing(x => x.Description.Length >= 500))
                 .ForMember(x => x.Teaser, _ => _.ResolveUsing(MapTeaser));
 
+            AutoMapper.Mapper.CreateMap<Post, Infrastructure.DTO.SimplePost>()
+                .ForMember(x => x.Type, _ => _.UseValue("link"))
+                .ForMember(x => x.EmbeddedUrl, _ => _.ResolveUsing(MapEmbeddedUrl))
+                .ForMember(x => x.Teaser, _ => _.ResolveUsing(MapTeaser));
+
             AutoMapper.Mapper.CreateMap<Comment, Infrastructure.DTO.Comment>()
                 .ForMember(x => x.Body, _ => _.MapFrom(src => src.Text));
 

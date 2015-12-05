@@ -1,16 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Linq;
-using System.Net.Sockets;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Dapper;
 using Identity.Domain;
-using log4net;
 using Channel = Identity.Domain.Channel;
 using RssFeeder = Identity.Domain.RssFeeder;
 
@@ -49,37 +42,50 @@ namespace Identity.Infrastructure.Repositories
             return con.Connection.Query<Channel>(String.Format(sql, count), new { UserId = userId, Timestamp = DateTimeOffset.Now.Subtract(TimeSpan.FromDays(7)) }, con);
         }
 
+        public IEnumerable<Channel> All()
+        {
+            return con.Connection.Query<Channel>("select * from Channel", null, con);
+        }
+
+
         public IEnumerable<Channel> AllPublic()
         {
-            //return new int[]
-            //{
-            //    2,5,6,7,8,9
-            //}.Select(i =>            
-            //    new Channel
-            //    {
-            //        Id = i,
-            //        Name = "a",
-            //        ListType = "List",
-            //        IsPublic = true,
-            //        Created = DateTimeOffset.Now,
-            //        OrderBy = "Added"
-
-            //    }
-            //);
-
             return con.Connection.Query<Channel>("select top 1000 * from Channel where IsPublic = 1", null, con);
+        }
+
+        public IEnumerable<WeightedTag> CalculateTagCloud(long channelId)
+        {
+            using (var pc = new PerfCounter("CalculateTagCloud"))
+            {
+                return 
+                    con.Connection.Query<WeightedTag>(@"select top 20 count(*) as Weight, Tag as Text from Tagged 
+                                                        left join ChannelLink cl on cl.ParentId = @ChannelId
+                                                        join ChannelItem ci on ci.PostId = Tagged.PostId and (ci.ChannelId = @ChannelId or ci.ChannelId = cl.ChildId)
+                                                        group by Tag order by COUNT(*) desc",
+                        new {ChannelId = channelId}, con);
+            }
         }
 
         public IEnumerable<WeightedTag> GetTagCloud(long channelId)
         {
             using (var pc = new PerfCounter("GetTagCloud"))
             {
-                return 
-                    con.Connection.Query<WeightedTag>(@" select top 20 count(*) as Weight, Tag as Text from Tagged 
-                                                        left join ChannelLink cl on cl.ParentId = @ChannelId
-                                                        join ChannelItem ci on ci.PostId = Tagged.PostId and (ci.ChannelId = @ChannelId or ci.ChannelId = cl.ChildId)
-                                                        group by Tag order by COUNT(*) desc",
-                        new {ChannelId = channelId}, con);
+                return
+                    con.Connection.Query<WeightedTag>(@"select Tag as Text, Count as Weight from ChannelTag where ChannelId = @ChannelId",
+                        new { ChannelId = channelId }, con);
+            }
+        }
+
+        public void UpdateTagCloud(long channelId, IEnumerable<WeightedTag> tags)
+        {
+            using (var pc = new PerfCounter("UpdateTagCloud"))
+            {
+                con.Connection.Execute("delete from ChannelTag where ChannelId=@ChannelId", new { ChannelId = channelId }, con);
+
+                foreach (var tag in tags)
+                {
+                    con.Connection.Execute("insert ChannelTag values(@ChannelId, @Text, @Weight)", new { ChannelId = channelId, Text = tag.Text, tag.Weight }, con);
+                }            
             }
         }
 
@@ -116,8 +122,7 @@ namespace Identity.Infrastructure.Repositories
             foreach (var childId in subscriptions)
             {
                 con.Connection.Execute("update ChannelLink set ChildId=@ChildId where ChildId=@ChildId and ParentId=@ParentId if @@rowcount = 0 insert ChannelLink values(@ParentId, @ChildId)", new { ParentId = channel.Id, ChildId = childId }, con);    
-            }
-            
+            }            
         }
 
         public void Delete(long userId, long channelId)
@@ -254,6 +259,21 @@ where (ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId) and (co.ChannelId is n
         public void AddFeedItem(long rssFeederId, long postId, DateTimeOffset created)
         {
             con.Connection.Execute("update FeedItem set PostId=@PostId where PostId=@PostId and RssFeederId=@RssFeederId if @@rowcount = 0 insert FeedItem values(@RssFeederId, @PostId, @Created)", new { RssFeederId = rssFeederId, PostId = postId, Created = created }, con);
+        }
+
+        public IEnumerable<UnreadCount> GetUneadCounts(long userId)
+        {
+            var sql = @"select Channels.Id as ChannelId, Count(*) as Count from 
+                        ( 
+                            select co.ChannelId as Id from ChannelOwner co where co.UserId = @UserId
+                            union select cl.ChildId as Id from ChannelLink cl join ChannelOwner co on cl.ParentId = co.ChannelId and co.UserId = @UserId
+                        ) Channels
+                        join ChannelItem ci on Channels.Id = ci.ChannelId
+                        left join ReadHistory on ci.PostId = ReadHistory.PostId and ReadHistory.UserId = @UserId
+                        where ReadHistory.UserId IS NULL
+                        group by Channels.Id";
+
+            return con.Connection.Query<UnreadCount>(sql, new { UserId = userId }, con);
         }
 
         public void Dispose()

@@ -70,12 +70,16 @@ namespace Identity.Rest.Api
             var channel = Mapper.Map<Channel>(channelRepo.GetById(id));
             var rssFeeder = userRepo.FindByName("rssfeeder");
 
-            channel.Posts = Enumerable.Range(0, 5)
-                      .SelectMany(i => postRepo.PostsFromChannel(rssFeeder.Id, false, channel.Id, DateTimeOffset.Now, i * 30, "Added"))
-                      .Select(Mapper.Map<Post>)
-                      .ToList();
-
-            return Request.CreateResponse(HttpStatusCode.OK, channel, new SyndicationFeedFormatter());
+            var namedPostList = new NamedPostList
+            {
+                Name = channel.Name,
+                Posts = Enumerable.Range(0, 5)
+                    .SelectMany(i => postRepo.PostsFromChannel(rssFeeder.Id, false, channel.Id, DateTimeOffset.Now, i*30, "Added"))
+                    .Select(Mapper.Map<Post>)
+                    .ToList()
+            };
+            
+            return Request.CreateResponse(HttpStatusCode.OK, namedPostList, new SyndicationFeedFormatter());
         }
 
         [HttpPut]
@@ -247,7 +251,7 @@ namespace Identity.Rest.Api
         }
 
         [HttpGet]
-        public Channel Get(long id, bool onlyUnread, DateTimeOffset timestamp, int fromIndex, string orderBy)
+        public IList<Post> Get(long id, bool onlyUnread, DateTimeOffset timestamp, int fromIndex, string orderBy)
         {          
            log.Debug("Fetching items from channel " + id + " and page " + fromIndex);
 
@@ -258,10 +262,9 @@ namespace Identity.Rest.Api
                 return null;
             }
 
-            //var result = dtoLoader.LoadChannel(user, channel);
-            var result = Mapper.Map<Channel>(channel);
             log.Debug("Channel loaded");
-            result.Posts = dtoLoader.LoadChannelPosts(user, channel, onlyUnread, timestamp, fromIndex, orderBy).ToList();
+            var posts = postRepo.PostsFromChannel(user.Id, onlyUnread, channel.Id, timestamp, fromIndex, orderBy).ToList();
+            var result = dtoLoader.LoadPosts(user, posts).ToList();
             log.Debug("Posts loaded");
 
             log.Debug("Items from channel " + id + " was fetched");

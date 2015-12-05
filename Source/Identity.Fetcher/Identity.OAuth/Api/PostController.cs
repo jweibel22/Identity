@@ -5,10 +5,11 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Web.Http;
 using AutoMapper;
-using Identity.Domain;
+using Identity.Infrastructure.DTO;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
 using log4net;
+using Comment = Identity.Domain.Comment;
 using Post = Identity.Infrastructure.DTO.Post;
 
 namespace Identity.Rest.Api
@@ -38,7 +39,7 @@ namespace Identity.Rest.Api
 
         public IEnumerable<Post> Get(string tag)
         {
-            return dtoLoader.LoadPosts(user, postRepo.FindByTitleOrTag(tag));
+            return postRepo.FindByTitleOrTag(tag).Select(Mapper.Map<Post>); 
         }
 
         [HttpPut]
@@ -96,7 +97,7 @@ namespace Identity.Rest.Api
         [Route("Api/Post/History")]
         public IEnumerable<Post> History()
         {
-            return dtoLoader.LoadPosts(user, postRepo.ReadHistory(user.Id));
+            return postRepo.ReadHistory(user.Id).Select(Mapper.Map<Post>);
         }
     }
 }

@@ -3,13 +3,32 @@ angular.module('inspire')
     '$scope', '$modal', '$http', '$stateParams', '$location', 'ngSettings', '$filter', 'postService', 'channelService', 'tagService', 'channelSelectorService', 'channelPromise', 'userPromise', 
     function($scope, $modal, $http, $stateParams, $location, ngSettings, $filter, postService, channelService, tagService, channelSelectorService, channelPromise, userPromise){
 
+        $scope.findChannel = function (channelId) {
+
+            var x = $filter('filter')($scope.user.Owns, { Id: channelId }, true)[0];
+
+            if (x) {
+                return x;
+            } else {
+                for (var i = 0; i < $scope.user.Owns.length; i++) {
+                    var y = $filter('filter')($scope.user.Owns[i].Subscriptions, { Id: channelId }, true)[0];
+
+                    if (y) {
+                        return y;
+                    }
+                }
+            }
+            return null;
+        }
+
+
         $scope.user = userPromise.data;        
         $scope.posts = [];
 
         $scope.rssUrl = ngSettings.baseUrl + "/Api/Channel/" + channelPromise.data.Id + "/Rss";
 
         //we want the $scope.channel to point to the same channel object that is used in the channel list, such that the unread counter gets updated
-        var x = $filter('filter')($scope.user.Owns, { Id: channelPromise.data.Id }, true)[0];
+        var x = $scope.findChannel(channelPromise.data.Id);
         $scope.channel = x ? x : channelPromise.data;
 
         $scope.channel.TagCloud = channelPromise.data.TagCloud; //TODO: find a better way!
@@ -38,7 +57,10 @@ angular.module('inspire')
             title: '',
             description: '',
             tags: ''
+        
         }
+
+
 
         $scope.subscribe = function () {
             channelService.subscribe($scope.channel.Id).success(function (data) {
@@ -85,7 +107,7 @@ angular.module('inspire')
 
         $scope.showOnlyUnreadChanged = function() {
             postService.getFromChannel($scope.channel.Id, $scope.showOnlyUnread).success(function(data) {
-                angular.copy(data.data.Posts, $scope.posts);
+                angular.copy(data.data, $scope.posts);
             });
         }
 

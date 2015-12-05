@@ -45,9 +45,9 @@
     <Compile Include="Comment.cs" />
     <Compile Include="Post.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnreadCount.cs" />
     <Compile Include="ReadHistory.cs" />
     <Compile Include="RssFeeder.cs" />
-    <Compile Include="Subscription.cs" />
     <Compile Include="Tagged.cs" />
     <Compile Include="User.cs" />
     <Compile Include="WeightedTag.cs" />

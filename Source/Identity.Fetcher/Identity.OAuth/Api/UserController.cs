@@ -44,6 +44,8 @@ namespace Identity.Rest.Api
 
         private User Map(Domain.User user, Domain.User loggedInUser)
         {
+            var unreadCounts = channelRepo.GetUneadCounts(user.Id).ToList();
+
             return new User
             {
                 Id = user.Id,
@@ -54,8 +56,16 @@ namespace Identity.Rest.Api
                 Owns = userRepo.Owns(user.Id).Select(c =>
                 {
                     var channel = Mapper.Map<Channel>(c);
-                    //channel.UnreadCount = channelRepo.UnreadCount(user.Id, channel.Id);
+
                     channel.Subscriptions = channelRepo.GetSubscriptions(channel.Id).Select(Mapper.Map<Channel>).ToList();
+
+                    foreach (var sub in channel.Subscriptions)
+                    {
+                        sub.UnreadCount = unreadCounts.Where(x => x.ChannelId == sub.Id).Sum(x => x.Count);
+                    }
+
+                    channel.UnreadCount = unreadCounts.Where(x => x.ChannelId == channel.Id).Sum(x => x.Count);
+                    
                     return channel;
                 }).ToList(),
                 SavedChannel = user.SavedChannel,

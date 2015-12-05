@@ -57,6 +57,7 @@
     <Compile Include="DTO\Channel.cs" />
     <Compile Include="DTO\Comment.cs" />
     <Compile Include="DTO\HomeScreen.cs" />
+    <Compile Include="DTO\NamedPostList.cs" />
     <Compile Include="DTO\Post.cs" />
     <Compile Include="DTO\RssFeeder.cs" />
     <Compile Include="DTO\User.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="Rss\RssFeedRefresher.cs" />
     <Compile Include="Rss\RssReader.cs" />
     <Compile Include="Services\DtoLoader.cs" />
+    <Compile Include="TagCloudRefresher.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Identity.Domain\Identity.Domain.csproj">

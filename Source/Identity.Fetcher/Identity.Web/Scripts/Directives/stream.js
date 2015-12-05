@@ -77,7 +77,7 @@
                             $scope.loading = true;
 
                             postService.getFromChannel($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType).then(function (data) {
-                                angular.copy(data.data.Posts, $scope.posts);
+                                angular.copy(data.data, $scope.posts);
                                 $scope.loading = false;
 
                                 for (var i = 0; i < $scope.posts.length; i++) {

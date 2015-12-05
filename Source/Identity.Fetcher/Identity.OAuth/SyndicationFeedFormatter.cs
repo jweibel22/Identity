@@ -52,14 +52,14 @@ namespace Identity.OAuth
         {
             return Task.Factory.StartNew(() =>
             {
-                if (type == typeof(Channel))
+                if (type == typeof(NamedPostList))
                     BuildSyndicationFeed(value, writeStream, content.Headers.ContentType.MediaType);
             });
         }
 
         private void BuildSyndicationFeed(object models, Stream stream, string contenttype)
         {
-            var channel = ((Channel)models);
+            var channel = ((NamedPostList)models);
 
             var items = new List<SyndicationItem>();
             var feed = new SyndicationFeed()
