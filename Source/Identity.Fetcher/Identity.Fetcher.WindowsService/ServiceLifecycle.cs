@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Data.SqlClient;
 using System.Reflection;
 using System.Threading;
+using Identity.Infrastructure;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Rss;
 using Identity.Infrastructure.Services;
@@ -34,21 +35,46 @@ namespace Identity.Fetcher.WindowsService
 
         private void Run(object state)
         {
-            using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString))
+            try
             {
-                con.Open();
-                using (var transaction = con.BeginTransaction())
+                //using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString))
+                //{
+                //    con.Open();
+                //    using (var transaction = con.BeginTransaction())
+                //    {
+                //        var channelRepo = new ChannelRepository(transaction);
+                //        var postRepo = new PostRepository(transaction);
+                //        var userRepo = new UserRepository(transaction);
+
+                //        var feedRefresher = new RssFeedRefresher(postRepo, userRepo, channelRepo);
+
+                //        feedRefresher.Run();
+
+                //        transaction.Commit();
+                //    }
+                //}
+
+                using (
+                    var con =
+                        new SqlConnection(
+                            ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString))
                 {
-                    var channelRepo = new ChannelRepository(transaction);
-                    var postRepo = new PostRepository(transaction);
-                    var userRepo = new UserRepository(transaction);
+                    con.Open();
+                    using (var transaction = con.BeginTransaction())
+                    {
+                        var channelRepo = new ChannelRepository(transaction);
 
-                    var feedRefresher = new RssFeedRefresher(postRepo, userRepo, channelRepo);
+                        var refresher = new TagCloudRefresher(channelRepo);
 
-                    feedRefresher.Run();
+                        refresher.Execute();
 
-                    transaction.Commit();
+                        transaction.Commit();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
             }
         }
     }

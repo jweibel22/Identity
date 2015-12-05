@@ -23,7 +23,7 @@ namespace Identity.Infrastructure
             
             foreach (var channel in allChannels)
             {
-                var tagCloud = channelRepository.CalculateTagCloud(channel.Id);
+                var tagCloud = channelRepository.CalculateTagCloud(channel.Id).ToList();
                 channelRepository.UpdateTagCloud(channel.Id, tagCloud);
             }
         }

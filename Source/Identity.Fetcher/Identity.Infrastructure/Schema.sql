@@ -173,7 +173,7 @@ CREATE TABLE [dbo].[FeedItem](
 
 CREATE TABLE [dbo].[ChannelTag](
 	[ChannelId] [bigint] NOT NULL,
-	[Tag] [bigint] NOT NULL,
+	[Tag] [nvarchar](64) NOT NULL,
 	[Count] [bigint] NULL,
  CONSTRAINT [PK_ChannelTag] PRIMARY KEY CLUSTERED 
 (

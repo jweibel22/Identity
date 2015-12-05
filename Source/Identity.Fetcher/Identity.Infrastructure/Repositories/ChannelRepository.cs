@@ -84,7 +84,7 @@ namespace Identity.Infrastructure.Repositories
 
                 foreach (var tag in tags)
                 {
-                    con.Connection.Execute("insert ChannelTag values(@ChannelId, @Text, @Weight)", new { ChannelId = channelId, Text = tag.Text, tag.Weight }, con);
+                    con.Connection.Execute("insert ChannelTag (ChannelId, Tag, Count) values(@ChannelId, @Text, @Weight)", new { ChannelId = channelId, Text = tag.Text, tag.Weight }, con);
                 }            
             }
         }
