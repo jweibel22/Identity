@@ -97,7 +97,7 @@
                                 $scope.loading = true;
 
                                 postService.loadMorePosts($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType).then(function (data) {
-                                    angular.copy($scope.posts.concat(data.data.Posts), $scope.posts);
+                                    angular.copy($scope.posts.concat(data.data), $scope.posts);
                                     $scope.loading = false;
 
                                     for (var i = 0; i < $scope.posts.length; i++) {

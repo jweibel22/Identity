@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Web.Http;
 using AutoMapper;
+using CsQuery.ExtensionMethods;
 using Identity.Infrastructure.DTO;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
@@ -39,7 +40,9 @@ namespace Identity.Rest.Api
 
         public IEnumerable<Post> Get(string tag)
         {
-            return postRepo.FindByTitleOrTag(tag).Select(Mapper.Map<Post>); 
+            var results = postRepo.FindByTitleOrTag(tag).Select(Mapper.Map<Post>).ToList(); 
+            results.ForEach(p => p.IsCollapsed = true);
+            return results;
         }
 
         [HttpPut]
