@@ -1,4 +1,4 @@
-angular.module('inspire').factory('postService', ['$http', '$q', 'ngSettings', function ($http, $q, ngSettings) {
+angular.module('inspire').factory('postService', ['$http', '$q', '$filter', 'ngSettings', function ($http, $q, $filter, ngSettings) {
     var o = {
         posts: [],
         queryresults: [],
@@ -37,7 +37,7 @@ angular.module('inspire').factory('postService', ['$http', '$q', 'ngSettings', f
             if (!o.posts[channelId]) {
                 o.posts[channelId] = [];
             }
-            angular.copy(data.Posts, o.posts[channelId]);
+            angular.copy(data, o.posts[channelId]);            
         });
         return promise;
     };
@@ -50,10 +50,24 @@ angular.module('inspire').factory('postService', ['$http', '$q', 'ngSettings', f
             if (!o.posts[channelId]) {
                 o.posts[channelId] = [];
             }
-            angular.copy(o.posts[channelId].concat(data.Posts), o.posts[channelId]);
-        });
+            //angular.copy(o.posts[channelId].concat(data), o.posts[channelId]);
+
+                o.appendPosts(o.posts[channelId], data);
+
+            });
         return promise;
     };
+
+    o.appendPosts = function(list, toAppend) {
+        
+        for (var i = 0; i < toAppend.length; i++) {
+            var exists = $filter('filter')(list, { Id: toAppend[i].Id }, true).length > 0;
+
+            if (!exists) {
+                list.push(toAppend[i]);
+            }
+        }
+    }
 
     o.getFromDefaultChannel = function() {
 
@@ -66,7 +80,7 @@ angular.module('inspire').factory('postService', ['$http', '$q', 'ngSettings', f
                 if (!o.posts[user.SavedChannel]) {
                     o.posts[user.SavedChannel] = [];
                 }
-                angular.copy(data.Posts, o.posts[user.SavedChannel]);
+                angular.copy(data, o.posts[user.SavedChannel]);
                 deferred.resolve({data: data});
             });
         });

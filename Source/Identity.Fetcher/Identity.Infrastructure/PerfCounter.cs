@@ -25,7 +25,7 @@ namespace Identity.Infrastructure
         public void Dispose()
         {
             stopwatch.Stop();
-            log.Debug(String.Format("{0} took {1} ms", label, stopwatch.ElapsedMilliseconds));
+            //log.Debug(String.Format("{0} took {1} ms", label, stopwatch.ElapsedMilliseconds));
         }
     }
 }

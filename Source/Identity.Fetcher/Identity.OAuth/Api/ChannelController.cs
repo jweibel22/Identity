@@ -262,15 +262,15 @@ namespace Identity.Rest.Api
                 return null;
             }
 
-            log.Debug("Channel loaded");
-            var posts = postRepo.PostsFromChannel(user.Id, onlyUnread, channel.Id, timestamp, fromIndex, orderBy).ToList();
+            
+            var posts = postRepo.PostsFromChannel(user.Id, onlyUnread, channel.Id, timestamp, 0, orderBy).ToList();
             var result = dtoLoader.LoadPosts(user, posts).ToList();
             foreach (var p in result)
             {
                 p.IsCollapsed = true;
             }
-
-            log.Debug("Items from channel " + id + " was fetched");
+            log.Debug("Posts loaded");
+            //log.Debug("Items from channel [" + String.Join(",", result.Select(r => r.Id)) + "] was fetched");
 
             return result;
         }

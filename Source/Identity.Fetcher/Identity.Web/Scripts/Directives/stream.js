@@ -40,6 +40,17 @@
                     $scope.reloadPosts();
                 }
 
+                $scope.appendPosts = function (list, toAppend) {
+
+                    for (var i = 0; i < toAppend.length; i++) {
+                        var exists = $filter('filter')(list, { Id: toAppend[i].Id }, true).length > 0;
+
+                        if (!exists) {
+                            list.push(toAppend[i]);
+                        }
+                    }
+                }
+
                 $scope.postVisible = function (post) {
 
                     if ($scope.channelId == $scope.user.SavedChannel) {
@@ -97,7 +108,9 @@
                                 $scope.loading = true;
 
                                 postService.loadMorePosts($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType).then(function (data) {
-                                    angular.copy($scope.posts.concat(data.data), $scope.posts);
+                                    //angular.copy($scope.posts.concat(data.data), $scope.posts);
+                                    $scope.appendPosts($scope.posts, data.data);
+
                                     $scope.loading = false;
 
                                     for (var i = 0; i < $scope.posts.length; i++) {
