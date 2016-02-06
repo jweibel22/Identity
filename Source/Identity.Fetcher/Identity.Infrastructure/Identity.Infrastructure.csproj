@@ -70,6 +70,7 @@
     <Compile Include="Rss\RssFeedRefresher.cs" />
     <Compile Include="Rss\RssReader.cs" />
     <Compile Include="Services\DtoLoader.cs" />
+    <Compile Include="Services\PostListLoader.cs" />
     <Compile Include="TagCloudRefresher.cs" />
   </ItemGroup>
   <ItemGroup>

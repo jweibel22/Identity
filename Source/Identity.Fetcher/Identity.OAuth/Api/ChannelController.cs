@@ -29,11 +29,12 @@ namespace Identity.Rest.Api
         private readonly PostRepository postRepo;
         private readonly UserRepository userRepo;
         private readonly ILoadDtos dtoLoader;
+        private PostListLoader postListLoader;
 
         private Domain.User user;
 
         public ChannelController(ILoadDtos dtoLoader, ChannelRepository channelRepo, PostRepository postRepo,
-            UserRepository userRepo)
+            UserRepository userRepo, PostListLoader postListLoader)
         {
             var identity = User.Identity as ClaimsIdentity;
             user = userRepo.FindByName(identity.Name);
@@ -42,6 +43,7 @@ namespace Identity.Rest.Api
             this.channelRepo = channelRepo;
             this.postRepo = postRepo;
             this.userRepo = userRepo;
+            this.postListLoader = postListLoader;
         }
 
         [HttpGet]
@@ -253,26 +255,7 @@ namespace Identity.Rest.Api
         [HttpGet]
         public IList<Post> Get(long id, bool onlyUnread, DateTimeOffset timestamp, int fromIndex, string orderBy)
         {          
-           log.Debug("Fetching items from channel " + id + " and page " + fromIndex);
-
-            var channel = channelRepo.GetById(id);
-
-            if (channel == null)
-            {
-                return null;
-            }
-
-            
-            var posts = postRepo.PostsFromChannel(user.Id, onlyUnread, channel.Id, timestamp, 0, orderBy).ToList();
-            var result = dtoLoader.LoadPosts(user, posts).ToList();
-            foreach (var p in result)
-            {
-                p.IsCollapsed = true;
-            }
-            log.Debug("Posts loaded");
-            //log.Debug("Items from channel [" + String.Join(",", result.Select(r => r.Id)) + "] was fetched");
-
-            return result;
+            return postListLoader.Load(id, user, onlyUnread, timestamp, fromIndex, orderBy);
         }
     }
 }

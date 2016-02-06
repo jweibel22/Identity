@@ -42,6 +42,7 @@
     <Compile Include="Channel.cs" />
     <Compile Include="ChannelItem.cs" />
     <Compile Include="ChannelOwner.cs" />
+    <Compile Include="PublishedIn.cs" />
     <Compile Include="Comment.cs" />
     <Compile Include="Post.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -42,7 +42,7 @@ namespace Identity.Infrastructure.DTO
         {
             Tags = new List<string>();
             Comments = new List<Comment>();
-            PublishedIn = new List<Channel>();
+            PublishedIn = new List<ChannelReference>();
         }
 
         public long Id { get; set; }
@@ -89,8 +89,15 @@ namespace Identity.Infrastructure.DTO
 
         public int UserSpecificPopularity { get; set; }
 
-        public IList<Channel> PublishedIn { get; set; }
+        public IList<ChannelReference> PublishedIn { get; set; }
 
         public string EmbeddedUrl { get; set; }
+    }
+
+    public class ChannelReference
+    {
+        public long Id { get; set; }
+
+        public string Name { get; set; }        
     }
 }

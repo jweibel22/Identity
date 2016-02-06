@@ -38,6 +38,18 @@ namespace Identity.Infrastructure.Repositories
             return con.Connection.Query<int>("select count(*) from Comment where PostId=@PostId", new { PostId = postId }, con).Single();
         }
 
+        public class PostIdAndCount
+        {
+            public long PostId { get; set; }
+
+            public int Count { get; set; }
+        }
+
+        public IEnumerable<PostIdAndCount> CommentCount(IEnumerable<long> postIds)
+        {
+            return con.Connection.Query<PostIdAndCount>("select PostId, count(*) as Count from Comment group by PostId having PostId in @PostIds", new { PostIds = postIds }, con);
+        }
+
         public IEnumerable<CommentCount> CommentCounts(long channelId)
         {
             return con.Connection.Query<CommentCount>(@"select Comment.PostId as Id, count(*) as [Count] from Comment join ChannelItem on ChannelItem.PostId = Comment.PostId 

@@ -1,11 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
-using Identity.Domain;
+using Identity.Infrastructure.DTO;
 using Identity.Infrastructure.Repositories;
+using Channel = Identity.Domain.Channel;
+using Post = Identity.Domain.Post;
+using RssFeeder = Identity.Domain.RssFeeder;
+using User = Identity.Domain.User;
 
 namespace Identity.Infrastructure.Services
 {
@@ -21,6 +24,7 @@ namespace Identity.Infrastructure.Services
 
         DTO.RssFeeder LoadRssFeeder(RssFeeder rssFeeder);
     }
+
 
     public class DtoLoader : ILoadDtos
     {
@@ -47,17 +51,25 @@ namespace Identity.Infrastructure.Services
 
         public DTO.Post LoadPost(User user, Post post)
         {
-            var p  = Mapper.Map<DTO.Post>(post);
+            var p = Mapper.Map<DTO.Post>(post);
             LoadTags(p);
             p.CommentCount = commentRepo.CommentCount(p.Id);
             p.IsCollapsed = p.Description.Length >= 500; //p.Teaser != null;
-            p.PublishedIn = postRepo.PublishedIn(p.Id, user.Id).Select(c => Mapper.Map<DTO.Channel>(c)).ToList();
+            p.PublishedIn = postRepo.PublishedIn(new[] { p.Id }, user.Id)
+                        .OrderByDescending(pi => pi.Count)
+                        .Take(5)
+                        .Select(pi => new ChannelReference
+                        {
+                            Id = pi.ChannelId,
+                            Name = pi.ChannelName
+                        })
+                        .ToList();
             return p;
         }
 
         private void LoadTags(DTO.Post p)
         {
-            p.Tags = postRepo.Tags(p.Id).Select(t => t.Tag).ToList();            
+            p.Tags = postRepo.Tags(p.Id).Select(t => t.Tag).ToList();
         }
 
         public DTO.RssFeeder LoadRssFeeder(RssFeeder rssFeeder)

@@ -176,18 +176,27 @@ where Post.Id = @Id
             }
         }
 
-        public IEnumerable<Channel> PublishedIn(long postId, long userId)
+        public IEnumerable<Tagged> Tags(IEnumerable<long> postIds)
+        {
+            using (var pc = new PerfCounter("Tags"))
+            {
+                return con.Connection.Query<Tagged>("select * from Tagged where PostId in @PostIds", new { PostIds = postIds },
+                    con);
+            }
+        }
+
+        public IEnumerable<PublishedIn> PublishedIn(IEnumerable<long> postIds, long userId)
         {
             using (var pc = new PerfCounter("PublishedIn"))
             {
-                return con.Connection.Query<Channel>(@"
-            select * from Channel where Id in (select top 5 Id from Channel 
-            join ChannelItem ci on ci.ChannelId = Channel.Id and ci.PostId = @PostId
+                return con.Connection.Query<PublishedIn>(@"
+            select Channel.Id as ChannelId, Channel.Name as ChannelName, ci.PostId, COUNT(*) as Count from Channel 
+            join ChannelItem ci on ci.ChannelId = Channel.Id and ci.PostId in @PostIds
             left join ChannelOwner co on co.ChannelId = Channel.Id and co.UserId = @UserId
             left join Subscription s on s.ChannelId = Channel.Id
             where co.ChannelId is not null or Channel.IsPublic = 1
-            group by Channel.Id
-            order by COUNT(*))", new {PostId = postId, UserId = userId}, con);
+            group by Channel.Id, Channel.Name, ci.PostId
+            order by COUNT(*)", new {PostIds = postIds, UserId = userId}, con);
             }
         }
 
