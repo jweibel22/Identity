@@ -25,7 +25,7 @@ namespace Identity.Infrastructure.Services
             this.postRepo = postRepo;
         }
 
-        public IList<DTO.Post> Load(long id, User user, bool onlyUnread, DateTimeOffset timestamp, int fromIndex, string orderBy)
+        public IList<DTO.Post> Load(long id, User user, bool onlyUnread, DateTimeOffset timestamp, int fromIndex, string orderBy, int pageSize)
         {
             log.Debug("Fetching items from channel " + id + " and page " + fromIndex);
 
@@ -36,7 +36,7 @@ namespace Identity.Infrastructure.Services
                 return null;
             }
 
-            var posts = postRepo.PostsFromChannel(user.Id, onlyUnread, channel.Id, timestamp, 0, orderBy).ToList();
+            var posts = postRepo.PostsFromChannel(user.Id, onlyUnread, channel.Id, timestamp, 0, orderBy, pageSize).ToList();
             var postIds = posts.Select(p => p.Id).ToList();
             var allTags = postRepo.Tags(postIds).ToList();
             var commentCounts = commentRepo.CommentCount(postIds).ToList();

@@ -39,18 +39,18 @@
     </div>
 
     <div style="margin-top:10px" scroll infinite-scroll="loadMorePosts()" infinite-scroll-distance="2">
-        <div ng-repeat="post in posts " style="margin-top: 20px" class="readable">
+        <div ng-repeat="post in posts " class="readable">
             <div ng-show="postVisible(post)">
                 
-                <div ng-show="selectedListType == 'Full' || !post.IsCollapsed">
+                <div ng-show="selectedListType == 'Full' || !post.IsCollapsed" style="margin-top: 20px">
                     <span style="font-size:20px; margin-left:10px;">
                         <a ng-show="post.Uri" href="{{post.Uri}}" ng-bind-html="post.Title" target="_blank"></a>
                         <span ng-hide="post.Uri">{{post.Title}}</span>
-                    </span>                    
-                
+                    </span>
+
                     <!-- collapse="post.IsCollapsed" -->
 
-                    <div ng-bind-html="post.Description" style="margin-left: 30px;"/>
+                    <div ng-bind-html="post.Description" style="margin-left: 30px;" />
 
                     <iframe ng-show="post.EmbeddedUrl" width="560" height="315" ng-src="{{post.TrustedEmbeddedUrl}}" frameborder="0" allowfullscreen></iframe>
 
@@ -116,18 +116,23 @@
                                 <span class="glyphicon glyphicon-remove"></span> Remove
                             </button>
                         </div>
-                    </div>                    
+                    </div>
 
                 </div>
                 
-                <div ng-show="selectedListType == 'List' && post.IsCollapsed">
+                <div ng-show="selectedListType == 'List' && post.IsCollapsed" style="margin-top: 20px">
                     <span style="font-size:20px; margin-left:10px;">
                         <a ng-show="post.Uri" href="" ng-click="post.IsCollapsed = false" ng-bind-html="post.Title" target="_blank"></a>
-                    </span>                    
-                    
+                    </span>
+
                     <div ng-bind-html="post.Teaser" style=" margin-left:40px ;"></div>
-                </div>                
-                
+                </div>
+                <!--selectedListType == 'Titles' &&--> 
+                <div ng-show="post.IsCollapsed" style="margin-top: 5px">
+                    <span style="font-size:16px; margin-left:10px;">
+                        <a ng-show="post.Uri" href="" ng-click="post.IsCollapsed = false" ng-bind-html="post.Title" target="_blank"></a>
+                    </span>
+                </div> 
             </div>
         </div>
     </div>

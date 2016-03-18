@@ -76,7 +76,7 @@ namespace Identity.Rest.Api
             {
                 Name = channel.Name,
                 Posts = Enumerable.Range(0, 5)
-                    .SelectMany(i => postRepo.PostsFromChannel(rssFeeder.Id, false, channel.Id, DateTimeOffset.Now, i*30, "Added"))
+                    .SelectMany(i => postRepo.PostsFromChannel(rssFeeder.Id, false, channel.Id, DateTimeOffset.Now, i*30, "Added",30))
                     .Select(Mapper.Map<Post>)
                     .ToList()
             };
@@ -253,9 +253,9 @@ namespace Identity.Rest.Api
         }
 
         [HttpGet]
-        public IList<Post> Get(long id, bool onlyUnread, DateTimeOffset timestamp, int fromIndex, string orderBy)
+        public IList<Post> Get(long id, bool onlyUnread, DateTimeOffset timestamp, int fromIndex, string orderBy, int pageSize)
         {          
-            return postListLoader.Load(id, user, onlyUnread, timestamp, fromIndex, orderBy);
+            return postListLoader.Load(id, user, onlyUnread, timestamp, fromIndex, orderBy, pageSize);
         }
     }
 }

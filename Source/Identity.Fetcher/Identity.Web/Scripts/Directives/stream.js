@@ -19,8 +19,8 @@
                 $scope.selectedSortType = $scope.channel ? $scope.channel.OrderBy : "Added";
                 $scope.reverse = true;
 
-                $scope.listTypes = ["Full", "List"];
-                $scope.selectedListType = $scope.channel ? $scope.channel.ListType : "Full";
+                $scope.listTypes = ["Full", "List", "Titles"];
+                $scope.selectedListType = $scope.channel ? $scope.channel.ListType : "Titles";
 
                 $scope.channelOwned = $scope.channel && $filter('filter')($scope.user.Owns, { Id: $scope.channel.Id }, true).length > 0;
 
@@ -84,10 +84,12 @@
 
                 $scope.reloadPosts = function() {
 
+                    var pageSize = $scope.selectedListType == 'Titles' ? 60 : 30;
+
                         if (!$scope.loading) {
                             $scope.loading = true;
 
-                            postService.getFromChannel($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType).then(function (data) {
+                            postService.getFromChannel($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType, pageSize).then(function (data) {
                                 angular.copy(data.data, $scope.posts);
                                 $scope.loading = false;
 
@@ -102,12 +104,14 @@
 
                 $scope.loadMorePosts = function () {
 
+                    var pageSize = $scope.selectedListType == 'Titles' ? 60 : 30;
+
                     if ($scope.autoloadonscroll) {
 
                             if (!$scope.loading) {
                                 $scope.loading = true;
 
-                                postService.loadMorePosts($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType).then(function (data) {
+                                postService.loadMorePosts($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType, pageSize).then(function (data) {
                                     //angular.copy($scope.posts.concat(data.data), $scope.posts);
                                     $scope.appendPosts($scope.posts, data.data);
 

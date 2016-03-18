@@ -5,7 +5,7 @@
             $scope.channel = channelService.editchannel;
 
             $scope.sortTypes = ["Popularity", "Added"];
-            $scope.listTypes = ["Full", "List"];
+            $scope.listTypes = ["Full", "List", "Titles"];
 
             $scope.changeSortBy = function (sortBy) {
                 $scope.channel.OrderBy = sortBy;

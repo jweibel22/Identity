@@ -29,9 +29,9 @@ angular.module('inspire').factory('postService', ['$http', '$q', '$filter', 'ngS
         return promise;
     };
 
-    o.getFromChannel = function (channelId, onlyUnread, orderBy) {
+    o.getFromChannel = function (channelId, onlyUnread, orderBy, count) {
         var fromIndex = 0;
-        var promise = $http.get(ngSettings.baseUrl + '/Api/Channel/' + channelId + "?onlyUnread=" + onlyUnread + "&timestamp=" + o.formattedTimestamp() + "&fromIndex=" + fromIndex + "&orderBy=" + orderBy);
+        var promise = $http.get(ngSettings.baseUrl + '/Api/Channel/' + channelId + "?onlyUnread=" + onlyUnread + "&timestamp=" + o.formattedTimestamp() + "&fromIndex=" + fromIndex + "&orderBy=" + orderBy + "&pageSize=" + count);
 
         promise.success(function (data) {
             if (!o.posts[channelId]) {
@@ -42,9 +42,9 @@ angular.module('inspire').factory('postService', ['$http', '$q', '$filter', 'ngS
         return promise;
     };
 
-    o.loadMorePosts = function (channelId, onlyUnread, orderBy) {
+    o.loadMorePosts = function (channelId, onlyUnread, orderBy, count) {
         var fromIndex = (o.posts[channelId] ? o.posts[channelId].length : 0);
-        var promise = $http.get(ngSettings.baseUrl + '/Api/Channel/' + channelId + "?onlyUnread=" + onlyUnread + "&timestamp=" + o.formattedTimestamp() + "&fromIndex=" + fromIndex + "&orderBy=" + orderBy);
+        var promise = $http.get(ngSettings.baseUrl + '/Api/Channel/' + channelId + "?onlyUnread=" + onlyUnread + "&timestamp=" + o.formattedTimestamp() + "&fromIndex=" + fromIndex + "&orderBy=" + orderBy + "&pageSize=" + count);
 
             promise.success(function(data){
             if (!o.posts[channelId]) {
@@ -76,7 +76,7 @@ angular.module('inspire').factory('postService', ['$http', '$q', '$filter', 'ngS
         $http.get(ngSettings.baseUrl + '/Api/User').success(function (user) {
 
             var fromIndex = (o.posts[user.SavedChannel] ? o.posts[user.SavedChannel].length : 0);
-            $http.get(ngSettings.baseUrl + '/Api/Channel/' + user.SavedChannel + "?onlyUnread=false" + "&timestamp=" + o.formattedTimestamp() + "&fromIndex=" + fromIndex + "&orderBy=Added").success(function (data) {
+            $http.get(ngSettings.baseUrl + '/Api/Channel/' + user.SavedChannel + "?onlyUnread=false" + "&timestamp=" + o.formattedTimestamp() + "&fromIndex=" + fromIndex + "&orderBy=Added&pageSize=30").success(function (data) {
                 if (!o.posts[user.SavedChannel]) {
                     o.posts[user.SavedChannel] = [];
                 }

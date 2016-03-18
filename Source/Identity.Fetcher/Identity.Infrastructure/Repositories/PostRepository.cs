@@ -88,10 +88,8 @@ namespace Identity.Infrastructure.Repositories
                                                 order by h.Timestamp desc", new { UserId = userId }, con);
         }
 
-        public IEnumerable<Post> PostsFromChannel(long userId, bool onlyUnread, long channelId, DateTimeOffset timestamp, int fromIndex, string orderBy)
+        public IEnumerable<Post> PostsFromChannel(long userId, bool onlyUnread, long channelId, DateTimeOffset timestamp, int fromIndex, string orderBy, int pageSize)
         {
-            const int pageSize = 30;
-
             if (orderBy == "Added")
             {
                 orderBy = "XX.Added desc";
@@ -140,7 +138,10 @@ where Post.Created < @Timestamp {1}";
 
             var sql = String.Format(paged, String.Format(postData, postIds, onlyUnread ? " and ReadHistory.Timestamp IS NULL" : "", orderBy), pageSize);
 
-            return con.Connection.Query<Post>(sql, new { ChannelId = channelId, UserId = userId, Timestamp = timestamp, FromIndex = fromIndex}, con);                
+            //return con.Connection.Query<Post>(sql, new { ChannelId = channelId, UserId = userId, Timestamp = timestamp, FromIndex = fromIndex}, con);                
+
+            return con.Connection.Query<Post>("FetchPosts2", 
+                new { ChannelId = channelId, UserId = userId, Timestamp = timestamp, FromIndex = fromIndex, PageSize = pageSize }, con, true,null,CommandType.StoredProcedure);                
         }
 
         public Post GetById(long id, long userId)
