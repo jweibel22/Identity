@@ -84,6 +84,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Schema.sql" />
+    <Content Include="Scripts\FetchPosts.sql" />
+    <Content Include="Scripts\FetchPosts2.sql" />
+    <Content Include="Scripts\SimpleFetchUnreadPosts.sql" />
+    <Content Include="Scripts\SimpleFetchPosts.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

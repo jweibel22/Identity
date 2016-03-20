@@ -140,7 +140,9 @@ where Post.Created < @Timestamp {1}";
 
             //return con.Connection.Query<Post>(sql, new { ChannelId = channelId, UserId = userId, Timestamp = timestamp, FromIndex = fromIndex}, con);                
 
-            return con.Connection.Query<Post>("FetchPosts2", 
+            var sp = onlyUnread ? "SimpleFetchUnreadPosts" : "SimpleFetchPosts";
+
+            return con.Connection.Query<Post>(sp, 
                 new { ChannelId = channelId, UserId = userId, Timestamp = timestamp, FromIndex = fromIndex, PageSize = pageSize }, con, true,null,CommandType.StoredProcedure);                
         }
 

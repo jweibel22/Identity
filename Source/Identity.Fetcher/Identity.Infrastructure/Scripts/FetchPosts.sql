@@ -1,4 +1,4 @@
-﻿create procedure FetchPosts2
+﻿create procedure FetchPosts
 	@UserId bigint,
 	@FromIndex int,
 	@ChannelId bigint,
