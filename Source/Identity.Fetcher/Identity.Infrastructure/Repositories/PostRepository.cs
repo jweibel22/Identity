@@ -88,27 +88,44 @@ namespace Identity.Infrastructure.Repositories
                                                 order by h.Timestamp desc", new { UserId = userId }, con);
         }
 
+        class ChannelQueryResult
+        {
+            public int RowNum { get; set; }
+
+            public long PostId { get; set; }
+
+            public DateTimeOffset Added { get; set; }
+
+            public int Popularity { get; set; }
+        }
+
         public IEnumerable<Post> PostsFromChannel(long userId, bool onlyUnread, long channelId, DateTimeOffset timestamp, int fromIndex, string orderBy, int pageSize)
         {
-            //TODO: add support for ordering by popularity
-            if (orderBy == "Added")
-            {
-                orderBy = "XX.Added desc";
-            }
-            else if (orderBy == "Popularity")
-            {
-                orderBy = "XX.pop desc, pop.Popularity desc";
-            }
-            else
-            {
-                throw new Exception("Unexpected orderby clause: " + orderBy);
-            }            
+            int orderByColumn;
 
-            var sp = onlyUnread ? "FetchUnreadPostsIds" : "FetchPostsIds";
+            switch (orderBy)
+            {
+                case "Added":
+                    orderByColumn = 1;
+                    break;
+                case "Popularity":
+                    orderByColumn = 2;
+                    break;
+                default:
+                    throw new Exception("Unrecognized sort column " + orderBy);
+            }           
 
-            var ids = con.Connection.Query<long>(sp, new { ChannelId = channelId, UserId = userId, FromIndex = fromIndex, PageSize = pageSize }, con, true,null, CommandType.StoredProcedure);
+            var sp = onlyUnread ? "FetchUnreadPostIds" : "FetchPostIds";
 
-            return GetByIds(ids, userId);
+            var channelQueryResult = con.Connection.Query<ChannelQueryResult>(sp, 
+                new { ChannelId = channelId, UserId = userId, FromIndex = fromIndex, PageSize = pageSize, OrderByColumn = orderByColumn }, 
+                con, true, null, CommandType.StoredProcedure).ToList();
+
+            return GetByIds(channelQueryResult.Select(cqr => cqr.PostId), userId)
+                .Join(channelQueryResult, x => x.Id, x => x.PostId, (p,cqr) => new {p,cqr})
+                .OrderBy(x => x.cqr.RowNum)
+                .Select(x => x.p)
+                .ToList();
         }
 
         private IEnumerable<Post> GetByIds(IEnumerable<long> ids, long userId)
