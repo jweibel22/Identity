@@ -10,18 +10,42 @@
         return res;
     };
 
-    return function (scope, element, attrs) {
-        angular.element($window).bind("scroll", function () {
+    function aboveWindow(top, elm) {
+        st = $(window).scrollTop(), // Scroll Top
+        y = $(elm).offset().top;
+        elementHeight = $(elm).height();
 
+        var res = (y+elementHeight) < st + top;
+
+        return res;
+    };
+
+    return function (scope, element, attrs) {
+
+        var onScrollAction = function () {
             var divs = $(element).find('div.readable');
 
-            for (var i = 1; i < divs.length; i++) {
-                if (checkVisible(divs[i])) {
-                    scope.read(scope.posts[i - 1]);
+            var readPosts = [];
+
+            for (var i = 0; i < divs.length; i++) {
+                var top = 150; //TODO: this corresponds to the height of Menu+ChannelName+ChannelButtonMenu. (which corresponds to the place where an article goes out of sight) Replace this constant with a calculated value.  //$(element).offset().top
+                if (aboveWindow(top, divs[i])) {
+                    readPosts.push(scope.posts[i]);
                 }
             }
 
+            if (readPosts.length > 0) {
+                scope.read(readPosts);
+            }
+
+
             scope.$apply();
+        };
+
+        angular.element($window).on('scroll', onScrollAction);
+
+        scope.$on('$destroy', function () {
+            angular.element($window).off('scroll', onScrollAction);
         });
     };
 });

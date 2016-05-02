@@ -9,6 +9,7 @@ using CsQuery.ExtensionMethods;
 using Identity.Infrastructure.DTO;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
+using Identity.OAuth.Models;
 using log4net;
 using Comment = Identity.Domain.Comment;
 using Post = Identity.Infrastructure.DTO.Post;
@@ -94,6 +95,16 @@ namespace Identity.Rest.Api
         public void Read(long id, long userId)
         {
             userRepo.Read(userId, id);
+        }
+
+        [HttpPost]
+        [Route("Api/Post/Read")]
+        public void Read(long userId, ReadHistory readHistory)
+        {
+            foreach (var id in readHistory.PostIds)
+            {
+                userRepo.Read(userId, id);    
+            }            
         }
 
         [HttpGet]

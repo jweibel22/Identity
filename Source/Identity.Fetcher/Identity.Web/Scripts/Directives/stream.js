@@ -24,6 +24,10 @@
 
                 $scope.channelOwned = $scope.channel && $filter('filter')($scope.user.Owns, { Id: $scope.channel.Id }, true).length > 0;
 
+                $scope.readHistory = [];
+                $scope.initialUnread = 0;
+               
+
                 $scope.publishOnChannelWindowdata = {
                     user: $scope.user,
                     channels: $scope.user.Owns,
@@ -67,17 +71,34 @@
                     }
                 }
 
-                $scope.read = function (post) {
-                    if (!post.Read) {
-                        postService.read(post.Id, $scope.user.Id)
-                            .success(function () {
-                                if (!post.Read) {
-                                    post.Read = true;
+                $scope.read = function (posts) {
 
-                                    if ($scope.channel) {
-                                        $scope.channel.UnreadCount = $scope.channel.UnreadCount - 1;
-                                    }
+                    for (var i = 0; i < posts.length; i++) {
+                        var post = posts[i];
+                        var exists = $filter('filter')($scope.readHistory, { Id: post.Id }, true).length > 0;
+
+                        if (!exists) {
+                            console.log("Adding to history: " + post.Title);
+                            $scope.readHistory.push(post);
+                        }
+                    }
+
+                    var pending = $filter('filter')($scope.readHistory, { Read: false }, true);
+
+                    if (pending.length > 0) {
+                        console.log("Submitting " + pending.length + " posts");
+                        postService.read({ PostIds: pending.map(function(p) { return p.Id }) }, $scope.user.Id)
+                            .success(function() {
+
+                                for (var i = 0; i < posts.length; i++) {
+                                    posts[i].Read = true;
                                 }
+
+                                if ($scope.channel) {
+                                    $scope.channel.UnreadCount = $scope.initialUnread - $filter('filter')($scope.readHistory, { Read: true }, true).length;
+                                }
+
+                                
                             });
                     }
                 }
@@ -92,6 +113,9 @@
                             postService.getFromChannel($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType, pageSize).then(function (data) {
                                 angular.copy(data.data, $scope.posts);
                                 $scope.loading = false;
+
+                                $scope.readHistory = [];
+                                $scope.initialUnread = $scope.channel.UnreadCount;
 
                                 for (var i = 0; i < $scope.posts.length; i++) {
                                     if ($scope.posts[i].EmbeddedUrl) {

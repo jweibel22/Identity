@@ -187,6 +187,7 @@
     <Compile Include="Api\ChannelController.cs" />
     <Compile Include="Api\HomeController.cs" />
     <Compile Include="Api\PostController.cs" />
+    <Compile Include="Models\ReadHistory.cs" />
     <Compile Include="Api\RssFeederController.cs" />
     <Compile Include="Api\TagController.cs" />
     <Compile Include="Api\UserController.cs" />

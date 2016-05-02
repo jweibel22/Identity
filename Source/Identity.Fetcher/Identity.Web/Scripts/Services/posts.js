@@ -119,8 +119,8 @@ angular.module('inspire').factory('postService', ['$http', '$q', '$filter', 'ngS
         return $http.post(ngSettings.baseUrl + '/Api/Post/' + id + '/Comments', comment);
     };
 
-    o.read = function (id, userId) {
-        return $http.post(ngSettings.baseUrl + '/Api/Post/' + id + '/Read?userId=' + userId);
+    o.read = function (ids, userId) {
+        return $http.post(ngSettings.baseUrl + '/Api/Post/Read?userId=' + userId, ids);
     };
 
     o.editPost = function(post) {
