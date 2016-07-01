@@ -32,7 +32,7 @@ namespace Identity.OAuth
 
         Func<Type, bool> SupportedType = (type) =>
         {
-            if (type == typeof(Channel))
+            if (type == typeof(NamedPostList))
                 return true;
             else
                 return false;
