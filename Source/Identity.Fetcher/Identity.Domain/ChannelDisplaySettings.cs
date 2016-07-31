@@ -20,7 +20,7 @@ namespace Identity.Domain
             {
                 ListType = "Full",
                 OrderBy = "Added",
-                ShowOnlyUnread = false
+                ShowOnlyUnread = true
             };
         }
     }
