@@ -31,6 +31,8 @@ namespace Identity.Rest
                 .ForMember(x => x.weight, _ => _.MapFrom(src => src.Weight))
                 .ForMember(x => x.text, _ => _.MapFrom(src => src.Text));
 
+            AutoMapper.Mapper.CreateMap<ChannelDisplaySettings, Infrastructure.DTO.ChannelDisplaySettings>();
+            AutoMapper.Mapper.CreateMap<Infrastructure.DTO.ChannelDisplaySettings, ChannelDisplaySettings>();
         }
 
         private static string MapEmbeddedUrl(Post post)

@@ -139,11 +139,8 @@ namespace Identity.Rest.Api
         {
             var c = channelRepo.GetById(channel.Id);
 
-            c.ShowOnlyUnread = channel.ShowOnlyUnread;
             c.IsPublic = !channel.IsPrivate;
             c.Name = channel.Name;
-            c.ListType = channel.ListType;
-            c.OrderBy = channel.OrderBy;
 
             channelRepo.UpdateChannel(c, channel.RssFeeders.Select(f => f.Url), channel.Subscriptions.Select(x => x.Id));
 
@@ -256,6 +253,12 @@ namespace Identity.Rest.Api
         public IList<Post> Get(long id, bool onlyUnread, DateTimeOffset timestamp, int fromIndex, string orderBy, int pageSize)
         {          
             return postListLoader.Load(id, user, onlyUnread, timestamp, fromIndex, orderBy, pageSize);
+        }
+
+        [HttpPut]
+        public void UpdateDisplaySettings(long id, long userId, ChannelDisplaySettings settings)
+        {
+            channelRepo.UpdateChannelDisplaySettings(userId, id, Mapper.Map<Domain.ChannelDisplaySettings>(settings));
         }
     }
 }

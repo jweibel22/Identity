@@ -4,17 +4,6 @@
 
             $scope.channel = channelService.editchannel;
 
-            $scope.sortTypes = ["Popularity", "Added"];
-            $scope.listTypes = ["Full", "List", "Titles"];
-
-            $scope.changeSortBy = function (sortBy) {
-                $scope.channel.OrderBy = sortBy;
-            }
-
-            $scope.changeListBy = function (listBy) {
-                $scope.channel.ListType = listBy;
-            }
-
             $scope.addRssFeeder = function() {
                 $scope.channel.RssFeeders.push({ Url: $scope.rssfeederUrl });
             }

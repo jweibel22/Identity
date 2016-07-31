@@ -3,10 +3,7 @@ CREATE TABLE [dbo].[Channel](
 	[Id] [bigint] IDENTITY(1,1) NOT NULL,
 	[Name] [nvarchar](128) NOT NULL,
 	[Created] [datetimeoffset] NOT NULL,
-	[IsPublic] [bit] NOT NULL,
-	ShowOnlyUnread bit NOT NULL default 1,
-	OrderBy nchar (128) NOT NULL default 'Added',
-	ListType nchar (128) NOT NULL default 'Full',
+	[IsPublic] [bit] NOT NULL
  CONSTRAINT [PK_Channel] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -179,7 +176,7 @@ CREATE TABLE [dbo].[ChannelTag](
 (
 	[ChannelId] ASC, Tag ASC
 )
-) ON [PRIMARY]
+) ON [PRIMARY];
 
 
 CREATE VIEW [dbo].[Popularity] as
@@ -189,6 +186,18 @@ from Post  join ChannelItem ci on ci.PostId = Post.Id join Subscription s on s.C
 union all
 select Post.Id as PostId 
 from Post join ChannelItem ci on ci.PostId = Post.Id join ChannelOwner co on co.ChannelId = ci.ChannelId) as xx
-group by PostId
+group by PostId;
 
 
+CREATE TABLE [dbo].[ChannelDisplaySettings](
+	[ChannelId] [bigint] NOT NULL,
+	[UserId] [bigint] NOT NULL,
+	[Settings] nvarchar(max),
+ CONSTRAINT [PK_ChannelDisplaySettings] PRIMARY KEY CLUSTERED 
+(
+	[ChannelId] ASC,
+	[UserId] ASC
+),
+CONSTRAINT [Content should be formatted as JSON]
+ CHECK ( ISJSON(Settings)>0 )
+) ON [PRIMARY]

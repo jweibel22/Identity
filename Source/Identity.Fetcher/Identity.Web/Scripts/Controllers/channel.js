@@ -30,12 +30,13 @@ angular.module('inspire')
         //we want the $scope.channel to point to the same channel object that is used in the channel list, such that the unread counter gets updated
         var x = $scope.findChannel(channelPromise.data.Id);
         $scope.channel = x ? x : channelPromise.data;
+        $scope.channel.DisplaySettings = channelPromise.data.DisplaySettings; //Dirty hack, please fix this! The channels from the channel list don't have the DisplaySettings!!
 
         $scope.channel.TagCloud = channelPromise.data.TagCloud; //TODO: find a better way!
 
         $scope.channelFollowed = $filter('filter')($scope.user.FollowsChannels, {Id: $scope.channel.Id}, true).length > 0;
         $scope.channelOwned = $filter('filter')($scope.user.Owns, { Id: $scope.channel.Id }, true).length > 0;
-        $scope.showOnlyUnread = $scope.channel.ShowOnlyUnread;
+        $scope.showOnlyUnread = $scope.channel.DisplaySettings.ShowOnlyUnread;
 
         for (var i = 0; i < $scope.channel.TagCloud.length; i++) {
             $scope.channel.TagCloud[i].link = "#/search?query=" + $scope.channel.TagCloud[i].text;
@@ -105,11 +106,9 @@ angular.module('inspire')
             });
         };
 
-        $scope.showOnlyUnreadChanged = function() {
-            postService.getFromChannel($scope.channel.Id, $scope.showOnlyUnread).success(function(data) {
-                angular.copy(data.data, $scope.posts);
-            });
-        }
+        $scope.displaySettingsChanged = function (settings) {
+            channelService.updateDisplaySettings($scope.channel.Id, $scope.user.Id, settings);
+        };
 
         $scope.addLink = function () {
 

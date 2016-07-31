@@ -9,6 +9,7 @@
                 showonlyunread: "=",
                 showcontrols: "=",
                 autoloadonscroll: "=",
+                displaySettingsChanged: "&"
             },
             templateUrl: 'Content/templates/stream.html',
             controller: function ($scope) {
@@ -16,11 +17,11 @@
                 $scope.loading = false;
 
                 $scope.sortTypes = ["Popularity", "Added"];
-                $scope.selectedSortType = $scope.channel ? $scope.channel.OrderBy : "Added";
+                $scope.selectedSortType = $scope.channel ? $scope.channel.DisplaySettings.OrderBy : "Added";
                 $scope.reverse = true;
 
                 $scope.listTypes = ["Full", "List", "Titles"];
-                $scope.selectedListType = $scope.channel ? $scope.channel.ListType : "Titles";
+                $scope.selectedListType = $scope.channel ? $scope.channel.DisplaySettings.ListType : "Titles";
 
                 $scope.channelOwned = $scope.channel && $filter('filter')($scope.user.Owns, { Id: $scope.channel.Id }, true).length > 0;
 
@@ -36,11 +37,29 @@
                 
                 $scope.changeSortBy = function(sortBy) {
                     $scope.selectedSortType = sortBy;
-                    $scope.reloadPosts();
+                    $scope.onDisplaySettingsChanged();
+                    $scope.reloadPosts();                    
                 }
 
                 $scope.changeListBy = function (listBy) {
                     $scope.selectedListType = listBy;
+                    $scope.onDisplaySettingsChanged();
+                    $scope.reloadPosts();                    
+                }
+
+                $scope.onDisplaySettingsChanged = function () {
+
+                    $scope.displaySettingsChanged({
+                        settings: {
+                            ShowOnlyUnread: $scope.showonlyunread,
+                            OrderBy: $scope.selectedSortType,
+                            ListType: $scope.selectedListType
+                        }
+                    });
+                }
+
+                $scope.showOnlyUnreadChanged = function () {
+                    $scope.onDisplaySettingsChanged();
                     $scope.reloadPosts();
                 }
 

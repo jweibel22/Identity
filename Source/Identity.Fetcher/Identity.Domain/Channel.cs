@@ -17,12 +17,7 @@ namespace Identity.Domain
         public bool IsPublic { get; set; }
 
         public bool IsLocked { get; set; }
-
-        public bool ShowOnlyUnread { get; set; }
-
-        public string OrderBy { get; set; }
-
-        public string ListType { get; set; }
+        
 
         public Channel()
         {
@@ -41,24 +36,7 @@ namespace Identity.Domain
                 Name = name,
                 Created = DateTimeOffset.Now,
                 IsLocked = false,
-                IsPublic = false,
-                ListType = "Full",
-                OrderBy = "Added",
-                ShowOnlyUnread = false
-            };
-        }
-
-        public static Channel Standard(string name, bool streaming)
-        {
-            return new Channel
-            {
-                Created = DateTimeOffset.Now,
-                Name = name,
-                ShowOnlyUnread = !streaming,
-                IsLocked = true,
-                IsPublic = false,
-                OrderBy = streaming ? "Popularity" : "Added",
-                ListType = streaming ? "List" : "Full"
+                IsPublic = false
             };
         }
     }

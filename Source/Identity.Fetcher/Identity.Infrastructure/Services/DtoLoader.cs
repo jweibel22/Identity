@@ -92,6 +92,7 @@ namespace Identity.Infrastructure.Services
             result.RssFeeders = channelRepo.GetRssFeedersForChannel(channel.Id).Select(Mapper.Map<DTO.RssFeeder>).ToList();
             result.TagCloud = channelRepo.GetTagCloud(channel.Id).Select(Mapper.Map<DTO.WeightedTag>).ToList();
             result.Subscriptions = channelRepo.GetSubscriptions(channel.Id).Select(Mapper.Map<DTO.Channel>).ToList();
+            result.DisplaySettings = Mapper.Map <DTO.ChannelDisplaySettings>(channelRepo.GetChannelDisplaySettings(user.Id, channel.Id));
 
             return result;
         }

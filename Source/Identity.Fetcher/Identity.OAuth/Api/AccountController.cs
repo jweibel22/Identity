@@ -115,11 +115,11 @@ namespace Identity.OAuth.Api
 
         private User CreateNewUser(string username)
         {
-            var starredChannel = Channel.Standard(String.Format("{0}'s starred", username), false);
-            var savedChannel = Channel.Standard(String.Format("{0}'s saved", username), false);
-            var likedChannel = Channel.Standard(String.Format("{0}'s liked", username), false);
-            var inbox = Channel.Standard(String.Format("{0}'s inbox", username), false);
-            var subscriptionChannel = Channel.Standard(String.Format("{0}'s subscriptions", username), false);
+            var starredChannel = Channel.New(String.Format("{0}'s starred", username));
+            var savedChannel = Channel.New(String.Format("{0}'s saved", username));
+            var likedChannel = Channel.New(String.Format("{0}'s liked", username));
+            var inbox = Channel.New(String.Format("{0}'s inbox", username));
+            var subscriptionChannel = Channel.New(String.Format("{0}'s subscriptions", username));
                 
             channelRepository.AddChannel(starredChannel);
             channelRepository.AddChannel(savedChannel);

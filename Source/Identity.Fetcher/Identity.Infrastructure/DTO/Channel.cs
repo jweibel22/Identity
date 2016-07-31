@@ -32,6 +32,8 @@ namespace Identity.Infrastructure.DTO
         public IEnumerable<Channel> Subscriptions { get; set; }
 
         public IList<WeightedTag> TagCloud { get; set; }
+
+        public ChannelDisplaySettings DisplaySettings { get; set; }
     }
 
     public class WeightedTag

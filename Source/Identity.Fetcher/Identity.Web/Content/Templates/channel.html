@@ -37,7 +37,7 @@
 <div style="margin-top:120px">
     <!--<button class="btn btn-default" ng-show="channelOwned" ng-click="rss()">RSS</button>-->
     <jqcloud words="channel.TagCloud" width="400" height="100" delay="10" steps="7" font-size="{from:0.09, to:0.04}"></jqcloud>
-    <stream posts="posts" user="user" showonlyunread="showOnlyUnread" channel="channel" autoloadonscroll="true" showcontrols="true" />
+    <stream posts="posts" user="user" showonlyunread="showOnlyUnread" display-settings-changed="displaySettingsChanged(settings)" channel="channel" autoloadonscroll="true" showcontrols="true" />
 </div>
 
     <script type="text/ng-template" id="channelSelector.html">

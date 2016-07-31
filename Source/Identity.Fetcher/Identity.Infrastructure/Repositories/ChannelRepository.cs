@@ -6,6 +6,7 @@ using Dapper;
 using Identity.Domain;
 using Channel = Identity.Domain.Channel;
 using RssFeeder = Identity.Domain.RssFeeder;
+using Newtonsoft.Json;
 
 namespace Identity.Infrastructure.Repositories
 {
@@ -108,7 +109,7 @@ namespace Identity.Infrastructure.Repositories
 
         public void UpdateChannel(Channel channel, IEnumerable<string> rssFeeders, IEnumerable<long> subscriptions)
         {
-            con.Connection.Execute("update Channel set Name=@Name, IsPublic=@IsPublic, ShowOnlyUnread=@ShowOnlyUnread, OrderBy=@OrderBy, ListType=@ListType where Id=@Id", channel, con);
+            con.Connection.Execute("update Channel set Name=@Name, IsPublic=@IsPublic, where Id=@Id", channel, con);
 
             RemoveAllFeeders(channel.Id);
 
@@ -274,6 +275,30 @@ where (ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId) and (co.ChannelId is n
                         group by Channels.Id";
 
             return con.Connection.Query<UnreadCount>(sql, new { UserId = userId }, con);
+        }
+
+
+        public void UpdateChannelDisplaySettings(long userId, long channelId, ChannelDisplaySettings settings)
+        {
+            con.Connection.Execute("update ChannelDisplaySettings set Settings=@SerializedSettings where UserId=@UserId and ChannelId=@ChannelId if @@rowcount = 0 insert ChannelDisplaySettings values(@ChannelId, @UserId, @SerializedSettings)", new { UserId = userId, ChannelId = channelId, SerializedSettings = JsonConvert.SerializeObject(settings) }, con);
+        }
+
+        public ChannelDisplaySettings GetChannelDisplaySettings(long userId, long channelId)
+        {
+            var sql = "select Settings from ChannelDisplaySettings where UserId = @UserId and ChannelId = @ChannelId";
+
+            var result = con.Connection
+                .Query<string>(sql, new { UserId = userId, ChannelId = channelId }, con)
+                .SingleOrDefault();
+
+            if (result != null)
+            {
+                return JsonConvert.DeserializeObject<ChannelDisplaySettings>(result);
+            }
+            else
+            {
+                return ChannelDisplaySettings.New();
+            }
         }
 
         public void Dispose()

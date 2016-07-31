@@ -48,6 +48,12 @@ angular.module('inspire').factory('channelService', ['$http', 'ngSettings', func
         });
     };
 
+    o.updateDisplaySettings = function (channelId, userId, settings) {
+        return $http.put(ngSettings.baseUrl + '/Api/Channel/' + channelId + '/UpdateDisplaySettings?userId='+userId, settings).success(function (res) {
+
+        });
+    };
+
     o.delete = function (channel) {
         return $http.delete(ngSettings.baseUrl + '/Api/Channel/' + channel.Id).success(function (data) {
             var index = channels.indexOf(channel);

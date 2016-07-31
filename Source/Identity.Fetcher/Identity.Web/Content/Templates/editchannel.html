@@ -17,54 +17,6 @@
 </div>
 
 <div style="margin-bottom:50px">
-    <h4>Display settings</h4>
-    <div class="row">
-        <div class="col-md-2">
-            <span>Show only unread</span>
-        </div>
-        <div class="col-md-2">
-            <input type="checkbox" ng-model="channel.ShowOnlyUnread">            
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-2">
-            <span>Sort by</span>
-        </div>
-        <div class="col-md-2">
-            <div class="btn-group">
-                <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{channel.OrderBy}}  <span class="caret"></span></button>
-                <ul class="dropdown-menu">
-                    <li ng-repeat="item in sortTypes">
-                        <a ng-click="changeSortBy(item)">
-                            {{item}}
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-2">
-            <span>List by</span>
-        </div>
-        <div class="col-md-2">
-            <div class="btn-group">
-                <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{channel.ListType}}  <span class="caret"></span></button>
-                <ul class="dropdown-menu">
-                    <li ng-repeat="item in listTypes">
-                        <a ng-click="changeListBy(item)">
-                            {{item}}
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div style="margin-bottom:50px">
     <div>
         <h4>RSS Feeders</h4>
         <div ng-repeat="feeder in channel.RssFeeders">
