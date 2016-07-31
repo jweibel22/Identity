@@ -3,7 +3,7 @@
 <div ng-repeat="channel in user.Owns" style="margin-left: 20px">
     <div ng-show="channel.IsLocked">
         <a href="#/home/{{channel.Id}}">
-            {{channel.Name}} <span ng-show="channel.ShowUnreadCounter && sub.UnreadCount > 0"> ({{totalUnreadCount(channel)}})</span>
+            {{channel.Name}} <span ng-show="channel.ShowUnreadCounter && totalUnreadCount(channel) > 0"> ({{totalUnreadCount(channel)}})</span>
         </a>
         <div ng-repeat="sub in channel.Subscriptions" style="margin-left: 10px">
             <a href="#/home/{{sub.Id}}">
@@ -17,7 +17,7 @@
     <div ng-repeat="channel in user.Owns" style="margin-left: 20px">
         <div ng-show="!channel.IsLocked">
             <a href="#/home/{{channel.Id}}">
-                {{channel.Name}} <span ng-show="channel.ShowUnreadCounter && sub.UnreadCount > 0"> ({{totalUnreadCount(channel)}})</span>
+                {{channel.Name}} <span ng-show="channel.ShowUnreadCounter && totalUnreadCount(channel) > 0"> ({{totalUnreadCount(channel)}})</span>
             </a>
             <div ng-repeat="sub in channel.Subscriptions" style="margin-left: 10px">
                 <a href="#/home/{{sub.Id}}">
