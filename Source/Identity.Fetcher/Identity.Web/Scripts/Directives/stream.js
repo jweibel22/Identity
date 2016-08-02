@@ -223,6 +223,11 @@
                     }
                 }
 
+                $scope.fetchPostContent = function (post) {
+                    postService.fetchPostContent(post).then(function (data) {
+                        post.Description = data;
+                    });
+                };
 
                 $scope.publishOnChannel = function (post) {
 

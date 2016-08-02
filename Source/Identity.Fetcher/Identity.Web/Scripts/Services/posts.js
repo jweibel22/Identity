@@ -138,5 +138,11 @@ angular.module('inspire').factory('postService', ['$http', '$q', '$filter', 'ngS
             });
     };
 
+    o.fetchPostContent = function (post) {
+        return $http.get(ngSettings.baseUrl + '/Api/Post/' + post.Id + '/Contents').then(function (res) {
+            return res.data;
+        });
+    };
+
     return o;
 }]);
