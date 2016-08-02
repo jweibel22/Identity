@@ -123,7 +123,9 @@ namespace Identity.Rest.Api
             if (url.Contains("http://jyllands-posten.dk") || url.Contains("http://finans.dk"))
                 return "//div[@id=\"articleText\"]";
             else if (url.Contains("http://www.dr.dk") || url.Contains("http://dr.dk"))
-                return "//div[@class=\"wcms-article-content\"]";            
+                return "//div[@class=\"wcms-article-content\"]";      
+            else if (url.Contains("https://ing.dk"))
+                return "//section[@class=\"body\"]";
             else
                 return null;            
         }
