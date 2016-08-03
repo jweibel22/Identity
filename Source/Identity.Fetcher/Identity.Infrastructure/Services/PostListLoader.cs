@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using AutoMapper;
+using Identity.Domain;
 using Identity.Infrastructure.DTO;
 using Identity.Infrastructure.Repositories;
 using log4net;
@@ -17,12 +18,14 @@ namespace Identity.Infrastructure.Services
         private readonly PostRepository postRepo;
         private readonly CommentRepostitory commentRepo;
         private readonly ChannelRepository channelRepo;
+        private readonly IEnumerable<InlineArticleSelector> inlineArticleSelectors;
 
-        public PostListLoader(ChannelRepository channelRepo, CommentRepostitory commentRepo, PostRepository postRepo)
+        public PostListLoader(ChannelRepository channelRepo, CommentRepostitory commentRepo, PostRepository postRepo, InlineArticleSelectorRepository inlineArticleSelectorRepo)
         {
             this.channelRepo = channelRepo;
             this.commentRepo = commentRepo;
             this.postRepo = postRepo;
+            this.inlineArticleSelectors = inlineArticleSelectorRepo.GetAll();
         }
 
         public IList<DTO.Post> Load(long id, User user, bool onlyUnread, DateTimeOffset timestamp, int fromIndex, string orderBy, int pageSize)
@@ -57,6 +60,7 @@ namespace Identity.Infrastructure.Services
                         Name = pi.ChannelName
                     })
                     .ToList();
+                p.CanBeInlined = inlineArticleSelectors.Any(s => p.Uri.Contains(s.UrlPattern));
             }
             log.Debug("Posts loaded");
             //log.Debug("Items from channel [" + String.Join(",", result.Select(r => r.Id)) + "] was fetched");

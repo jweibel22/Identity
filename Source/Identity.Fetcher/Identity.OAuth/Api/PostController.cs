@@ -10,13 +10,14 @@ using System.Web.Http;
 using AutoMapper;
 using CsQuery.ExtensionMethods;
 using HtmlAgilityPack;
+using Identity.Domain;
 using Identity.Infrastructure.DTO;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
-using Identity.OAuth.Models;
 using log4net;
 using Comment = Identity.Domain.Comment;
 using Post = Identity.Infrastructure.DTO.Post;
+using ReadHistory = Identity.OAuth.Models.ReadHistory;
 
 namespace Identity.Rest.Api
 {
@@ -31,13 +32,15 @@ namespace Identity.Rest.Api
         private readonly UserRepository userRepo;
         private readonly ILoadDtos dtoLoader;
         private Domain.User user;
+        private readonly IEnumerable<InlineArticleSelector> inlineArticleSelectors;
 
-        public PostController(ILoadDtos dtoLoader, PostRepository postRepo, UserRepository userRepo, CommentRepostitory commentRepo)
+        public PostController(ILoadDtos dtoLoader, PostRepository postRepo, UserRepository userRepo, CommentRepostitory commentRepo, InlineArticleSelectorRepository inlineArticleSelectorRepo)
         {
             this.dtoLoader = dtoLoader;
             this.postRepo = postRepo;
             this.userRepo = userRepo;
             this.commentRepo = commentRepo;
+            this.inlineArticleSelectors = inlineArticleSelectorRepo.GetAll();
 
             var identity = User.Identity as ClaimsIdentity;
             user = userRepo.FindByName(identity.Name);
@@ -118,18 +121,6 @@ namespace Identity.Rest.Api
             return postRepo.ReadHistory(user.Id).Select(Mapper.Map<Post>);
         }
 
-        private string ArticleCssSelector(string url)
-        {
-            if (url.Contains("http://jyllands-posten.dk") || url.Contains("http://finans.dk"))
-                return "//div[@id=\"articleText\"]";
-            else if (url.Contains("http://www.dr.dk") || url.Contains("http://dr.dk"))
-                return "//div[@class=\"wcms-article-content\"]";      
-            else if (url.Contains("https://ing.dk"))
-                return "//section[@class=\"body\"]";
-            else
-                return null;            
-        }
-
         [HttpGet]
         [Route("Api/Post/{id}/Contents")]
         public string FetchContents(long id)
@@ -137,22 +128,26 @@ namespace Identity.Rest.Api
             var post = postRepo.GetById(id, user.Id);
             using (var webClient = new WebClient())
             {
+                var selector = inlineArticleSelectors.FirstOrDefault(s => post.Uri.Contains(s.UrlPattern));
+
+                if (selector == null)
+                {
+                    return "";
+                }
+
                 webClient.Encoding = Encoding.UTF8;
                 var result = webClient.DownloadString(post.Uri);
 
                 var doc = new HtmlDocument();
                 doc.LoadHtml(result);
-                var selector = ArticleCssSelector(post.Uri);
-                var elm = selector == null ? null : doc.DocumentNode.SelectSingleNode(selector);
+                var elm = doc.DocumentNode.SelectSingleNode(selector.Selector);
 
                 if (elm == null)
                 {
                     return "";
                 }
-                else
-                {
-                    return elm.InnerHtml.Replace("\r\n", "").Replace("\n", "").Replace("\t", "").Replace("\"", "");
-                }
+
+                return elm.InnerHtml.Replace("\r\n", "").Replace("\n", "").Replace("\t", "").Replace("\"", "");                
             }
         }
     }

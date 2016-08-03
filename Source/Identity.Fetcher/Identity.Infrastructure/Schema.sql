@@ -201,3 +201,13 @@ CREATE TABLE [dbo].[ChannelDisplaySettings](
 CONSTRAINT [Content should be formatted as JSON]
  CHECK ( ISJSON(Settings)>0 )
 ) ON [PRIMARY]
+
+
+CREATE TABLE [dbo].[InlineArticleSelector](
+	[UrlPattern] [nvarchar](255) NOT NULL,
+	[Selector] [nvarchar](255) NOT NULL,
+ CONSTRAINT [PK_InlineArticleSelector] PRIMARY KEY CLUSTERED 
+(
+	[UrlPattern] ASC
+)
+) ON [PRIMARY]

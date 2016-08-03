@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Identity.Domain;
 using Identity.Infrastructure.DTO;
 using Identity.Infrastructure.Repositories;
 using Channel = Identity.Domain.Channel;
@@ -32,13 +33,15 @@ namespace Identity.Infrastructure.Services
         private readonly CommentRepostitory commentRepo;
         private readonly UserRepository userRepo;
         private readonly ChannelRepository channelRepo;
+        private readonly IEnumerable<InlineArticleSelector> inlineArticleSelectors;
 
-        public DtoLoader(PostRepository postRepo, CommentRepostitory commentRepo, UserRepository userRepo, ChannelRepository channelRepo)
+        public DtoLoader(PostRepository postRepo, CommentRepostitory commentRepo, UserRepository userRepo, ChannelRepository channelRepo, InlineArticleSelectorRepository inlineArticleSelectorRepo)
         {
             this.postRepo = postRepo;
             this.commentRepo = commentRepo;
             this.userRepo = userRepo;
             this.channelRepo = channelRepo;
+            this.inlineArticleSelectors = inlineArticleSelectorRepo.GetAll();
         }
 
         public IEnumerable<DTO.Post> LoadPosts(User user, IEnumerable<Post> post)
@@ -64,6 +67,7 @@ namespace Identity.Infrastructure.Services
                             Name = pi.ChannelName
                         })
                         .ToList();
+            p.CanBeInlined = inlineArticleSelectors.Any(s => p.Uri.Contains(s.UrlPattern));
             return p;
         }
 

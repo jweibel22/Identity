@@ -92,6 +92,8 @@ namespace Identity.Infrastructure.DTO
         public IList<ChannelReference> PublishedIn { get; set; }
 
         public string EmbeddedUrl { get; set; }
+
+        public bool CanBeInlined { get; set; }
     }
 
     public class ChannelReference
