@@ -109,7 +109,7 @@ namespace Identity.Infrastructure.Repositories
 
         public void UpdateChannel(Channel channel, IEnumerable<string> rssFeeders, IEnumerable<long> subscriptions)
         {
-            con.Connection.Execute("update Channel set Name=@Name, IsPublic=@IsPublic, where Id=@Id", channel, con);
+            con.Connection.Execute("update Channel set Name=@Name, IsPublic=@IsPublic where Id=@Id", channel, con);
 
             RemoveAllFeeders(channel.Id);
 

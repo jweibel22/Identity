@@ -68,7 +68,9 @@ namespace Identity.Infrastructure.Repositories
             con.Connection.Execute("delete from Tagged where PostId=@PostId", new { PostId = postId }, con);
             foreach (var tag in tags)
             {
-                con.Connection.Execute("insert Tagged values(@PostId,@Tag)", new { PostId = postId, Tag = tag }, con);    
+                con.Connection.Execute("update Tag set Name=@Tag where Name=@Tag if @@rowcount = 0 insert Tag (Name) values(@Tag)", new { Tag = tag }, con);
+                var tagId = con.Connection.Query<long>("select Id from Tag where Name=@Tag", new { Tag = tag }, con).Single();
+                con.Connection.Execute("insert Tagged values(@PostId,@TagId)", new { PostId = postId, TagId = tagId }, con);    
             }
         }
 
@@ -77,7 +79,7 @@ namespace Identity.Infrastructure.Repositories
         {
             var encodedTag = tag.Replace("%", "[%]").Replace("[", "[[]").Replace("]", "[]]") + "%";
 
-            return con.Connection.Query<Post>(@"select top 100 Post.* from Post left join Tagged t on t.PostId = Post.Id where t.Tag like @EncodedTag or FREETEXT (Title, @Tag)", new { EncodedTag = encodedTag, Tag = tag }, con);
+            return con.Connection.Query<Post>(@"select top 100 Post.* from Post left join Tagged t on t.PostId = Post.Id join Tag on Tag.Id = Tagged.TagId where Tag.Name = @EncodedTag", new { EncodedTag = encodedTag, Tag = tag }, con);
         }
 
         //TODO: add paging here
@@ -150,7 +152,7 @@ namespace Identity.Infrastructure.Repositories
         {
             using (var pc = new PerfCounter("Tags"))
             {
-                return con.Connection.Query<Tagged>("select * from Tagged where PostId=@PostId", new {PostId = postId},
+                return con.Connection.Query<Tagged>("select Tagged.PostId, Tag.Name as Tag from Tagged join Tag on Tag.Id = Tagged.TagId where PostId=@PostId", new {PostId = postId},
                     con);
             }
         }
@@ -159,7 +161,7 @@ namespace Identity.Infrastructure.Repositories
         {
             using (var pc = new PerfCounter("Tags"))
             {
-                return con.Connection.Query<Tagged>("select * from Tagged where PostId in @PostIds", new { PostIds = postIds },
+                return con.Connection.Query<Tagged>("select Tagged.PostId, Tag.Name as Tag from Tagged join Tag on Tag.Id = Tagged.TagId where Tagged.PostId in @PostIds", new { PostIds = postIds },
                     con);
             }
         }
@@ -181,10 +183,11 @@ namespace Identity.Infrastructure.Repositories
 
         public IEnumerable<WeightedTag> TopTags(int count)
         {
-            var sql = @"select top {0} count(*) as Weight, Tag as Text from Tagged 
+            var sql = @"select top {0} count(*) as Weight, Tag.Name as Text from Tagged 
+                        join Tag on Tag.Id = Tagged.TagId
                         join ChannelItem ci on ci.PostId = Tagged.PostId
                         where ci.Created > @Timestamp and ci.UserId <> 2 and ci.UserId <> 5
-                        group by Tag
+                        group by Tag.Name
                         order by count(*) desc";
 
             return con.Connection.Query<WeightedTag>(String.Format(sql, count), new { Timestamp = DateTimeOffset.Now.Subtract(TimeSpan.FromDays(7)) }, con);

@@ -109,13 +109,18 @@ CREATE TABLE [dbo].[RssFeeder](
 
 CREATE TABLE [dbo].[Tagged](
 	[PostId] [bigint] NOT NULL,
-	[Tag] [nvarchar](64) NOT NULL,
- CONSTRAINT [PK_Tagged] PRIMARY KEY CLUSTERED 
+	[TagId] [bigint] NOT NULL,
+ CONSTRAINT [PK_Tagged3] PRIMARY KEY CLUSTERED 
 (
-	PostId ASC, Tag ASC
+	PostId ASC, TagId ASC
 )
 ) ON [PRIMARY]
 
+
+CREATE NONCLUSTERED INDEX [Tagged_Tag_Index] ON [dbo].[Tagged]
+(
+	[Tag] ASC
+)
 
 CREATE TABLE [dbo].[User](
 	[Id] [bigint] IDENTITY(1,1) NOT NULL,
@@ -211,3 +216,14 @@ CREATE TABLE [dbo].[InlineArticleSelector](
 	[UrlPattern] ASC
 )
 ) ON [PRIMARY]
+
+CREATE TABLE [dbo].[Tag](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](128) NOT NULL,
+	[ML_Enabled] [bit] NOT NULL default 0
+ CONSTRAINT [PK_Tag] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)
+) ON [PRIMARY]
+
