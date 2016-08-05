@@ -228,3 +228,23 @@ CREATE TABLE [dbo].[Tag](
 )
 ) ON [PRIMARY]
 
+
+CREATE TABLE [dbo].[Word](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[Contents] [nvarchar](128) NOT NULL
+ CONSTRAINT [PK_Word] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)
+) ON [PRIMARY]
+
+
+CREATE TABLE [dbo].[PostTitleWords](
+	[WordId] [bigint] NOT NULL,
+	[PostId] [bigint] NOT NULL,
+	[Count] [int] NOT NULL default 1,
+ CONSTRAINT [PK_PostTitleWords] PRIMARY KEY CLUSTERED 
+(
+	WordId ASC, PostId ASC
+)
+) ON [PRIMARY]

@@ -147,12 +147,13 @@ namespace Identity.Infrastructure.Repositories
         public IEnumerable<WeightedTag> GetTagCloud(long userId, long forUserId)
         {
             return con.Connection.Query<WeightedTag>(@"
-                        select top 20 count(*) as Weight, Tag as Text from Tagged 
+                        select top 20 count(*) as Weight, Tag.Name as Text from Tagged 
+                        join Tag on Tag.Id = Tagged.TagId
                         join ChannelItem ci on ci.PostId = Tagged.PostId and ci.UserId = @UserId                         
                         join Channel c on c.Id = ci.ChannelId
                         left join ChannelOwner co on co.ChannelId = c.Id and co.UserId = @ForUserId
                         where co.ChannelId is not null or c.IsPublic = 1                                            
-                        group by Tag order by COUNT(*) desc", new { UserId = userId, ForUserId = forUserId }, con);
+                        group by Tag.Name order by COUNT(*) desc", new { UserId = userId, ForUserId = forUserId }, con);
         }
 
         public void Dispose()

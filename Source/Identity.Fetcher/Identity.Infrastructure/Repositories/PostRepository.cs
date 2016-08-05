@@ -56,6 +56,7 @@ namespace Identity.Infrastructure.Repositories
         public void AddPost(Post post)
         {
             post.Id = con.Connection.Query<long>("insert Post values(@Created,@Title,@Description,@Uri); SELECT CAST(SCOPE_IDENTITY() as bigint)", post, con).Single();
+            StoreTokenizedTitle(post);
         }
 
         public void UpdatePost(Post post)
@@ -63,6 +64,7 @@ namespace Identity.Infrastructure.Repositories
             con.Connection.Execute("update Post set Title=@Title, Description=@Description, Uri=@Uri where Id=@Id", post, con);
         }
 
+        //TODO: optimize this!
         public void TagPost(long postId, IEnumerable<string> tags)
         {
             con.Connection.Execute("delete from Tagged where PostId=@PostId", new { PostId = postId }, con);
@@ -71,6 +73,19 @@ namespace Identity.Infrastructure.Repositories
                 con.Connection.Execute("update Tag set Name=@Tag where Name=@Tag if @@rowcount = 0 insert Tag (Name) values(@Tag)", new { Tag = tag }, con);
                 var tagId = con.Connection.Query<long>("select Id from Tag where Name=@Tag", new { Tag = tag }, con).Single();
                 con.Connection.Execute("insert Tagged (PostId,TagId) values(@PostId,@TagId)", new { PostId = postId, TagId = tagId }, con);    
+            }
+        }
+
+        //TODO: optimize this!
+        private void StoreTokenizedTitle(Post post)
+        {
+            var tokens = post.Title.Trim().Replace(":", "").Replace("-", " ").ToLower().Split(' ').Where(word => word.Length >= 4);
+            con.Connection.Execute("delete from PostTitleWords where PostId=@PostId", new { PostId = post.Id }, con);
+            foreach (var token in tokens)
+            {
+                con.Connection.Execute("update Word set Contents=@Word where Contents=@Word if @@rowcount = 0 insert Word (Contents) values(@Word)", new { Word = token }, con);
+                var wordId = con.Connection.Query<long>("select Id from Word where Contents=@Word", new { Word = token }, con).Single();
+                con.Connection.Execute("insert PostTitleWords (PostId,WordId) values(@PostId,@WordId)", new { PostId = post.Id, WordId = wordId }, con);
             }
         }
 
