@@ -110,6 +110,7 @@ CREATE TABLE [dbo].[RssFeeder](
 CREATE TABLE [dbo].[Tagged](
 	[PostId] [bigint] NOT NULL,
 	[TagId] [bigint] NOT NULL,
+	[Confirmed] [bit] NOT NULL default 1,
  CONSTRAINT [PK_Tagged3] PRIMARY KEY CLUSTERED 
 (
 	PostId ASC, TagId ASC

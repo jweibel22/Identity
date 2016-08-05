@@ -70,7 +70,7 @@ namespace Identity.Infrastructure.Repositories
             {
                 con.Connection.Execute("update Tag set Name=@Tag where Name=@Tag if @@rowcount = 0 insert Tag (Name) values(@Tag)", new { Tag = tag }, con);
                 var tagId = con.Connection.Query<long>("select Id from Tag where Name=@Tag", new { Tag = tag }, con).Single();
-                con.Connection.Execute("insert Tagged values(@PostId,@TagId)", new { PostId = postId, TagId = tagId }, con);    
+                con.Connection.Execute("insert Tagged (PostId,TagId) values(@PostId,@TagId)", new { PostId = postId, TagId = tagId }, con);    
             }
         }
 
