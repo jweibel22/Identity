@@ -29,7 +29,23 @@ namespace Identity.Infrastructure.Repositories
             return con.Connection.Query<Post>("select * from Post where Uri=@Uri", new { Uri = uri }, con).SingleOrDefault();
         }
 
-        public bool AlreadyPosted(string title, DateTimeOffset created, long rssFeederId)
+        public bool WebScraperItemAlreadyPosted(string title, DateTimeOffset created, long webScraperId)
+        {
+            return con.Connection.Query<Post>(@"select * from Post join WebScraperItem fi on fi.PostId = Post.Id 
+                                                where Title=@Title and fi.Created=@Created and fi.WebScraperId=@WebScraperId", new
+            {
+                Title = title,
+                Created = created,
+                WebScraperId = webScraperId
+            }, con).Any();
+        }
+
+        public void AddWebScraperItem(long webScraperId, long postId, DateTimeOffset created)
+        {
+            con.Connection.Execute("update WebScraperItem set PostId=@PostId where PostId=@PostId and WebScraperId=@WebScraperId if @@rowcount = 0 insert WebScraperItem values(@WebScraperId, @PostId, @Created)", new { WebScraperId = webScraperId, PostId = postId, Created = created }, con);
+        }
+
+        public bool FeedItemAlreadyPosted(string title, DateTimeOffset created, long rssFeederId)
         {
             return con.Connection.Query<Post>(@"select * from Post join FeedItem fi on fi.PostId = Post.Id 
                                                 where Title=@Title and fi.Created=@Created and fi.RssFeederId=@RssFeederId", new
@@ -38,6 +54,11 @@ namespace Identity.Infrastructure.Repositories
                 Created = created, 
                 RssFeederId = rssFeederId
             }, con).Any();
+        }
+
+        public void AddFeedItem(long rssFeederId, long postId, DateTimeOffset created)
+        {
+            con.Connection.Execute("update FeedItem set PostId=@PostId where PostId=@PostId and RssFeederId=@RssFeederId if @@rowcount = 0 insert FeedItem values(@RssFeederId, @PostId, @Created)", new { RssFeederId = rssFeederId, PostId = postId, Created = created }, con);
         }
 
         public IEnumerable<Post> TopPosts(int count, long userId)
@@ -53,10 +74,13 @@ namespace Identity.Infrastructure.Repositories
             return con.Connection.Query<Post>(String.Format(sql, count), new { UserId = userId, Timestamp = DateTimeOffset.Now.Subtract(TimeSpan.FromDays(7)) }, con);
         }
 
-        public void AddPost(Post post)
+        public void AddPost(Post post, bool tokenizeTitle)
         {
             post.Id = con.Connection.Query<long>("insert Post values(@Created,@Title,@Description,@Uri); SELECT CAST(SCOPE_IDENTITY() as bigint)", post, con).Single();
-            StoreTokenizedTitle(post);
+            if (tokenizeTitle)
+            {
+                StoreTokenizedTitle(post);
+            }            
         }
 
         public void UpdatePost(Post post)
@@ -76,16 +100,20 @@ namespace Identity.Infrastructure.Repositories
             }
         }
 
+        public void AutoTagPost(long postId, long tagId)
+        {
+            con.Connection.Execute("insert Tagged (PostId,TagId,Confirmed) values(@PostId,@TagId,false)", new { PostId = postId, TagId = tagId }, con);
+        }
+
         //TODO: optimize this!
         private void StoreTokenizedTitle(Post post)
-        {
-            var tokens = post.Title.Trim().Replace(":", "").Replace("-", " ").ToLower().Split(' ').Where(word => word.Length >= 4);
+        {            
             con.Connection.Execute("delete from PostTitleWords where PostId=@PostId", new { PostId = post.Id }, con);
-            foreach (var token in tokens)
+            foreach (var token in post.TokenizedTitle)
             {
                 con.Connection.Execute("update Word set Contents=@Word where Contents=@Word if @@rowcount = 0 insert Word (Contents) values(@Word)", new { Word = token }, con);
                 var wordId = con.Connection.Query<long>("select Id from Word where Contents=@Word", new { Word = token }, con).Single();
-                con.Connection.Execute("insert PostTitleWords (PostId,WordId) values(@PostId,@WordId)", new { PostId = post.Id, WordId = wordId }, con);
+                con.Connection.Execute("update PostTitleWords set Count=Count+1 where PostId=@PostId and WordId=@WordId if @@rowcount = 0 insert PostTitleWords (PostId,WordId) values(@PostId,@WordId)", new { PostId = post.Id, WordId = wordId }, con);
             }
         }
 

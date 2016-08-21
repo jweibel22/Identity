@@ -34,7 +34,8 @@ namespace Identity.Rest.Api
         private Domain.User user;
         private readonly IEnumerable<InlineArticleSelector> inlineArticleSelectors;
 
-        public PostController(ILoadDtos dtoLoader, PostRepository postRepo, UserRepository userRepo, CommentRepostitory commentRepo, InlineArticleSelectorRepository inlineArticleSelectorRepo)
+        public PostController(ILoadDtos dtoLoader, PostRepository postRepo, UserRepository userRepo, CommentRepostitory commentRepo, 
+            InlineArticleSelectorRepository inlineArticleSelectorRepo)
         {
             this.dtoLoader = dtoLoader;
             this.postRepo = postRepo;
@@ -141,7 +142,7 @@ namespace Identity.Rest.Api
                 var doc = new HtmlDocument();
                 doc.LoadHtml(result);
                 var elm = doc.DocumentNode.SelectSingleNode(selector.Selector);
-
+                
                 if (elm == null)
                 {
                     return "";

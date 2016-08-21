@@ -36,6 +36,10 @@
     <Reference Include="Dapper">
       <HintPath>..\packages\Dapper.1.42\lib\net45\Dapper.dll</HintPath>
     </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.4.9.5, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.4.9.5\lib\Net45\HtmlAgilityPack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="log4net">
       <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
     </Reference>
@@ -57,7 +61,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoTagger.cs" />
     <Compile Include="Client.cs" />
+    <Compile Include="ConnectionFactory.cs" />
     <Compile Include="DTO\Channel.cs" />
     <Compile Include="DTO\ChannelDisplaySettings.cs" />
     <Compile Include="DTO\Comment.cs" />
@@ -68,6 +74,7 @@
     <Compile Include="DTO\User.cs" />
     <Compile Include="PerfCounter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\TagCountRepository.cs" />
     <Compile Include="Repositories\ChannelRepository.cs" />
     <Compile Include="Repositories\CommentRepostitory.cs" />
     <Compile Include="Repositories\InlineArticleSelectorRepository.cs" />
@@ -75,6 +82,9 @@
     <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Rss\RssFeedRefresher.cs" />
     <Compile Include="Rss\RssReader.cs" />
+    <Compile Include="WebScrapers\AlScraper.cs" />
+    <Compile Include="WebScrapers\IWebScraper.cs" />
+    <Compile Include="WebScrapers\WebScraperJob.cs" />
     <Compile Include="Services\DtoLoader.cs" />
     <Compile Include="Services\PostListLoader.cs" />
     <Compile Include="TagCloudRefresher.cs" />

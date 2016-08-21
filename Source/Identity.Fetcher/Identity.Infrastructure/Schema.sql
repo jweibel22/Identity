@@ -248,3 +248,24 @@ CREATE TABLE [dbo].[PostTitleWords](
 	WordId ASC, PostId ASC
 )
 ) ON [PRIMARY]
+
+CREATE TABLE [dbo].[WebScraper](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[Url] [nvarchar](255) NOT NULL,
+	[LastFetch] [datetimeoffset] NULL,
+	[Algorithm] int NOT NULL,
+ CONSTRAINT [PK_WebScraper] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)
+) ON [PRIMARY]
+
+CREATE TABLE [dbo].[WebScraperItem](
+	[WebScraperId] [bigint] NOT NULL,
+	[PostId] [bigint] NOT NULL,
+	[Created] [datetimeoffset] NULL,
+ CONSTRAINT [PK_WebScraperItem] PRIMARY KEY CLUSTERED 
+(
+	[WebScraperId] ASC, PostId ASC
+)
+) ON [PRIMARY]

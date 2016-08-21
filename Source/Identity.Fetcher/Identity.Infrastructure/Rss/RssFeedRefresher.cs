@@ -9,27 +9,34 @@ using Identity.Domain;
 using Identity.Infrastructure.Repositories;
 using log4net;
 
+
 namespace Identity.Infrastructure.Rss
 {
     public class RssFeedRefresher
     {
         private readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private readonly ChannelRepository channelRepo;
-        readonly PostRepository postRepo;
-        readonly UserRepository userRepo;
+        private readonly ConnectionFactory connectionFactory;
         private const string rssFeederUsername = "rssfeeder";
 
-        public RssFeedRefresher(PostRepository postRepo, UserRepository userRepo, ChannelRepository channelRepo)
+        public RssFeedRefresher(ConnectionFactory connectionFactory)
         {
-            this.postRepo = postRepo;
-            this.userRepo = userRepo;
-            this.channelRepo = channelRepo;
+            this.connectionFactory = connectionFactory;
         }
 
         public void Run()
         {
-            var rssFeederUser = userRepo.FindByName(rssFeederUsername);
+            User rssFeederUser;
+            IEnumerable<RssFeeder> feeders;
+
+            using (var session = connectionFactory.NewTransaction())
+            {
+                var channelRepo = new ChannelRepository(session);
+                var userRepo = new UserRepository(session);
+
+                rssFeederUser = userRepo.FindByName(rssFeederUsername);
+                feeders = channelRepo.OutOfSyncRssFeeders(TimeSpan.FromHours(1));
+            }
 
             if (rssFeederUser == null)
             {
@@ -37,32 +44,43 @@ namespace Identity.Infrastructure.Rss
                 return;
             }
 
-            var fetchRssFeedersBlock = new TransformBlock<Identity.Domain.RssFeeder, FeedX>(rssFeeder => new FeedX
+            var fetchRssFeedersBlock = new TransformBlock<Identity.Domain.RssFeeder, FeedX>(rssFeeder =>
             {
-                RssFeeder = rssFeeder,
-                ChannelIds = channelRepo.GetChannelsForRssFeeder(rssFeeder.Id).ToList(),
-                Tags = channelRepo.GetRssFeederTags(rssFeeder.Id)
+                using (var session = connectionFactory.NewTransaction())
+                {
+                    var channelRepo = new ChannelRepository(session);
+                    return new FeedX
+                    {
+                        RssFeeder = rssFeeder,
+                        ChannelIds = channelRepo.GetChannelsForRssFeeder(rssFeeder.Id).ToList(),
+                        Tags = channelRepo.GetRssFeederTags(rssFeeder.Id)
+                    };
+                }
             });
 
             var fetchFeedItemsBlock = new TransformManyBlock<FeedX, Tuple<FeedX, SyndicationItem>>(f =>
             {
-                log.Info("fetching feed " + f.RssFeeder.Url);
-                try
+                using (var session = connectionFactory.NewTransaction())
                 {
-                    var rssReader = new RssReader(f.RssFeeder.Url);
-                    var feed = rssReader.ReadRss();
-                    
-                    f.RssFeeder.LastFetch = DateTimeOffset.Now;
-                    channelRepo.UpdateRssFeeder(f.RssFeeder);
+                    log.Info("fetching feed " + f.RssFeeder.Url);
+                    var channelRepo = new ChannelRepository(session);
+                    try
+                    {
+                        var rssReader = new RssReader(f.RssFeeder.Url);
+                        var feed = rssReader.ReadRss();
 
-                    return feed.Items.Select(i => new Tuple<FeedX, SyndicationItem>(f, i));
-                }
-                catch (Exception ex)
-                {
-                    log.Error("Unable to fetch feed " + f.RssFeeder.Url, ex);
-                    return new Tuple<FeedX, SyndicationItem>[0];
-                }
+                        f.RssFeeder.LastFetch = DateTimeOffset.Now;
+                        channelRepo.UpdateRssFeeder(f.RssFeeder);
 
+                        session.Commit();
+                        return feed.Items.Select(i => new Tuple<FeedX, SyndicationItem>(f, i));                        
+                    }
+                    catch (Exception ex)
+                    {
+                        log.Error("Unable to fetch feed " + f.RssFeeder.Url, ex);
+                        return new Tuple<FeedX, SyndicationItem>[0];
+                    }
+                }
             }, new ExecutionDataflowBlockOptions
             {
                 MaxDegreeOfParallelism = 5
@@ -70,47 +88,57 @@ namespace Identity.Infrastructure.Rss
             
             var storeFeedItemBlock = new ActionBlock<Tuple<FeedX, SyndicationItem>>(t =>
             {
-                try
+                using (var session = connectionFactory.NewTransaction())
                 {
-                    var url = t.Item2.Links.First().Uri.ToString();
-                    var created = GetCreatedTime(t.Item2);
-                    var title = t.Item2.Title.Text;
+                    var channelRepo = new ChannelRepository(session);
+                    var postRepo = new PostRepository(session);
+                    var userRepo = new UserRepository(session);
+                    var autoTagger = new AutoTagger(new TagCountRepository(session), postRepo);
 
-
-                    if (postRepo.AlreadyPosted(title, created, t.Item1.RssFeeder.Id)) return;
-
-                    var post = postRepo.GetByUrl(url);
-
-                    if (post == null)
+                    try
                     {
-                        log.Info("processing item " + t.Item2.Title.Text + " from feed " + t.Item1.RssFeeder.Url);
+                        var url = t.Item2.Links.First().Uri.ToString();
+                        var created = GetCreatedTime(t.Item2);
+                        var title = t.Item2.Title.Text;
 
-                        post = new Post
+
+                        if (postRepo.FeedItemAlreadyPosted(title, created, t.Item1.RssFeeder.Id)) return;
+
+                        var post = postRepo.GetByUrl(url);
+
+                        if (post == null)
                         {
-                            Created = created,
-                            Description = GetDescription(t.Item2),
-                            Title = title,
-                            Uri = url,
-                        };
+                            //log.Info("processing item " + t.Item2.Title.Text + " from feed " + t.Item1.RssFeeder.Url);
 
-                        postRepo.AddPost(post);
+                            post = new Post
+                            {
+                                Created = created,
+                                Description = GetDescription(t.Item2),
+                                Title = title,
+                                Uri = url,
+                            };
 
-                        postRepo.TagPost(post.Id, t.Item2.Categories.Select(c => c.Name).Union(t.Item1.Tags));
+                            postRepo.AddPost(post, true);
+                            postRepo.TagPost(post.Id, t.Item2.Categories.Select(c => c.Name).Union(t.Item1.Tags));
+                            autoTagger.AutoTag(post);
+                        }
+
+                        //TODO: we should probably add this feeds tags to the post
+
+                        postRepo.AddFeedItem(t.Item1.RssFeeder.Id, post.Id, created);
+
+                        foreach (var channelId in t.Item1.ChannelIds)
+                        {
+                            userRepo.Publish(rssFeederUser.Id, channelId, post.Id);
+                        }
+
+                        session.Commit();
                     }
-
-                    //TODO: we should probably add this feeds tags to the post
-
-                    channelRepo.AddFeedItem(t.Item1.RssFeeder.Id, post.Id, created);
-
-                    foreach (var channelId in t.Item1.ChannelIds)
+                    catch (Exception ex)
                     {
-                        userRepo.Publish(rssFeederUser.Id, channelId, post.Id);
+                        log.Error("Unable store item " + t.Item2.Title.Text, ex);
                     }
                 }
-                catch (Exception ex)
-                {
-                    log.Error("Unable store item " + t.Item2.Title.Text, ex);
-                }      
             });
 
             fetchRssFeedersBlock.LinkTo(fetchFeedItemsBlock);
@@ -127,8 +155,6 @@ namespace Identity.Infrastructure.Rss
                 else storeFeedItemBlock.Complete();
             });
 
-
-            var feeders = channelRepo.OutOfSyncRssFeeders(TimeSpan.FromHours(1));
 
             foreach (var feeder in feeders)
             {
@@ -180,7 +206,7 @@ namespace Identity.Infrastructure.Rss
 
     class FeedX
     {
-        public RssFeeder RssFeeder { get; set; }
+        public Domain.RssFeeder RssFeeder { get; set; }
 
         public IEnumerable<long> ChannelIds { get; set; }
 

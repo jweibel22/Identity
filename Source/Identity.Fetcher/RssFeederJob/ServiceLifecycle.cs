@@ -7,6 +7,7 @@ using Identity.Infrastructure;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Rss;
 using Identity.Infrastructure.Services;
+using Identity.Infrastructure.WebScrapers;
 using log4net;
 using log4net.Config;
 
@@ -33,36 +34,36 @@ namespace RssFeeder
 
         public void Run()
         {
-            using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString))
+            var connectionFactory = new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
+
+            var feedRefresher = new RssFeedRefresher(connectionFactory);
+            try
             {
-                con.Open();
-                using (var transaction = con.BeginTransaction())
-                {
-                    var channelRepo = new ChannelRepository(transaction);
-                    var postRepo = new PostRepository(transaction);
-                    var userRepo = new UserRepository(transaction);
+                feedRefresher.Run();
+            }
+            catch (Exception ex)
+            {
+                log.Error("RSS feeder failed", ex);
+            }           
 
-                    var feedRefresher = new RssFeedRefresher(postRepo, userRepo, channelRepo);
-
-                    feedRefresher.Run();
-
-                    transaction.Commit();
-                }
+            var webScraperJob = new WebScraperJob(connectionFactory);
+            try
+            {
+                webScraperJob.Run();
+            }
+            catch (Exception ex)
+            {
+                log.Error("Web scraper job failed", ex);
             }
 
-            using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString))
+            var refresher = new TagCloudRefresher(connectionFactory);
+            try
             {
-                con.Open();
-                using (var transaction = con.BeginTransaction())
-                {
-                    var channelRepo = new ChannelRepository(transaction);
-             
-                    var refresher = new TagCloudRefresher(channelRepo);
-
-                    refresher.Execute();
-
-                    transaction.Commit();
-                }
+                refresher.Execute();
+            }
+            catch (Exception ex)
+            {
+                log.Error("Tag cloud refresher failed", ex);
             }
         }
     }

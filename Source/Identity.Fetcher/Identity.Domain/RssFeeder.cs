@@ -14,4 +14,20 @@ namespace Identity.Domain
 
         public DateTimeOffset? LastFetch { get; set; }
     }
+
+    public class WebScraper
+    {
+        public long Id { get; set; }
+
+        public string Url { get; set; }
+
+        public DateTimeOffset? LastFetch { get; set; }
+
+        public ScraperAlgorithm Algorithm { get; set; }
+    }
+
+    public enum ScraperAlgorithm
+    {
+        AL
+    }
 }

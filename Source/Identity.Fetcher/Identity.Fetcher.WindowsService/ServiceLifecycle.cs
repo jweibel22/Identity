@@ -7,6 +7,7 @@ using Identity.Infrastructure;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Rss;
 using Identity.Infrastructure.Services;
+using Identity.Infrastructure.WebScrapers;
 using log4net;
 using log4net.Config;
 
@@ -37,40 +38,32 @@ namespace Identity.Fetcher.WindowsService
         {
             try
             {
-                //using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString))
+
+                var connectionFactory = new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
+                //var feedRefresher = new RssFeedRefresher(connectionFactory);
+                //feedRefresher.Run();
+
+                var webscraperJob = new WebScraperJob(connectionFactory);
+                webscraperJob.Run();
+
+
+                //using (
+                //    var con =
+                //        new SqlConnection(
+                //            ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString))
                 //{
                 //    con.Open();
                 //    using (var transaction = con.BeginTransaction())
                 //    {
-                //        var channelRepo = new ChannelRepository(transaction);
-                //        var postRepo = new PostRepository(transaction);
-                //        var userRepo = new UserRepository(transaction);
+                //        //var channelRepo = new ChannelRepository(transaction);
+                //        //var postRepo = new PostRepository(transaction);
 
-                //        var feedRefresher = new RssFeedRefresher(postRepo, userRepo, channelRepo);
+                //        //var refresher = new TagCloudRefresher(channelRepo);
+                //        //refresher.Execute();
 
-                //        feedRefresher.Run();
-
-                //        transaction.Commit();
+                //    //    transaction.Commit();
                 //    }
                 //}
-
-                using (
-                    var con =
-                        new SqlConnection(
-                            ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString))
-                {
-                    con.Open();
-                    using (var transaction = con.BeginTransaction())
-                    {
-                        var channelRepo = new ChannelRepository(transaction);
-
-                        var refresher = new TagCloudRefresher(channelRepo);
-
-                        refresher.Execute();
-
-                        transaction.Commit();
-                    }
-                }
             }
             catch (Exception ex)
             {

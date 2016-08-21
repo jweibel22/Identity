@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Identity.Domain
 {
@@ -9,6 +11,14 @@ namespace Identity.Domain
         public DateTimeOffset Created { get; set; }
 
         public string Title { get; set; }
+
+        public IEnumerable<string> TokenizedTitle
+        {
+            get
+            {
+                return Title.Trim().Replace(":", "").Replace("-", " ").ToLower().Split(' ').Where(word => word.Length >= 4);
+            }
+        }
 
         public string Description { get; set; }
 

@@ -9,22 +9,29 @@ namespace Identity.Infrastructure
 {
     public class TagCloudRefresher
     {
-        private readonly ChannelRepository channelRepository;
+        private readonly ConnectionFactory connectionFactory;
 
-        public TagCloudRefresher(ChannelRepository channelRepository)
+        public TagCloudRefresher(ConnectionFactory connectionFactory)
         {
-            this.channelRepository = channelRepository;
+            this.connectionFactory = connectionFactory;
         }
 
         public void Execute()
         {
-            //TODO: this will not scale :-)
-            var allChannels = channelRepository.All();
-            
-            foreach (var channel in allChannels)
+            using (var session = connectionFactory.NewTransaction())
             {
-                var tagCloud = channelRepository.CalculateTagCloud(channel.Id).ToList();
-                channelRepository.UpdateTagCloud(channel.Id, tagCloud);
+                var channelRepo = new ChannelRepository(session);
+
+                //TODO: this will not scale :-)
+                var allChannels = channelRepo.All();
+
+                foreach (var channel in allChannels)
+                {
+                    var tagCloud = channelRepo.CalculateTagCloud(channel.Id).ToList();
+                    channelRepo.UpdateTagCloud(channel.Id, tagCloud);
+                }
+
+                session.Commit();
             }
         }
     }

@@ -215,6 +215,11 @@ where (ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId) and (co.ChannelId is n
             return con.Connection.Query<RssFeeder>("select RssFeeder.* from RssFeeder where LastFetch is null or DATEDIFF(mi, LastFetch, @Now) >= @TotalMinutes", new { DateTimeOffset.Now, timeSpan.TotalMinutes }, con);
         }
 
+        public IEnumerable<WebScraper> OutOfSyncWebScrapers(TimeSpan timeSpan)
+        {
+            return con.Connection.Query<WebScraper>("select WebScraper.* from WebScraper where LastFetch is null or DATEDIFF(mi, LastFetch, @Now) >= @TotalMinutes", new { DateTimeOffset.Now, timeSpan.TotalMinutes }, con);
+        }
+
         public void UpdateRssFeeder(RssFeeder rssFeeder)
         {
             con.Connection.Execute("update RssFeeder set LastFetch=@LastFetch, Url=@Url where Id=@Id", rssFeeder, con);
@@ -255,11 +260,6 @@ where (ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId) and (co.ChannelId is n
             {
                 con.Connection.Execute("insert FeederTags values(@RssFeederId,@Tag)", new { RssFeederId = rssFeederId, Tag = tag }, con);
             }
-        }
-
-        public void AddFeedItem(long rssFeederId, long postId, DateTimeOffset created)
-        {
-            con.Connection.Execute("update FeedItem set PostId=@PostId where PostId=@PostId and RssFeederId=@RssFeederId if @@rowcount = 0 insert FeedItem values(@RssFeederId, @PostId, @Created)", new { RssFeederId = rssFeederId, PostId = postId, Created = created }, con);
         }
 
         public IEnumerable<UnreadCount> GetUneadCounts(long userId)
