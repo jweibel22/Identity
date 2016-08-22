@@ -93,7 +93,7 @@ namespace Identity.Infrastructure.Rss
                     var channelRepo = new ChannelRepository(session);
                     var postRepo = new PostRepository(session);
                     var userRepo = new UserRepository(session);
-                    var autoTagger = new AutoTagger(new TagCountRepository(session), postRepo);
+                    //var autoTagger = new AutoTagger(new TagCountRepository(session), postRepo);
 
                     try
                     {
@@ -120,7 +120,7 @@ namespace Identity.Infrastructure.Rss
 
                             postRepo.AddPost(post, true);
                             postRepo.TagPost(post.Id, t.Item2.Categories.Select(c => c.Name).Union(t.Item1.Tags));
-                            autoTagger.AutoTag(post);
+                            //autoTagger.AutoTag(post);
                         }
 
                         //TODO: we should probably add this feeds tags to the post
