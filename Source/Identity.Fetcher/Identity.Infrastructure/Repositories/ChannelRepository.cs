@@ -59,10 +59,11 @@ namespace Identity.Infrastructure.Repositories
             using (var pc = new PerfCounter("CalculateTagCloud"))
             {
                 return 
-                    con.Connection.Query<WeightedTag>(@"select top 20 count(*) as Weight, Tag as Text from Tagged 
-                                                        left join ChannelLink cl on cl.ParentId = @ChannelId
-                                                        join ChannelItem ci on ci.PostId = Tagged.PostId and (ci.ChannelId = @ChannelId or ci.ChannelId = cl.ChildId)
-                                                        group by Tag order by COUNT(*) desc",
+                    con.Connection.Query<WeightedTag>(@"select top 20 count(*) as Weight, Tag.Name as Text from Tagged                                                       
+left join ChannelLink cl on cl.ParentId = 5
+join ChannelItem ci on ci.PostId = Tagged.PostId and (ci.ChannelId = 5 or ci.ChannelId = cl.ChildId)
+join Tag on Tag.Id = TagId
+group by Tag.Name order by COUNT(*) desc",
                         new {ChannelId = channelId}, con);
             }
         }
