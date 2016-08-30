@@ -48,7 +48,7 @@ namespace Identity.Infrastructure.WebScrapers
 
                     foreach (var article in articles)
                     {
-                        if (postRepo.WebScraperItemAlreadyPosted(article.Title, article.Updated, scraper.Id)) return;
+                        if (postRepo.WebScraperItemAlreadyPosted(article.Title, article.Updated, scraper.Id)) continue;
 
                         var post = postRepo.GetByUrl(article.Url);
 
