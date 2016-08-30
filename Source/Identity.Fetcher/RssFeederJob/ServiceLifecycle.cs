@@ -23,13 +23,13 @@ namespace RssFeeder
             XmlConfigurator.Configure();
 
             //timer = new Timer(Run, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
-            log.Info("Service started");
+            Console.WriteLine("Service started");
         }
 
         public void Stop()
         {
             //timer.Dispose();
-            log.Info("Service stopped");
+            Console.WriteLine("Service stopped");
         }
 
         public void Run()
