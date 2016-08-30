@@ -15,13 +15,13 @@ namespace RssFeeder
 {
     class ServiceLifecycle
     {
-        //private Timer timer;
         private readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-
         public void Run()
-        {
+        {            
             Console.WriteLine("Service started");
+
+            XmlConfigurator.Configure();
 
             var connectionFactory = new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
 
