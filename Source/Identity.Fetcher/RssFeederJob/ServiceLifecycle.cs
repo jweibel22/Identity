@@ -18,22 +18,11 @@ namespace RssFeeder
         //private Timer timer;
         private readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        public void Start()
-        {
-            XmlConfigurator.Configure();
-
-            //timer = new Timer(Run, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
-            Console.WriteLine("Service started");
-        }
-
-        public void Stop()
-        {
-            //timer.Dispose();
-            Console.WriteLine("Service stopped");
-        }
 
         public void Run()
         {
+            Console.WriteLine("Service started");
+
             var connectionFactory = new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
 
             var feedRefresher = new RssFeedRefresher(connectionFactory);
@@ -65,6 +54,8 @@ namespace RssFeeder
             {
                 log.Error("Tag cloud refresher failed", ex);
             }
+
+            Console.WriteLine("Service stopped");
         }
     }
 }
