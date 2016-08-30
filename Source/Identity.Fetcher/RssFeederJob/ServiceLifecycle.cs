@@ -19,8 +19,6 @@ namespace RssFeeder
 
         public void Run()
         {            
-            Console.WriteLine("Service started");
-
             XmlConfigurator.Configure();
 
             var connectionFactory = new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
@@ -28,7 +26,9 @@ namespace RssFeeder
             var feedRefresher = new RssFeedRefresher(connectionFactory);
             try
             {
+                Console.WriteLine("Rss feeder started");
                 feedRefresher.Run();
+                Console.WriteLine("Rss feeder finished");
             }
             catch (Exception ex)
             {
@@ -38,7 +38,9 @@ namespace RssFeeder
             var webScraperJob = new WebScraperJob(connectionFactory);
             try
             {
+                Console.WriteLine("Web scraper started");
                 webScraperJob.Run();
+                Console.WriteLine("Web scraper finished");
             }
             catch (Exception ex)
             {
@@ -48,14 +50,14 @@ namespace RssFeeder
             var refresher = new TagCloudRefresher(connectionFactory);
             try
             {
+                Console.WriteLine("tag cloud refresher started");
                 refresher.Execute();
+                Console.WriteLine("tag cloud refresher finished");
             }
             catch (Exception ex)
             {
                 log.Error("Tag cloud refresher failed", ex);
             }
-
-            Console.WriteLine("Service stopped");
         }
     }
 }
