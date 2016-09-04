@@ -48,9 +48,7 @@
                         <span ng-hide="post.Uri">{{post.Title}}</span>
                     </span>
 
-                    <!-- collapse="post.IsCollapsed" -->
-
-                    <div ng-bind-html="post.Description" style="margin-left: 30px;" />
+                    <div ng-bind-html="post.Description" style="margin-left: 30px;"/>
 
                     <iframe ng-show="post.EmbeddedUrl" width="560" height="315" ng-src="{{post.TrustedEmbeddedUrl}}" frameborder="0" allowfullscreen></iframe>
 
