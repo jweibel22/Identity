@@ -85,6 +85,8 @@ namespace Identity.Infrastructure.WebScrapers
                 }
 
                 session.Commit();
+
+                log.Info(String.Format("Web scraper done"));
             }
         }
     }

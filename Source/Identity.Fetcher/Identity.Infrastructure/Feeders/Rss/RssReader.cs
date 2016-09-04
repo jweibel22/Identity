@@ -12,21 +12,14 @@ namespace Identity.Infrastructure.Rss
 {
     public interface IFeederReader
     {
-        IEnumerable<FeedItem> Fetch();
+        IEnumerable<FeedItem> Fetch(string id);
     }
 
     public class RssReader : IFeederReader
     {
-        private readonly string url;
-
-        public RssReader(string url)
+        public IEnumerable<FeedItem> Fetch(string id)
         {
-            this.url = url;
-        }
-
-        public IEnumerable<FeedItem> Fetch()
-        {
-            using (var stringReader = new StringReader(ReadAll(url)))
+            using (var stringReader = new StringReader(ReadAll(id)))
             {
                 using (var xmlReader = XmlReader.Create(stringReader))
                 {

@@ -41,5 +41,7 @@ namespace Identity.Domain
         public int PosterId { get; set; }
 
         public string PosterUsername { get; set; }
+
+        public bool PremiumContent { get; set; }
     }
 }

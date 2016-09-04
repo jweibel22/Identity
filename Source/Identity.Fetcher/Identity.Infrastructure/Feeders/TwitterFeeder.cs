@@ -17,11 +17,22 @@ namespace Identity.Infrastructure.Feeders
     {
         private readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private readonly string accountName;
+        private readonly TwitterContext twitterCtx;
 
-        public TwitterFeeder(string accountName)
+        public TwitterFeeder()
         {
-            this.accountName = accountName;
+            var auth = new ApplicationOnlyAuthorizer
+            {
+                CredentialStore = new InMemoryCredentialStore
+                {
+                    ConsumerKey = "uyr3uEP6Cph7LvCcJKuYIVEMe",
+                    ConsumerSecret = "UJbPcahi6H07AlkaDLlNofBvWosHbUkOKJ0RqpRT92u8tk7Dpg"
+                }
+            };
+
+            auth.AuthorizeAsync().Wait();
+
+            twitterCtx = new TwitterContext(auth);
         }
 
         private IEnumerable<string> SubstringsStartingWith(string s, IEnumerable<string> startsWith)
@@ -52,25 +63,12 @@ namespace Identity.Infrastructure.Feeders
             return result;
         }
 
-        public IEnumerable<FeedItem> Fetch()
+        public IEnumerable<FeedItem> Fetch(string id)
         {
-            var auth = new ApplicationOnlyAuthorizer
-            {
-                CredentialStore = new InMemoryCredentialStore
-                {
-                    ConsumerKey = "uyr3uEP6Cph7LvCcJKuYIVEMe",
-                    ConsumerSecret = "UJbPcahi6H07AlkaDLlNofBvWosHbUkOKJ0RqpRT92u8tk7Dpg"
-                }
-            };
-
-            auth.AuthorizeAsync().Wait();
-
-            var twitterCtx = new TwitterContext(auth);
-
             var tweets = 
                 from tweet in twitterCtx.Status
                 where tweet.Type == StatusType.User &&
-                      tweet.ScreenName == accountName &&
+                      tweet.ScreenName == id &&
                       tweet.Count == 20
                 select tweet;
 

@@ -73,6 +73,7 @@ CREATE TABLE [dbo].[Post](
 	[Title] [nvarchar](255) NOT NULL,
 	[Description] [text] NOT NULL,
 	[Uri] [nvarchar](255) NOT NULL,
+	[PremiumContent] [bit] NOT NULL,
  CONSTRAINT [PK_Post] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC

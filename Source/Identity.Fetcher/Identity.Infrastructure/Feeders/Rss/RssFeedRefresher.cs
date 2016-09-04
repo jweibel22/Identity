@@ -17,10 +17,12 @@ namespace Identity.Infrastructure.Rss
 
         private readonly ConnectionFactory connectionFactory;
         private const string rssFeederUsername = "rssfeeder";
+        private readonly FeederFactory feederFactory;
 
         public RssFeedRefresher(ConnectionFactory connectionFactory)
         {
             this.connectionFactory = connectionFactory;
+            this.feederFactory = new FeederFactory();
         }
 
         public void Run()
@@ -48,8 +50,8 @@ namespace Identity.Infrastructure.Rss
                 log.Info("fetching feed " + rssFeeder.Url);
                 try
                 {
-                    var rssReader = GetReader(rssFeeder);
-                    var feed = rssReader.Fetch();
+                    var rssReader = feederFactory.GetReader(rssFeeder);
+                    var feed = rssReader.Fetch(rssFeeder.Url);
                     return new Tuple<RssFeeder, IEnumerable<FeedItem>>(rssFeeder, feed);
                 }
                 catch (Exception ex)
@@ -110,6 +112,7 @@ namespace Identity.Infrastructure.Rss
                                     Description = feedItem.Content,
                                     Title = feedItem.Title,
                                     Uri = url,
+                                    PremiumContent = url.Contains("protected/premium")
                                 };
 
                                 postRepo.AddPost(post, true);
@@ -156,15 +159,27 @@ namespace Identity.Infrastructure.Rss
 
             storeFeedItemBlock.Completion.Wait();
         }
+    }
 
-        private IFeederReader GetReader(RssFeeder feeder)
+    class FeederFactory
+    {
+        private readonly TwitterFeeder twitter;
+        private readonly RssReader rss;
+
+        public FeederFactory()
+        {
+            twitter = new TwitterFeeder();
+            rss = new RssReader();
+        }
+
+        public IFeederReader GetReader(RssFeeder feeder)
         {
             switch (feeder.Type)
             {
                 case FeederType.Rss:
-                    return new RssReader(feeder.Url);
+                    return rss;
                 case FeederType.Twitter:
-                    return new TwitterFeeder(feeder.Url);
+                    return twitter;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

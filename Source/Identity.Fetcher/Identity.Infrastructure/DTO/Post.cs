@@ -38,6 +38,8 @@ namespace Identity.Infrastructure.DTO
 
     public class Post
     {
+        private string _title;
+
         public Post()
         {
             Tags = new List<string>();
@@ -47,7 +49,15 @@ namespace Identity.Infrastructure.DTO
 
         public long Id { get; set; }
 
-        public string Title { get; set; }
+        public string Title
+        {
+            get
+            {
+                var prefix = PremiumContent ? "[Premium] " : "";
+                return prefix + _title;
+            }
+            set { _title = value; }
+        }
 
         public string Uri { get; set; }
 
@@ -94,6 +104,8 @@ namespace Identity.Infrastructure.DTO
         public string EmbeddedUrl { get; set; }
 
         public bool CanBeInlined { get; set; }
+
+        public bool PremiumContent { get; set; }
     }
 
     public class ChannelReference
