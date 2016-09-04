@@ -115,7 +115,7 @@ namespace Identity.Infrastructure.Repositories
                 var wordId = con.Connection.Query<long>("select Id from Word where Contents=@Word", new { Word = token }, con).Single();
                 con.Connection.Execute("update PostTitleWords set Count=Count+1 where PostId=@PostId and WordId=@WordId if @@rowcount = 0 insert PostTitleWords (PostId,WordId) values(@PostId,@WordId)", new { PostId = post.Id, WordId = wordId }, con);
             }
-        }
+        }        
 
         //TODO: add paging here
         public IEnumerable<Post> FindByTitleOrTag(string tag)
@@ -204,7 +204,7 @@ namespace Identity.Infrastructure.Repositories
         {
             using (var pc = new PerfCounter("Tags"))
             {
-                return con.Connection.Query<Tagged>("select Tagged.PostId, Tag.Name as Tag from Tagged join Tag on Tag.Id = Tagged.TagId where Tagged.PostId in @PostIds", new { PostIds = postIds },
+                return con.Connection.Query<Tagged>("select Tagged.PostId, Tag.Name as Tag, Tag.Id as TagId from Tagged join Tag on Tag.Id = Tagged.TagId where Tagged.PostId in @PostIds", new { PostIds = postIds },
                     con);
             }
         }

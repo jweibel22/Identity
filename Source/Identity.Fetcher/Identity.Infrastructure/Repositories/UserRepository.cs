@@ -156,6 +156,22 @@ namespace Identity.Infrastructure.Repositories
                         group by Tag.Name order by COUNT(*) desc", new { UserId = userId, ForUserId = forUserId }, con);
         }
 
+        public void BlockTag(long userId, string tag)
+        {
+            var tagIds = con.Connection.Query<long>("select Id from tag where Name = @Tag", new { Tag = tag }, con).ToList();
+            if (tagIds.Any())
+            {
+                con.Connection.Execute(
+                    "update BlockedTag set UserId=@UserId where UserId=@UserId and TagId=@TagId if @@rowcount = 0 insert BlockedTag values(@UserId, @TagId)",
+                    new {UserId = userId, TagId = tagIds.First() }, con);
+            }
+        }
+
+        public IEnumerable<long> BlockedTagIds(long userId)
+        {
+            return con.Connection.Query<long>("select TagId from BlockedTag where UserId = @UserId", new { UserId = userId }, con);
+        }
+
         public void Dispose()
         {
             

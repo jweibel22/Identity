@@ -24,9 +24,9 @@ namespace Identity.Infrastructure.WebScrapers
         {
             using (var session = connectionFactory.NewTransaction())
             {
-                var channelRepo = new ChannelRepository(session);
-                var userRepo = new UserRepository(session);
-                var postRepo = new PostRepository(session);
+                var channelRepo = new ChannelRepository(session.Transaction);
+                var userRepo = new UserRepository(session.Transaction);
+                var postRepo = new PostRepository(session.Transaction);
 
                 var rssFeederUser = userRepo.FindByName(rssFeederUsername);
 

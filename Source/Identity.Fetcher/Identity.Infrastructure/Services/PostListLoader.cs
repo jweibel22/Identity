@@ -18,13 +18,15 @@ namespace Identity.Infrastructure.Services
         private readonly PostRepository postRepo;
         private readonly CommentRepostitory commentRepo;
         private readonly ChannelRepository channelRepo;
+        private readonly UserRepository userRepo;
         private readonly IEnumerable<InlineArticleSelector> inlineArticleSelectors;
 
-        public PostListLoader(ChannelRepository channelRepo, CommentRepostitory commentRepo, PostRepository postRepo, InlineArticleSelectorRepository inlineArticleSelectorRepo)
+        public PostListLoader(ChannelRepository channelRepo, CommentRepostitory commentRepo, PostRepository postRepo, InlineArticleSelectorRepository inlineArticleSelectorRepo, UserRepository userRepo)
         {
             this.channelRepo = channelRepo;
             this.commentRepo = commentRepo;
             this.postRepo = postRepo;
+            this.userRepo = userRepo;
             this.inlineArticleSelectors = inlineArticleSelectorRepo.GetAll();
         }
 
@@ -42,9 +44,12 @@ namespace Identity.Infrastructure.Services
             var posts = postRepo.PostsFromChannel(user.Id, onlyUnread, channel.Id, timestamp, 0, orderBy, pageSize).ToList();
             var postIds = posts.Select(p => p.Id).ToList();
             var allTags = postRepo.Tags(postIds).ToList();
+            var blockedTags = userRepo.BlockedTagIds(user.Id);
             var commentCounts = commentRepo.CommentCount(postIds).ToList();
             var publishedIns = postRepo.PublishedIn(postIds, user.Id).ToList();
-            var result = posts.Select(Mapper.Map<DTO.Post>).ToList();
+            var result = posts
+                .Where(p => !allTags.Where(t => t.PostId == p.Id).Select(t => t.TagId).Intersect(blockedTags).Any())
+                .Select(Mapper.Map<DTO.Post>).ToList();
             foreach (var p in result)
             {
                 p.Tags = allTags.Where(t => t.PostId == p.Id).Select(t => t.Tag).ToList();

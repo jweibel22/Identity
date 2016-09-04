@@ -1,5 +1,8 @@
 using System;
+using System.ServiceModel.Syndication;
+using AutoMapper;
 using Identity.Domain;
+using Identity.Infrastructure.Feeders;
 
 namespace Identity.Rest
 {
@@ -32,7 +35,10 @@ namespace Identity.Rest
                 .ForMember(x => x.text, _ => _.MapFrom(src => src.Text));
 
             AutoMapper.Mapper.CreateMap<ChannelDisplaySettings, Infrastructure.DTO.ChannelDisplaySettings>();
-            AutoMapper.Mapper.CreateMap<Infrastructure.DTO.ChannelDisplaySettings, ChannelDisplaySettings>();
+            Mapper.CreateMap<Infrastructure.DTO.ChannelDisplaySettings, ChannelDisplaySettings>();
+
+            //Mapper.CreateMap<SyndicationItem, FeedItem>()
+            //    .ForMember(x => x.weight, _ => _.MapFrom(src => src.Weight));
         }
 
         private static string MapEmbeddedUrl(Post post)

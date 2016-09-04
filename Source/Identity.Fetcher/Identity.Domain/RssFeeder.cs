@@ -13,6 +13,13 @@ namespace Identity.Domain
         public string Url { get; set; }
 
         public DateTimeOffset? LastFetch { get; set; }
+
+        public FeederType Type { get; set; }
+    }
+
+    public enum FeederType
+    {
+        Rss, Twitter
     }
 
     public class WebScraper

@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Reflection;
 using System.Threading;
 using Identity.Infrastructure;
+using Identity.Infrastructure.Feeders;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Rss;
 using Identity.Infrastructure.Services;
@@ -36,39 +37,76 @@ namespace Identity.Fetcher.WindowsService
 
         private void Run(object state)
         {
+
+            //var items = new TwitterFeeder().Fetch();
+
+
+            var connectionFactory = new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
+
+            var feedRefresher = new RssFeedRefresher(connectionFactory);
             try
             {
-
-                var connectionFactory = new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
-                //var feedRefresher = new RssFeedRefresher(connectionFactory);
-                //feedRefresher.Run();
-
-                var webscraperJob = new WebScraperJob(connectionFactory);
-                webscraperJob.Run();
-
-
-                //using (
-                //    var con =
-                //        new SqlConnection(
-                //            ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString))
-                //{
-                //    con.Open();
-                //    using (var transaction = con.BeginTransaction())
-                //    {
-                //        //var channelRepo = new ChannelRepository(transaction);
-                //        //var postRepo = new PostRepository(transaction);
-
-                //        //var refresher = new TagCloudRefresher(channelRepo);
-                //        //refresher.Execute();
-
-                //    //    transaction.Commit();
-                //    }
-                //}
+                feedRefresher.Run();
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                log.Error("RSS feeder failed", ex);
             }
+
+            //var webScraperJob = new WebScraperJob(connectionFactory);
+            //try
+            //{
+            //    webScraperJob.Run();
+            //}
+            //catch (Exception ex)
+            //{
+            //    log.Error("Web scraper job failed", ex);
+            //}
+
+            //var refresher = new TagCloudRefresher(connectionFactory);
+            //try
+            //{
+            //    refresher.Execute();
+            //}
+            //catch (Exception ex)
+            //{
+            //    log.Error("Tag cloud refresher failed", ex);
+            //}
+
+
+            //try
+            //{
+
+            //    var connectionFactory = new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
+            //    //var feedRefresher = new RssFeedRefresher(connectionFactory);
+            //    //feedRefresher.Run();
+
+            //    var webscraperJob = new WebScraperJob(connectionFactory);
+            //    webscraperJob.Run();
+
+
+            //    //using (
+            //    //    var con =
+            //    //        new SqlConnection(
+            //    //            ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString))
+            //    //{
+            //    //    con.Open();
+            //    //    using (var transaction = con.BeginTransaction())
+            //    //    {
+            //    //        //var channelRepo = new ChannelRepository(transaction);
+            //    //        //var postRepo = new PostRepository(transaction);
+
+            //    //        //var refresher = new TagCloudRefresher(channelRepo);
+            //    //        //refresher.Execute();
+
+            //    //    //    transaction.Commit();
+            //    //    }
+            //    //}
+            //}
+            //catch (Exception ex)
+            //{
+            //    log.Error(ex);
+            //}
         }
     }
 }

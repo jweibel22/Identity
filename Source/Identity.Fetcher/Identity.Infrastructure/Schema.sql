@@ -100,6 +100,7 @@ CREATE TABLE [dbo].[RssFeeder](
 	[Id] [bigint] IDENTITY(1,1) NOT NULL,
 	[Url] [nvarchar](255) NOT NULL,
 	[LastFetch] [datetimeoffset] NULL,
+	[Type] [int] NOT NULL,
  CONSTRAINT [PK_RssFeeder] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -267,5 +268,14 @@ CREATE TABLE [dbo].[WebScraperItem](
  CONSTRAINT [PK_WebScraperItem] PRIMARY KEY CLUSTERED 
 (
 	[WebScraperId] ASC, PostId ASC
+)
+) ON [PRIMARY]
+
+CREATE TABLE [dbo].[BlockedTag](
+	[UserId] [bigint] NOT NULL,
+	[TagId] [bigint] NOT NULL,
+ CONSTRAINT [PK_BlockedTag] PRIMARY KEY CLUSTERED 
+(
+	UserId ASC, TagId ASC
 )
 ) ON [PRIMARY]

@@ -98,5 +98,12 @@ namespace Identity.Rest.Api
 
             return userRepo.SearchByName(query).Select(x => Map(x, user)).ToList();
         }
+
+        [HttpPost]
+        [Route("Api/User/{id}/Block")]
+        public void Block(long id, string tag)
+        {
+            userRepo.BlockTag(id, tag);
+        }
     }
 }

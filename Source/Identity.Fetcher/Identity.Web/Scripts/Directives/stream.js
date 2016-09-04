@@ -234,6 +234,10 @@
                     channelSelectorService.selectChannel($scope.user.Owns, function(id) { postService.savePost(id, post); });
                 }
 
+                $scope.block = function(tag) {
+                    userService.block($scope.user.Id, tag);
+                }
+
                 if ($scope.channel) {
                     $scope.reloadPosts();
                 }

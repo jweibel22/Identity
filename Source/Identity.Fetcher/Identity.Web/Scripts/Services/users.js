@@ -28,5 +28,9 @@ angular.module('inspire').factory('userService', ['$http', '$q', 'ngSettings', f
         });
     }
 
+    o.block = function (userId, tag) {
+        return $http.post(ngSettings.baseUrl + '/Api/User/' + userId + '/Block?tag=' + tag);
+    }
+
     return o;
 }]);

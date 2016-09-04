@@ -20,7 +20,7 @@ namespace Identity.Infrastructure
         {
             using (var session = connectionFactory.NewTransaction())
             {
-                var channelRepo = new ChannelRepository(session);
+                var channelRepo = new ChannelRepository(session.Transaction);
 
                 //TODO: this will not scale :-)
                 var allChannels = channelRepo.All();
