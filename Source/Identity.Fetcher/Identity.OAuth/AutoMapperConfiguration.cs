@@ -28,7 +28,7 @@ namespace Identity.Rest
             AutoMapper.Mapper.CreateMap<Comment, Infrastructure.DTO.Comment>()
                 .ForMember(x => x.Body, _ => _.MapFrom(src => src.Text));
 
-            AutoMapper.Mapper.CreateMap<RssFeeder, Infrastructure.DTO.RssFeeder>();
+            AutoMapper.Mapper.CreateMap<Feed, Infrastructure.DTO.RssFeeder>();
 
             AutoMapper.Mapper.CreateMap<WeightedTag, Infrastructure.DTO.WeightedTag>()
                 .ForMember(x => x.weight, _ => _.MapFrom(src => src.Weight))

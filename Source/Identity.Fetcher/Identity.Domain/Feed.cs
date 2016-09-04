@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Identity.Domain
 {
-    public class RssFeeder
+    public class Feed
     {
         public long Id { get; set; }
 
@@ -14,10 +14,10 @@ namespace Identity.Domain
 
         public DateTimeOffset? LastFetch { get; set; }
 
-        public FeederType Type { get; set; }
+        public FeedType Type { get; set; }
     }
 
-    public enum FeederType
+    public enum FeedType
     {
         Rss, Twitter
     }

@@ -28,7 +28,7 @@ namespace Identity.Infrastructure.Rss
         public void Run()
         {
             User rssFeederUser;
-            IEnumerable<RssFeeder> feeders;
+            IEnumerable<Feed> feeders;
 
             using (var session = connectionFactory.NewTransaction())
             {
@@ -36,7 +36,7 @@ namespace Identity.Infrastructure.Rss
                 var userRepo = new UserRepository(session.Transaction);
 
                 rssFeederUser = userRepo.FindByName(rssFeederUsername);
-                feeders = channelRepo.OutOfSyncRssFeeders(TimeSpan.FromHours(1));
+                feeders = channelRepo.OutOfSyncFeeds(TimeSpan.FromHours(1));
             }
 
             if (rssFeederUser == null)
@@ -45,26 +45,26 @@ namespace Identity.Infrastructure.Rss
                 return;
             }
 
-            var fetchFeedItemsBlock = new TransformBlock<RssFeeder, Tuple<RssFeeder, IEnumerable<FeedItem>>>(rssFeeder =>
+            var fetchFeedItemsBlock = new TransformBlock<Feed, Tuple<Feed, IEnumerable<FeedItem>>>(rssFeeder =>
             {
                 log.Info("fetching feed " + rssFeeder.Url);
                 try
                 {
                     var rssReader = feederFactory.GetReader(rssFeeder);
                     var feed = rssReader.Fetch(rssFeeder.Url);
-                    return new Tuple<RssFeeder, IEnumerable<FeedItem>>(rssFeeder, feed);
+                    return new Tuple<Feed, IEnumerable<FeedItem>>(rssFeeder, feed);
                 }
                 catch (Exception ex)
                 {
                     log.Error("Unable to fetch feed " + rssFeeder.Url, ex);
-                    return new Tuple<RssFeeder, IEnumerable<FeedItem>>(rssFeeder, new List<FeedItem>());
+                    return new Tuple<Feed, IEnumerable<FeedItem>>(rssFeeder, new List<FeedItem>());
                 }
             }, new ExecutionDataflowBlockOptions
             {
                 MaxDegreeOfParallelism = 5
             });
 
-            var storeFeedItemBlock = new ActionBlock<Tuple<RssFeeder, IEnumerable<FeedItem>>>(t =>
+            var storeFeedItemBlock = new ActionBlock<Tuple<Feed, IEnumerable<FeedItem>>>(t =>
             {
                 if (!t.Item2.Any())
                 {
@@ -80,17 +80,17 @@ namespace Identity.Infrastructure.Rss
 
                     log.Info("Processing feed items from feed " + t.Item1.Url);
 
-                    var channelIds = channelRepo.GetChannelsForRssFeeder(t.Item1.Id).ToList();
+                    var channelIds = channelRepo.GetChannelsForFeed(t.Item1.Id).ToList();
 
                     if (!channelIds.Any())
                     {
                         return;
                     }
 
-                    var tags = channelRepo.GetRssFeederTags(t.Item1.Id);
+                    var tags = channelRepo.GetFeedTags(t.Item1.Id);
 
                     t.Item1.LastFetch = DateTimeOffset.Now;
-                    channelRepo.UpdateRssFeeder(t.Item1);
+                    channelRepo.UpdateFeed(t.Item1);
 
                     try
                     {
@@ -172,13 +172,13 @@ namespace Identity.Infrastructure.Rss
             rss = new RssReader();
         }
 
-        public IFeederReader GetReader(RssFeeder feeder)
+        public IFeederReader GetReader(Feed feeder)
         {
             switch (feeder.Type)
             {
-                case FeederType.Rss:
+                case FeedType.Rss:
                     return rss;
-                case FeederType.Twitter:
+                case FeedType.Twitter:
                     return twitter;
                 default:
                     throw new ArgumentOutOfRangeException();

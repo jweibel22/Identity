@@ -38,13 +38,13 @@ namespace Identity.Rest.Api
         [HttpGet]
         public RssFeeder Get(long id)
         {
-            return dtoLoader.LoadRssFeeder(channelRepo.RssFeederById(id));
+            return dtoLoader.LoadRssFeeder(channelRepo.FeedById(id));
         }
 
         [HttpPut]
         public void Update(long id, RssFeeder rssFeeder)
         {
-            channelRepo.UpdateTagsOfRssFeeder(id, rssFeeder.Tags);
+            channelRepo.UpdateTagsOfFeed(id, rssFeeder.Tags);
         }
     }
 }

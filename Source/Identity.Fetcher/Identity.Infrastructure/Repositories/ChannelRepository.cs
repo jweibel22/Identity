@@ -5,7 +5,6 @@ using System.Linq;
 using Dapper;
 using Identity.Domain;
 using Channel = Identity.Domain.Channel;
-using RssFeeder = Identity.Domain.RssFeeder;
 using Newtonsoft.Json;
 
 namespace Identity.Infrastructure.Repositories
@@ -112,11 +111,11 @@ group by Tag.Name order by COUNT(*) desc",
         {
             con.Connection.Execute("update Channel set Name=@Name, IsPublic=@IsPublic where Id=@Id", channel, con);
 
-            RemoveAllFeeders(channel.Id);
+            RemoveAllFeeds(channel.Id);
 
             foreach (var url in rssFeeders)
             {
-                FeedInto(RssFeederByUrl(url).Id, channel.Id);
+                FeedInto(FeedByUrl(url).Id, channel.Id);
             }
 
             con.Connection.Execute("delete from ChannelLink where ParentId = @ParentId ", new { ParentId = channel.Id }, con);
@@ -164,9 +163,9 @@ group by Tag.Name order by COUNT(*) desc",
             con.Connection.Execute("update ChannelLink set ChildId=@ChildId where ChildId=@ChildId and ParentId=@ParentId if @@rowcount = 0 insert ChannelLink values(@ParentId, @ChildId)", new { ParentId = parentId, ChildId = childId }, con);
         }
 
-        public RssFeeder RssFeederById(long id)
+        public Feed FeedById(long id)
         {
-            return con.Connection.Query<RssFeeder>("select * from RssFeeder where Id=@Id", new { Id = id }, con).SingleOrDefault();
+            return con.Connection.Query<Feed>("select * from RssFeeder where Id=@Id", new { Id = id }, con).SingleOrDefault();
         }
 
         public void MarkAllAsRead(long userId, long channelId)
@@ -190,13 +189,13 @@ where (ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId) and (co.ChannelId is n
             }, con);            
         }
 
-        public RssFeeder RssFeederByUrl(string url)
+        public Feed FeedByUrl(string url)
         {
-            var rssFeeder = con.Connection.Query<RssFeeder>("select * from RssFeeder where Url=@Url", new { Url = url }, con).SingleOrDefault();
+            var rssFeeder = con.Connection.Query<Feed>("select * from RssFeeder where Url=@Url", new { Url = url }, con).SingleOrDefault();
 
             if (rssFeeder == null)
             {
-                rssFeeder = new RssFeeder
+                rssFeeder = new Feed
                 {
                     Url = url
                 };
@@ -206,14 +205,14 @@ where (ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId) and (co.ChannelId is n
             return rssFeeder;
         }
 
-        public IEnumerable<RssFeeder> AllRssFeeders()
+        public IEnumerable<Feed> AllFeeds()
         {
-            return con.Connection.Query<RssFeeder>("select RssFeeder.* from RssFeeder", null, con);
+            return con.Connection.Query<Feed>("select RssFeeder.* from RssFeeder", null, con);
         }
 
-        public IEnumerable<RssFeeder> OutOfSyncRssFeeders(TimeSpan timeSpan)
+        public IEnumerable<Feed> OutOfSyncFeeds(TimeSpan timeSpan)
         {
-            return con.Connection.Query<RssFeeder>("select RssFeeder.* from RssFeeder where LastFetch is null or DATEDIFF(mi, LastFetch, @Now) >= @TotalMinutes", new { DateTimeOffset.Now, timeSpan.TotalMinutes }, con);
+            return con.Connection.Query<Feed>("select RssFeeder.* from RssFeeder where LastFetch is null or DATEDIFF(mi, LastFetch, @Now) >= @TotalMinutes", new { DateTimeOffset.Now, timeSpan.TotalMinutes }, con);
         }
 
         public IEnumerable<WebScraper> OutOfSyncWebScrapers(TimeSpan timeSpan)
@@ -221,20 +220,20 @@ where (ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId) and (co.ChannelId is n
             return con.Connection.Query<WebScraper>("select WebScraper.* from WebScraper where LastFetch is null or DATEDIFF(mi, LastFetch, @Now) >= @TotalMinutes", new { DateTimeOffset.Now, timeSpan.TotalMinutes }, con);
         }
 
-        public void UpdateRssFeeder(RssFeeder rssFeeder)
+        public void UpdateFeed(Feed feed)
         {
-            con.Connection.Execute("update RssFeeder set LastFetch=@LastFetch, Url=@Url where Id=@Id", rssFeeder, con);
+            con.Connection.Execute("update RssFeeder set LastFetch=@LastFetch, Url=@Url where Id=@Id", feed, con);
         }
 
-        public IEnumerable<RssFeeder> GetRssFeedersForChannel(long channelId)
+        public IEnumerable<Feed> GetFeedsForChannel(long channelId)
         {
-            using (var pc = new PerfCounter("GetRssFeedersForChannel"))
+            using (var pc = new PerfCounter("GetFeedsForChannel"))
             { 
-                return con.Connection.Query<RssFeeder>("select RssFeeder.* from RssFeeder join FeedInto on FeedInto.RssFeederId = RssFeeder.Id and FeedInto.ChannelId=@Id", new { Id = channelId }, con);
+                return con.Connection.Query<Feed>("select RssFeeder.* from RssFeeder join FeedInto on FeedInto.RssFeederId = RssFeeder.Id and FeedInto.ChannelId=@Id", new { Id = channelId }, con);
             }           
         }
 
-        public IEnumerable<long> GetChannelsForRssFeeder(long rssFeederId)
+        public IEnumerable<long> GetChannelsForFeed(long rssFeederId)
         {
             return con.Connection.Query<long>("select ChannelId from FeedInto where RssFeederId = @RssFeederId", new { RssFeederId = rssFeederId }, con);
         }
@@ -244,17 +243,17 @@ where (ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId) and (co.ChannelId is n
             con.Connection.Execute("update FeedInto set ChannelId=@ChannelId where ChannelId=@ChannelId and RssFeederId=@RssFeederId if @@rowcount = 0 insert FeedInto values(@RssFeederId, @ChannelId)", new { ChannelId = channelId, RssFeederId = rssFeederId }, con);            
         }
 
-        public void RemoveAllFeeders(long channelId)
+        public void RemoveAllFeeds(long channelId)
         {
             con.Connection.Execute("delete from FeedInto where ChannelId=@ChannelId", new { ChannelId = channelId }, con);            
         }
 
-        public IEnumerable<string> GetRssFeederTags(long rssFeederId)
+        public IEnumerable<string> GetFeedTags(long rssFeederId)
         {
             return con.Connection.Query<string>("select Tag from FeederTags where RssFeederId=@RssFeederId", new { RssFeederId = rssFeederId }, con);
         }
 
-        public void UpdateTagsOfRssFeeder(long rssFeederId, IEnumerable<string> tags)
+        public void UpdateTagsOfFeed(long rssFeederId, IEnumerable<string> tags)
         {
             con.Connection.Execute("delete from FeederTags where RssFeederId=@RssFeederId", new { RssFeederId = rssFeederId }, con);
             foreach (var tag in tags)

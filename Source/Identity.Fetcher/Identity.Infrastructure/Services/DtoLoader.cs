@@ -8,7 +8,6 @@ using Identity.Infrastructure.DTO;
 using Identity.Infrastructure.Repositories;
 using Channel = Identity.Domain.Channel;
 using Post = Identity.Domain.Post;
-using RssFeeder = Identity.Domain.RssFeeder;
 using User = Identity.Domain.User;
 
 namespace Identity.Infrastructure.Services
@@ -23,7 +22,7 @@ namespace Identity.Infrastructure.Services
 
         IEnumerable<DTO.Channel> LoadChannelList(User user, IEnumerable<Channel> channels);
 
-        DTO.RssFeeder LoadRssFeeder(RssFeeder rssFeeder);
+        DTO.RssFeeder LoadRssFeeder(Feed feed);
     }
 
 
@@ -76,10 +75,10 @@ namespace Identity.Infrastructure.Services
             p.Tags = postRepo.Tags(p.Id).Select(t => t.Tag).ToList();
         }
 
-        public DTO.RssFeeder LoadRssFeeder(RssFeeder rssFeeder)
+        public DTO.RssFeeder LoadRssFeeder(Feed feed)
         {
-            var result = Mapper.Map<DTO.RssFeeder>(rssFeeder);
-            result.Tags = channelRepo.GetRssFeederTags(rssFeeder.Id).ToList();
+            var result = Mapper.Map<DTO.RssFeeder>(feed);
+            result.Tags = channelRepo.GetFeedTags(feed.Id).ToList();
             return result;
         }
 
@@ -93,7 +92,7 @@ namespace Identity.Infrastructure.Services
             var result = Mapper.Map<DTO.Channel>(channel);
 
             //result.UnreadCount = channelRepo.UnreadCount(user.Id, result.Id);
-            result.RssFeeders = channelRepo.GetRssFeedersForChannel(channel.Id).Select(Mapper.Map<DTO.RssFeeder>).ToList();
+            result.RssFeeders = channelRepo.GetFeedsForChannel(channel.Id).Select(Mapper.Map<DTO.RssFeeder>).ToList();
             result.TagCloud = channelRepo.GetTagCloud(channel.Id).Select(Mapper.Map<DTO.WeightedTag>).ToList();
             result.Subscriptions = channelRepo.GetSubscriptions(channel.Id).Select(Mapper.Map<DTO.Channel>).ToList();
             result.DisplaySettings = Mapper.Map <DTO.ChannelDisplaySettings>(channelRepo.GetChannelDisplaySettings(user.Id, channel.Id));
