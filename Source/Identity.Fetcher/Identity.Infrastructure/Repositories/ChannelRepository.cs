@@ -4,8 +4,11 @@ using System.Data;
 using System.Linq;
 using Dapper;
 using Identity.Domain;
+using Identity.Infrastructure.DTO;
 using Channel = Identity.Domain.Channel;
 using Newtonsoft.Json;
+using ChannelDisplaySettings = Identity.Domain.ChannelDisplaySettings;
+using WeightedTag = Identity.Domain.WeightedTag;
 
 namespace Identity.Infrastructure.Repositories
 {
@@ -107,15 +110,20 @@ group by Tag.Name order by COUNT(*) desc",
             channel.Id = con.Connection.Query<int>("insert Channel values (@Name, @Created, @IsPublic, @OrderBy, @ListType, @ShowOnlyUnread); SELECT CAST(SCOPE_IDENTITY() as bigint)", channel, con).Single();
         }
 
-        public void UpdateChannel(Channel channel, IEnumerable<string> rssFeeders, IEnumerable<long> subscriptions)
+        public void UpdateChannel(Channel channel, IEnumerable<Feed> feeds, IEnumerable<long> subscriptions)
         {
             con.Connection.Execute("update Channel set Name=@Name, IsPublic=@IsPublic where Id=@Id", channel, con);
 
             RemoveAllFeeds(channel.Id);
 
-            foreach (var url in rssFeeders)
-            {
-                FeedInto(FeedByUrl(url).Id, channel.Id);
+            foreach (var feed in feeds)
+            {                
+                if (feed.Id == 0)
+                {
+                    AddFeed(feed);
+                }
+
+                FeedInto(feed.Id, channel.Id);
             }
 
             con.Connection.Execute("delete from ChannelLink where ParentId = @ParentId ", new { ParentId = channel.Id }, con);
@@ -193,16 +201,19 @@ where (ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId) and (co.ChannelId is n
         {
             var rssFeeder = con.Connection.Query<Feed>("select * from RssFeeder where Url=@Url", new { Url = url }, con).SingleOrDefault();
 
-            if (rssFeeder == null)
+            return rssFeeder;
+        }
+
+        public Feed AddFeed(Feed feed)
+        {
+            if (feed.Id != 0)
             {
-                rssFeeder = new Feed
-                {
-                    Url = url
-                };
-                rssFeeder.Id = con.Connection.Query<int>("insert RssFeeder values (@Url,NULL); SELECT CAST(SCOPE_IDENTITY() as bigint)", rssFeeder, con).Single();
+                throw new Exception("Feed already added");
             }
 
-            return rssFeeder;
+            feed.Id = con.Connection.Query<int>("insert RssFeeder (Url,[Type]) values (@Url,@Type); SELECT CAST(SCOPE_IDENTITY() as bigint)", feed, con).Single();
+            
+            return feed;
         }
 
         public IEnumerable<Feed> AllFeeds()

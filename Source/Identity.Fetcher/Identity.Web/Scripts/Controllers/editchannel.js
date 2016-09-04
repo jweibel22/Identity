@@ -4,8 +4,15 @@
 
             $scope.channel = channelService.editchannel;
 
+            $scope.feedTypes = ["Rss", "Twitter"];
+            $scope.feedType = "Rss";
+
             $scope.addRssFeeder = function() {
-                $scope.channel.RssFeeders.push({ Url: $scope.rssfeederUrl });
+                $scope.channel.RssFeeders.push({ Url: $scope.rssfeederUrl, Type: $scope.feedType });
+            }
+
+            $scope.changeFeedType = function (feedType) {
+                $scope.feedType = feedType;
             }
 
             $scope.removeRssFeeder = function (rssFeeder) {

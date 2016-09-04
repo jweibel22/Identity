@@ -11,11 +11,15 @@ using System.Security.Claims;
 using System.Web.Http;
 using AutoMapper;
 using CsQuery;
+using Identity.Domain;
 using Identity.Infrastructure.DTO;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
 using Identity.OAuth;
 using log4net;
+using Channel = Identity.Infrastructure.DTO.Channel;
+using ChannelDisplaySettings = Identity.Infrastructure.DTO.ChannelDisplaySettings;
+using Post = Identity.Infrastructure.DTO.Post;
 
 namespace Identity.Rest.Api
 {
@@ -142,7 +146,7 @@ namespace Identity.Rest.Api
             c.IsPublic = !channel.IsPrivate;
             c.Name = channel.Name;
 
-            channelRepo.UpdateChannel(c, channel.RssFeeders.Select(f => f.Url), channel.Subscriptions.Select(x => x.Id));
+            channelRepo.UpdateChannel(c, channel.RssFeeders.Select(f => new Feed {Id = f.Id, Url = f.Url, Type = f.Type}), channel.Subscriptions.Select(x => x.Id));
 
             return dtoLoader.LoadChannel(user, channelRepo.GetById(id));
         }

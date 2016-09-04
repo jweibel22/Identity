@@ -77,7 +77,7 @@ namespace Identity.Infrastructure.Feeders
             return x.Select(i => new FeedItem
             {
                 CreatedAt = i.CreatedAt,
-                Title = RemoveAll(i.Text, SubstringsStartingWith(i.Text, new [] { "@", "http://", "https://" })).Trim(),
+                Title = RemoveAll(i.Text, SubstringsStartingWith(i.Text, new [] { "http://", "https://" })).Trim(),
                 Content = "",
                 Links = i.Entities.UrlEntities.Select(e => new Uri(e.Url)),
                 Tags = i.Entities.HashTagEntities.Select(e => e.Tag)
