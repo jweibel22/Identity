@@ -144,7 +144,17 @@ namespace Identity.Infrastructure.Repositories
             public int Popularity { get; set; }
         }
 
-        public IEnumerable<Post> PostsFromChannel(long userId, bool onlyUnread, long channelId, DateTimeOffset timestamp, int fromIndex, string orderBy, int pageSize)
+        public IEnumerable<Post> UnreadPostsFromChannel(long userId, long channelId, string orderBy, int count)
+        {
+            return PostsFromChannel("FetchUnreadPostIds", userId, channelId, 0, orderBy, count);
+        }
+
+        public IEnumerable<Post> PostsFromChannel(long userId, long channelId, int fromIndex, string orderBy, int pageSize)
+        {
+            return PostsFromChannel("FetchPostIds", userId, channelId, fromIndex, orderBy, pageSize);
+        }
+
+        private IEnumerable<Post> PostsFromChannel(string sp, long userId, long channelId, int fromIndex, string orderBy, int pageSize)
         {
             int orderByColumn;
 
@@ -158,16 +168,14 @@ namespace Identity.Infrastructure.Repositories
                     break;
                 default:
                     throw new Exception("Unrecognized sort column " + orderBy);
-            }           
+            }
 
-            var sp = onlyUnread ? "FetchUnreadPostIds" : "FetchPostIds";
-
-            var channelQueryResult = con.Connection.Query<ChannelQueryResult>(sp, 
-                new { ChannelId = channelId, UserId = userId, FromIndex = fromIndex, PageSize = pageSize, OrderByColumn = orderByColumn }, 
+            var channelQueryResult = con.Connection.Query<ChannelQueryResult>(sp,
+                new { ChannelId = channelId, UserId = userId, FromIndex = fromIndex, PageSize = pageSize, OrderByColumn = orderByColumn },
                 con, true, null, CommandType.StoredProcedure).ToList();
 
             return GetByIds(channelQueryResult.Select(cqr => cqr.PostId), userId)
-                .Join(channelQueryResult, x => x.Id, x => x.PostId, (p,cqr) => new {p,cqr})
+                .Join(channelQueryResult, x => x.Id, x => x.PostId, (p, cqr) => new { p, cqr })
                 .OrderBy(x => x.cqr.RowNum)
                 .Select(x => x.p)
                 .ToList();

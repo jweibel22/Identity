@@ -7,6 +7,7 @@ using Identity.Domain;
 using Identity.Infrastructure.DTO;
 using Identity.Infrastructure.Repositories;
 using log4net;
+using Post = Identity.Domain.Post;
 using User = Identity.Domain.User;
 
 namespace Identity.Infrastructure.Services
@@ -41,7 +42,10 @@ namespace Identity.Infrastructure.Services
                 return null;
             }
 
-            var posts = postRepo.PostsFromChannel(user.Id, onlyUnread, channel.Id, timestamp, 0, orderBy, pageSize).ToList();
+            var posts = onlyUnread ? 
+                postRepo.UnreadPostsFromChannel(user.Id, channel.Id, orderBy, pageSize).ToList() : 
+                postRepo.PostsFromChannel(user.Id, channel.Id, fromIndex, orderBy, pageSize).ToList();
+
             var postIds = posts.Select(p => p.Id).ToList();
             var allTags = postRepo.Tags(postIds).ToList();
             var blockedTags = userRepo.BlockedTagIds(user.Id);

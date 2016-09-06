@@ -80,7 +80,7 @@ namespace Identity.Rest.Api
             {
                 Name = channel.Name,
                 Posts = Enumerable.Range(0, 5)
-                    .SelectMany(i => postRepo.PostsFromChannel(rssFeeder.Id, false, channel.Id, DateTimeOffset.Now, i*30, "Added",30))
+                    .SelectMany(i => postRepo.PostsFromChannel(rssFeeder.Id, channel.Id, i*30, "Added",30))
                     .Select(Mapper.Map<Post>)
                     .ToList()
             };
