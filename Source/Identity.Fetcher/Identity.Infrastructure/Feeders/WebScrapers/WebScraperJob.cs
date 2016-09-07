@@ -47,13 +47,18 @@ namespace Identity.Infrastructure.WebScrapers
                     int importCount = 0;
 
                     foreach (var article in articles)
-                    {
-                        if (postRepo.WebScraperItemAlreadyPosted(article.Title, article.Updated, scraper.Id)) continue;
-
+                    {                        
                         var post = postRepo.GetByUrl(article.Url);
 
                         if (post == null)
                         {
+                            var alreadyPosted = postRepo.WebScraperItemAlreadyPosted(article.Title, article.Updated, scraper.Id);
+
+                            if (alreadyPosted)
+                            {
+                                continue;
+                            }
+
                             post = new Post
                             {
                                 Created = article.Updated,
@@ -67,13 +72,19 @@ namespace Identity.Infrastructure.WebScrapers
                         }
                         else
                         {
-                            var tags = postRepo.Tags(post.Id).Select(t => t.Tag).ToList();
-                            var missingTags = article.Tags.Any(tag => !tags.Contains(tag));
-                            
-                            if (missingTags)
+                            if (article.Updated > post.Created)
                             {
-                                var allTags = tags.Union(article.Tags).Distinct().ToList();
-                                postRepo.TagPost(post.Id, allTags);
+                                var tags = postRepo.Tags(post.Id).Select(t => t.Tag).ToList();
+                                var missingTags = article.Tags.Any(tag => !tags.Contains(tag));
+
+                                if (missingTags)
+                                {
+                                    var allTags = tags.Union(article.Tags).Distinct().ToList();
+                                    postRepo.TagPost(post.Id, allTags);
+                                }
+
+                                post.Created = article.Updated;
+                                postRepo.UpdatePost(post);
                             }
                         }
 

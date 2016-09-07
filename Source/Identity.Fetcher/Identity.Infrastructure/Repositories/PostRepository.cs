@@ -85,7 +85,7 @@ namespace Identity.Infrastructure.Repositories
 
         public void UpdatePost(Post post)
         {
-            con.Connection.Execute("update Post set Title=@Title, Description=@Description, Uri=@Uri where Id=@Id", post, con);
+            con.Connection.Execute("update Post set Title=@Title, Description=@Description, Uri=@Uri, Created=@Created where Id=@Id", post, con);
         }
 
         //TODO: optimize this!
