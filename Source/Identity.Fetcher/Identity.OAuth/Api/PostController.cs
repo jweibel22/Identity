@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Reflection;
 using System.Security.Claims;
 using System.Text;
@@ -122,9 +123,17 @@ namespace Identity.Rest.Api
             return postRepo.ReadHistory(user.Id).Select(Mapper.Map<Post>);
         }
 
+        private HttpResponseMessage RawStringResponse(string s)
+        {
+            return new HttpResponseMessage()
+            {
+                Content = new StringContent(s, Encoding.UTF8, "text/html")
+            };
+        }
+
         [HttpGet]
-        [Route("Api/Post/{id}/Contents")]
-        public string FetchContents(long id)
+        [Route("Api/Post/{id}/Contents")]        
+        public HttpResponseMessage FetchContents(long id)
         {
             var post = postRepo.GetById(id, user.Id);
 
@@ -136,7 +145,7 @@ namespace Identity.Rest.Api
 
                 if (selector == null)
                 {
-                    return "";
+                    return RawStringResponse("");
                 }
 
                 webClient.Encoding = Encoding.UTF8;
@@ -148,10 +157,10 @@ namespace Identity.Rest.Api
                 
                 if (elm == null)
                 {
-                    return "";
+                    return RawStringResponse("");
                 }
 
-                return elm.InnerHtml.Replace("\r\n", "").Replace("\n", "").Replace("\t", "").Replace("\"", "");                
+                return RawStringResponse(elm.InnerHtml.Replace("\r\n", "").Replace("\n", "").Replace("\t", ""));
             }
         }
     }

@@ -236,8 +236,9 @@
 
                 $scope.fetchPostContent = function (post) {
                     postService.fetchPostContent(post).then(function (data) {
-                        var stripped = $scope.strip_tags(data, '<a><br><p><div><script>')
+                        var stripped = $scope.strip_tags(data, '<a><br><p><div><script><img>')
                         post.Description = $sce.trustAsHtml(stripped); //data;
+                        //post.Description = $sce.trustAsHtml(data);
                     });
                 };
 
