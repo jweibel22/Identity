@@ -128,7 +128,7 @@ namespace Identity.Rest.Api
         {
             var post = postRepo.GetById(id, user.Id);
 
-            var url =  TinyUrlResolver.Resolve(post.Uri);
+            var url = post.Uri;
 
             using (var webClient = new WebClient())
             {

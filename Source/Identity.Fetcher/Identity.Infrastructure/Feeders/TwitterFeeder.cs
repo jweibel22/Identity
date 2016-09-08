@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Identity.Infrastructure.Rss;
+using Identity.Infrastructure.Services;
 using log4net;
 using log4net.Core;
 using LinqToTwitter;
@@ -79,7 +80,7 @@ namespace Identity.Infrastructure.Feeders
                 CreatedAt = i.CreatedAt,
                 Title = RemoveAll(i.Text, SubstringsStartingWith(i.Text, new [] { "http://", "https://" })).Trim(),
                 Content = "",
-                Links = i.Entities.UrlEntities.Select(e => new Uri(e.Url)),
+                Links = i.Entities.UrlEntities.Select(e => new Uri(TinyUrlResolver.Resolve(e.Url))),
                 Tags = i.Entities.HashTagEntities.Select(e => e.Tag)
             });
         }
