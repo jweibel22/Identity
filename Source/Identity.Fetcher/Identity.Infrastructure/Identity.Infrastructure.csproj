@@ -113,6 +113,7 @@
     <Compile Include="Feeders\WebScrapers\WebScraperJob.cs" />
     <Compile Include="Services\DtoLoader.cs" />
     <Compile Include="Services\PostListLoader.cs" />
+    <Compile Include="Services\TinyUrlResolver.cs" />
     <Compile Include="TagCloudRefresher.cs" />
   </ItemGroup>
   <ItemGroup>
