@@ -127,9 +127,12 @@ namespace Identity.Rest.Api
         public string FetchContents(long id)
         {
             var post = postRepo.GetById(id, user.Id);
+
+            var url =  TinyUrlResolver.Resolve(post.Uri);
+
             using (var webClient = new WebClient())
             {
-                var selector = inlineArticleSelectors.FirstOrDefault(s => post.Uri.Contains(s.UrlPattern));
+                var selector = inlineArticleSelectors.FirstOrDefault(s => url.Contains(s.UrlPattern));
 
                 if (selector == null)
                 {
@@ -137,7 +140,7 @@ namespace Identity.Rest.Api
                 }
 
                 webClient.Encoding = Encoding.UTF8;
-                var result = webClient.DownloadString(post.Uri);
+                var result = webClient.DownloadString(url);
 
                 var doc = new HtmlDocument();
                 doc.LoadHtml(result);
