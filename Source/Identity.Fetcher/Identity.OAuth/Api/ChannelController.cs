@@ -184,7 +184,7 @@ namespace Identity.Rest.Api
                     Uri = post.Uri
                 };
 
-                if (p.Uri != null && p.Title == null)
+                if (p.Uri != null && String.IsNullOrEmpty(p.Title))
                 {
                     PopulateMetaData(p);
                 }
