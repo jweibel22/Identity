@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Reflection;
 using System.Threading;
+using Identity.Domain;
 using Identity.Infrastructure;
 using Identity.Infrastructure.Feeders;
 using Identity.Infrastructure.Repositories;
@@ -17,6 +19,7 @@ namespace Identity.Fetcher.WindowsService
     class ServiceLifecycle
     {
         private Timer timer;
+        private const string rssFeederUsername = "rssfeeder";
         private readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public void Start()
@@ -43,10 +46,28 @@ namespace Identity.Fetcher.WindowsService
 
             var connectionFactory = new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
 
+            Identity.Domain.User rssFeederUser;
+            IEnumerable<Feed> feeders;
+
+            using (var session = connectionFactory.NewTransaction())
+            {
+                var channelRepo = new ChannelRepository(session.Transaction);
+                var userRepo = new UserRepository(session.Transaction);
+
+                rssFeederUser = userRepo.FindByName(rssFeederUsername);
+                feeders = channelRepo.OutOfSyncFeeds(TimeSpan.FromHours(1));
+            }
+
+            if (rssFeederUser == null)
+            {
+                log.Error("User 'rssFeeder' was not found");
+                return;
+            }
+
             var feedRefresher = new RssFeedRefresher(connectionFactory);
             try
             {
-                feedRefresher.Run();
+                feedRefresher.Run(rssFeederUser, feeders);
             }
             catch (Exception ex)
             {

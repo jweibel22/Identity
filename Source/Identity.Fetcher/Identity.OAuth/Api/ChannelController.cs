@@ -172,10 +172,9 @@ namespace Identity.Rest.Api
         [HttpPut]
         public void AddFeed(long id, string url, FeedType type)
         {
-            //var feed = channelRepo.GetFeed(url, type);
-            //channelRepo.AddSubscription(id, feed.ChannelId);
-
-            bus.Publish("new-feeder-created", id.ToString());
+            var feed = channelRepo.GetFeed(url, type);
+            channelRepo.AddSubscription(id, feed.ChannelId);
+            bus.Publish("new-feeder-created", feed.Id.ToString());
         }
 
         [HttpDelete]

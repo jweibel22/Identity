@@ -21,43 +21,43 @@ namespace RssFeeder
         {            
             XmlConfigurator.Configure();
 
-            var connectionFactory = new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
+            //var connectionFactory = new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
 
-            var feedRefresher = new RssFeedRefresher(connectionFactory);
-            try
-            {
-                Console.WriteLine("Rss feeder started");
-                feedRefresher.Run();
-                Console.WriteLine("Rss feeder finished");
-            }
-            catch (Exception ex)
-            {
-                log.Error("RSS feeder failed", ex);
-            }           
+            //var feedRefresher = new RssFeedRefresher(connectionFactory);
+            //try
+            //{
+            //    Console.WriteLine("Rss feeder started");
+            //    feedRefresher.Run();
+            //    Console.WriteLine("Rss feeder finished");
+            //}
+            //catch (Exception ex)
+            //{
+            //    log.Error("RSS feeder failed", ex);
+            //}           
 
-            var webScraperJob = new WebScraperJob(connectionFactory);
-            try
-            {
-                Console.WriteLine("Web scraper started");
-                webScraperJob.Run();
-                Console.WriteLine("Web scraper finished");
-            }
-            catch (Exception ex)
-            {
-                log.Error("Web scraper job failed", ex);
-            }
+            //var webScraperJob = new WebScraperJob(connectionFactory);
+            //try
+            //{
+            //    Console.WriteLine("Web scraper started");
+            //    webScraperJob.Run();
+            //    Console.WriteLine("Web scraper finished");
+            //}
+            //catch (Exception ex)
+            //{
+            //    log.Error("Web scraper job failed", ex);
+            //}
 
-            var refresher = new TagCloudRefresher(connectionFactory);
-            try
-            {
-                Console.WriteLine("tag cloud refresher started");
-                refresher.Execute();
-                Console.WriteLine("tag cloud refresher finished");
-            }
-            catch (Exception ex)
-            {
-                log.Error("Tag cloud refresher failed", ex);
-            }
+            //var refresher = new TagCloudRefresher(connectionFactory);
+            //try
+            //{
+            //    Console.WriteLine("tag cloud refresher started");
+            //    refresher.Execute();
+            //    Console.WriteLine("tag cloud refresher finished");
+            //}
+            //catch (Exception ex)
+            //{
+            //    log.Error("Tag cloud refresher failed", ex);
+            //}
         }
     }
 }

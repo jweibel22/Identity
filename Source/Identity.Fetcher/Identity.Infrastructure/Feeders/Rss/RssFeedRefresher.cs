@@ -16,7 +16,6 @@ namespace Identity.Infrastructure.Rss
         private readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private readonly ConnectionFactory connectionFactory;
-        private const string rssFeederUsername = "rssfeeder";
         private readonly FeederFactory feederFactory;
 
         public RssFeedRefresher(ConnectionFactory connectionFactory)
@@ -25,26 +24,8 @@ namespace Identity.Infrastructure.Rss
             this.feederFactory = new FeederFactory();
         }
 
-        public void Run()
+        public void Run(User rssFeederUser, IEnumerable<Feed> feeders)
         {
-            User rssFeederUser;
-            IEnumerable<Feed> feeders;
-
-            using (var session = connectionFactory.NewTransaction())
-            {
-                var channelRepo = new ChannelRepository(session.Transaction);
-                var userRepo = new UserRepository(session.Transaction);
-
-                rssFeederUser = userRepo.FindByName(rssFeederUsername);
-                feeders = channelRepo.OutOfSyncFeeds(TimeSpan.FromHours(1));
-            }
-
-            if (rssFeederUser == null)
-            {
-                log.Error("User 'rssFeeder' was not found");
-                return;
-            }
-
             var fetchFeedItemsBlock = new TransformBlock<Feed, Tuple<Feed, IEnumerable<FeedItem>>>(rssFeeder =>
             {
                 log.Info("fetching feed " + rssFeeder.Url);

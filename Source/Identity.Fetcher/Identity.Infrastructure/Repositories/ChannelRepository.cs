@@ -192,6 +192,11 @@ where (ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId) and (co.ChannelId is n
             return rssFeeder;
         }
 
+        public Feed GetFeedById(long id)
+        {
+            return con.Connection.Query<Feed>("select * from RssFeeder where Id = @Id", new { Id = id }, con).SingleOrDefault();
+        }
+
         public Feed GetFeed(string url, FeedType type)
         {
             var feed = con.Connection.Query<Feed>("select * from RssFeeder where Url = @Url", new { Url = url }, con).SingleOrDefault();
