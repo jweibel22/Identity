@@ -102,6 +102,7 @@ CREATE TABLE [dbo].[RssFeeder](
 	[Url] [nvarchar](255) NOT NULL,
 	[LastFetch] [datetimeoffset] NULL,
 	[Type] [int] NOT NULL,
+	[ChannelId] bigint NOT NULL,
  CONSTRAINT [PK_RssFeeder] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC

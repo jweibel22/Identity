@@ -79,14 +79,7 @@ namespace Identity.Infrastructure.Rss
                     //var autoTagger = new AutoTagger(new TagCountRepository(session), postRepo);
 
                     log.Info("Processing feed items from feed " + t.Item1.Url);
-
-                    var channelIds = channelRepo.GetChannelsForFeed(t.Item1.Id).ToList();
-
-                    if (!channelIds.Any())
-                    {
-                        return;
-                    }
-
+                    
                     var tags = channelRepo.GetFeedTags(t.Item1.Id);
 
                     t.Item1.LastFetch = DateTimeOffset.Now;
@@ -122,10 +115,7 @@ namespace Identity.Infrastructure.Rss
 
                             postRepo.AddFeedItem(t.Item1.Id, post.Id, feedItem.CreatedAt);
 
-                            foreach (var channelId in channelIds)
-                            {
-                                userRepo.Publish(rssFeederUser.Id, channelId, post.Id);
-                            }
+                            userRepo.Publish(rssFeederUser.Id, t.Item1.ChannelId, post.Id);
                         }
 
                         session.Commit();

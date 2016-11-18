@@ -15,6 +15,8 @@ namespace Identity.Domain
         public DateTimeOffset? LastFetch { get; set; }
 
         public FeedType Type { get; set; }
+
+        public long ChannelId { get; set; }
     }
 
     public enum FeedType
