@@ -7,20 +7,15 @@
             $scope.feedTypes = ["Rss", "Twitter"];
             $scope.feedType = "Rss";
 
-            $scope.addRssFeeder = function() {
-                $scope.channel.RssFeeders.push({ Url: $scope.rssfeederUrl, Type: $scope.feedType });
+            $scope.addRssFeeder = function () {
+
+                channelService.addFeed($scope.channel.Id, $scope.rssfeederUrl, $scope.feedType).then(function (res) {
+                    
+                });
             }
 
             $scope.changeFeedType = function (feedType) {
                 $scope.feedType = feedType;
-            }
-
-            $scope.removeRssFeeder = function (rssFeeder) {
-
-                var index = $scope.channel.RssFeeders.indexOf(rssFeeder);
-                if (index > -1) {
-                    $scope.channel.RssFeeders.splice(index, 1);
-                }                
             }
 
             $scope.removeSubscription = function (child) {

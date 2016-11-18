@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Fetcher.WindowsService", "Identity.Fetcher.WindowsService\Identity.Fetcher.WindowsService.csproj", "{BB6A2D09-2AF6-42BF-A11B-06FB0C3A05D8}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "AzureCloudService", "AzureCloudService\AzureCloudService.ccproj", "{9B13702E-AF29-4D37-81D9-D38151DB577B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RssFeederJob", "RssFeederJob\RssFeederJob.csproj", "{77293177-0D17-4EC5-AA7B-F30AE6650EC3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeederJob", "FeederJob\FeederJob.csproj", "{8E80B609-0133-4ECE-B4F8-E1F477AA1B2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{77293177-0D17-4EC5-AA7B-F30AE6650EC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77293177-0D17-4EC5-AA7B-F30AE6650EC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77293177-0D17-4EC5-AA7B-F30AE6650EC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E80B609-0133-4ECE-B4F8-E1F477AA1B2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E80B609-0133-4ECE-B4F8-E1F477AA1B2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E80B609-0133-4ECE-B4F8-E1F477AA1B2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E80B609-0133-4ECE-B4F8-E1F477AA1B2D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

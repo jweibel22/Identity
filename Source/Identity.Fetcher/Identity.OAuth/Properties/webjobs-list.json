@@ -3,6 +3,9 @@
   "WebJobs": [
     {
       "filePath": "../RssFeederJob/RssFeederJob.csproj"
+    },
+    {
+      "filePath": "../FeederJob/FeederJob.csproj"
     }
   ]
 }

@@ -24,6 +24,7 @@ ROW_NUMBER() OVER (ORDER BY CASE @OrderByColumn
 
 select Count(ci.PostId) as Popularity, ci.PostId, Min(ci.Created) as Added from ChannelItem ci
 inner join cte on ci.ChannelId = cte.Id
+--where (select count(*) from ChannelTagFilter ctf where ctf.ChannelId = cte.Id and ctf.[Include] = 1 and ctf.TagId not in (select TagId from Tagged where PostId = ci.PostId)) = 0
 left join ReadHistory on ReadHistory.PostId = ci.PostId and ReadHistory.UserId = @UserId
 where ReadHistory.Timestamp is null
 group by ci.PostId) as AllPosts) as Paged

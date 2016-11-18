@@ -8,7 +8,6 @@ namespace Identity.Infrastructure.DTO
         {
             Subscriptions = new List<DTO.Channel>();
             TagCloud = new List<WeightedTag>();
-            RssFeeders = new List<RssFeeder>();
             ShowUnreadCounter = true;
         }
 
@@ -23,8 +22,6 @@ namespace Identity.Infrastructure.DTO
         public int UnreadCount { get; set; }
 
         public bool ShowUnreadCounter { get; set; }
-
-        public IList<RssFeeder> RssFeeders { get; set; }
 
         public IEnumerable<Channel> Subscriptions { get; set; }
 

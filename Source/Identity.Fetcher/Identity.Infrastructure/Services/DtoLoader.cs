@@ -92,7 +92,6 @@ namespace Identity.Infrastructure.Services
             var result = Mapper.Map<DTO.Channel>(channel);
 
             //result.UnreadCount = channelRepo.UnreadCount(user.Id, result.Id);
-            result.RssFeeders = channelRepo.GetFeedsForChannel(channel.Id).Select(Mapper.Map<DTO.RssFeeder>).ToList();
             result.TagCloud = channelRepo.GetTagCloud(channel.Id).Select(Mapper.Map<DTO.WeightedTag>).ToList();
             result.Subscriptions = channelRepo.GetSubscriptions(channel.Id).Select(Mapper.Map<DTO.Channel>).ToList();
             result.DisplaySettings = Mapper.Map <DTO.ChannelDisplaySettings>(channelRepo.GetChannelDisplaySettings(user.Id, channel.Id));

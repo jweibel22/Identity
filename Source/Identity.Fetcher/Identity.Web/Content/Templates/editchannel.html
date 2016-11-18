@@ -18,13 +18,6 @@
 
 <div style="margin-bottom:50px">
     <div>
-        <h4>RSS Feeders</h4>
-        <div ng-repeat="feeder in channel.RssFeeders">
-            {{feeder.Url}} <a href="#/editrssfeeder/{{feeder.Id}}">Edit</a> <a ng-click="removeRssFeeder(feeder)">Remove</a>
-        </div>
-    </div>
-
-    <div>
         <form ng-submit="addRssFeeder()" style="margin-top:30px;">
             <h5>Add a new RSS feeder</h5>
 

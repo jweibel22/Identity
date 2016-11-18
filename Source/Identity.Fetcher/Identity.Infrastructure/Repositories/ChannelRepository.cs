@@ -107,24 +107,12 @@ group by Tag.Name order by COUNT(*) desc",
 
         public void AddChannel(Channel channel)
         {
-            channel.Id = con.Connection.Query<int>("insert Channel values (@Name, @Created, @IsPublic, @OrderBy, @ListType, @ShowOnlyUnread); SELECT CAST(SCOPE_IDENTITY() as bigint)", channel, con).Single();
+            channel.Id = con.Connection.Query<int>("insert Channel (Name, Created, IsPublic) values (@Name, @Created, @IsPublic); SELECT CAST(SCOPE_IDENTITY() as bigint)", channel, con).Single();
         }
 
-        public void UpdateChannel(Channel channel, IEnumerable<Feed> feeds, IEnumerable<long> subscriptions)
+        public void UpdateChannel(Channel channel, IEnumerable<long> subscriptions)
         {
             con.Connection.Execute("update Channel set Name=@Name, IsPublic=@IsPublic where Id=@Id", channel, con);
-
-            RemoveAllFeeds(channel.Id);
-
-            foreach (var feed in feeds)
-            {                
-                if (feed.Id == 0)
-                {
-                    AddFeed(feed);
-                }
-
-                FeedInto(feed.Id, channel.Id);
-            }
 
             con.Connection.Execute("delete from ChannelLink where ParentId = @ParentId ", new { ParentId = channel.Id }, con);
 
@@ -204,15 +192,29 @@ where (ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId) and (co.ChannelId is n
             return rssFeeder;
         }
 
-        public Feed AddFeed(Feed feed)
+        public Feed GetFeed(string url, FeedType type)
         {
-            if (feed.Id != 0)
+            var feed = con.Connection.Query<Feed>("select * from RssFeeder where Url = @Url", new { Url = url }, con).SingleOrDefault();
+
+            if (feed == null)
             {
-                throw new Exception("Feed already added");
+                var feedChannel = new Channel
+                {
+                    Name = url,
+                    IsPublic = true,
+                    Created = DateTimeOffset.Now
+                };
+                AddChannel(feedChannel);
+                feed = new Feed
+                {
+                    Url = url,
+                    Type = type,
+                    ChannelId = feedChannel.Id
+                };
+
+                feed.Id = con.Connection.Query<int>("insert RssFeeder (Url,[Type],ChannelId) values (@Url,@Type,@ChannelId); SELECT CAST(SCOPE_IDENTITY() as bigint)", feed, con).Single();
             }
 
-            feed.Id = con.Connection.Query<int>("insert RssFeeder (Url,[Type]) values (@Url,@Type); SELECT CAST(SCOPE_IDENTITY() as bigint)", feed, con).Single();
-            
             return feed;
         }
 
@@ -235,30 +237,7 @@ where (ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId) and (co.ChannelId is n
         {
             con.Connection.Execute("update RssFeeder set LastFetch=@LastFetch, Url=@Url where Id=@Id", feed, con);
         }
-
-        public IEnumerable<Feed> GetFeedsForChannel(long channelId)
-        {
-            using (var pc = new PerfCounter("GetFeedsForChannel"))
-            { 
-                return con.Connection.Query<Feed>("select RssFeeder.* from RssFeeder join FeedInto on FeedInto.RssFeederId = RssFeeder.Id and FeedInto.ChannelId=@Id", new { Id = channelId }, con);
-            }           
-        }
-
-        public IEnumerable<long> GetChannelsForFeed(long rssFeederId)
-        {
-            return con.Connection.Query<long>("select ChannelId from FeedInto where RssFeederId = @RssFeederId", new { RssFeederId = rssFeederId }, con);
-        }
-
-        public void FeedInto(long rssFeederId, long channelId)
-        {
-            con.Connection.Execute("update FeedInto set ChannelId=@ChannelId where ChannelId=@ChannelId and RssFeederId=@RssFeederId if @@rowcount = 0 insert FeedInto values(@RssFeederId, @ChannelId)", new { ChannelId = channelId, RssFeederId = rssFeederId }, con);            
-        }
-
-        public void RemoveAllFeeds(long channelId)
-        {
-            con.Connection.Execute("delete from FeedInto where ChannelId=@ChannelId", new { ChannelId = channelId }, con);            
-        }
-
+        
         public IEnumerable<string> GetFeedTags(long rssFeederId)
         {
             return con.Connection.Query<string>("select Tag from FeederTags where RssFeederId=@RssFeederId", new { RssFeederId = rssFeederId }, con);

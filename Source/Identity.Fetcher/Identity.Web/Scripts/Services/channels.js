@@ -83,5 +83,9 @@ angular.module('inspire').factory('channelService', ['$http', 'ngSettings', func
         return $http.put(ngSettings.baseUrl + '/Api/Channel/' + channelId + '/AddSubscription?childId=' + childId);
     };
 
+    o.addFeed = function (channelId, url, type) {
+        return $http.put(ngSettings.baseUrl + '/Api/Channel/' + channelId + '/AddFeed?url=' + url + '&type=' + type);
+    };
+
     return o;
 }]);

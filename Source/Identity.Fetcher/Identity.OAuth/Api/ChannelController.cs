@@ -17,6 +17,10 @@ using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
 using Identity.OAuth;
 using log4net;
+using Microsoft.Azure.WebJobs;
+using Microsoft.WindowsAzure;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Queue;
 using Channel = Identity.Infrastructure.DTO.Channel;
 using ChannelDisplaySettings = Identity.Infrastructure.DTO.ChannelDisplaySettings;
 using Post = Identity.Infrastructure.DTO.Post;
@@ -33,12 +37,13 @@ namespace Identity.Rest.Api
         private readonly PostRepository postRepo;
         private readonly UserRepository userRepo;
         private readonly ILoadDtos dtoLoader;
-        private PostListLoader postListLoader;
+        private readonly Bus bus;
 
+        private PostListLoader postListLoader;
         private Domain.User user;
 
         public ChannelController(ILoadDtos dtoLoader, ChannelRepository channelRepo, PostRepository postRepo,
-            UserRepository userRepo, PostListLoader postListLoader)
+            UserRepository userRepo, Bus bus, PostListLoader postListLoader)
         {
             var identity = User.Identity as ClaimsIdentity;
             user = userRepo.FindByName(identity.Name);
@@ -47,6 +52,7 @@ namespace Identity.Rest.Api
             this.channelRepo = channelRepo;
             this.postRepo = postRepo;
             this.userRepo = userRepo;
+            this.bus = bus;
             this.postListLoader = postListLoader;
         }
 
@@ -146,7 +152,7 @@ namespace Identity.Rest.Api
             c.IsPublic = !channel.IsPrivate;
             c.Name = channel.Name;
 
-            channelRepo.UpdateChannel(c, channel.RssFeeders.Select(f => new Feed {Id = f.Id, Url = f.Url, Type = f.Type}), channel.Subscriptions.Select(x => x.Id));
+            channelRepo.UpdateChannel(c, channel.Subscriptions.Select(x => x.Id));
 
             return dtoLoader.LoadChannel(user, channelRepo.GetById(id));
         }
@@ -161,6 +167,15 @@ namespace Identity.Rest.Api
         public void AddSubscription(long id, long childId)
         {
             channelRepo.AddSubscription(id, childId);
+        }
+
+        [HttpPut]
+        public void AddFeed(long id, string url, FeedType type)
+        {
+            //var feed = channelRepo.GetFeed(url, type);
+            //channelRepo.AddSubscription(id, feed.ChannelId);
+
+            bus.Publish("new-feeder-created", id.ToString());
         }
 
         [HttpDelete]

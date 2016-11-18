@@ -48,6 +48,7 @@ namespace Identity.Rest
             Bind<CommentRepostitory>().ToSelf().InScope(c => RequestScope.Scope.Value);
             Bind<PostRepository>().ToSelf().InScope(c => RequestScope.Scope.Value);
             Bind<UserRepository>().ToSelf().InScope(c => RequestScope.Scope.Value);
+            Bind<Bus>().ToSelf().InSingletonScope();
         }
     }
 }
