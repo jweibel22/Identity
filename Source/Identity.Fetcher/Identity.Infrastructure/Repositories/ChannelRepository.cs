@@ -26,6 +26,28 @@ namespace Identity.Infrastructure.Repositories
             return con.Connection.Query<Channel>("select * from Channel where Id=@Id", new { Id = id }, con).SingleOrDefault();
         }
 
+        public int GetPostsPerDay(long id)
+        {
+            var sql = @"with cte as 
+(
+    select @ChannelId as Id
+    union all
+    select t.ChildId as Id from cte 
+        inner join [ChannelLink] t on cte.Id = t.Parentid
+)
+select case when DATEDIFF(dd, Min(Created), Max(Created)) > 0 then Count(*)/DATEDIFF(dd, Min(Created), Max(Created)) else 0 end as cnt
+from ChannelItem ci
+inner join cte on ci.ChannelId = cte.Id";
+
+            return con.Connection.Query<int>(sql, new { ChannelId = id }, con).SingleOrDefault();
+        }
+
+        public int GetPopularity(long id)
+        {
+            return con.Connection.Query<int>("select count(*) from ChannelLink where ChildId = @Id", new { Id = id }, con).Single();
+        }
+
+
         public IEnumerable<Channel> FindPublicChannelsByName(string name)
         {
             var encoded = "%" + name.Replace("%", "[%]").Replace("[", "[[]").Replace("]", "[]]") + "%";

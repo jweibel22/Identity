@@ -28,6 +28,8 @@ namespace Identity.Infrastructure.DTO
         public IList<WeightedTag> TagCloud { get; set; }
 
         public ChannelDisplaySettings DisplaySettings { get; set; }
+
+        public ChannelStatistics Statistics { get; set; }
     }
 
     public class WeightedTag

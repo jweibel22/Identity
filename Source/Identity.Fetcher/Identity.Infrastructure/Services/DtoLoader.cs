@@ -95,26 +95,13 @@ namespace Identity.Infrastructure.Services
             result.TagCloud = channelRepo.GetTagCloud(channel.Id).Select(Mapper.Map<DTO.WeightedTag>).ToList();
             result.Subscriptions = channelRepo.GetSubscriptions(channel.Id).Select(Mapper.Map<DTO.Channel>).ToList();
             result.DisplaySettings = Mapper.Map <DTO.ChannelDisplaySettings>(channelRepo.GetChannelDisplaySettings(user.Id, channel.Id));
+            result.Statistics = new ChannelStatistics
+            {
+                Popularity = channelRepo.GetPopularity(channel.Id),
+                PostPerDay = channelRepo.GetPostsPerDay(channel.Id)
+            };
 
             return result;
         }
-
-        //public IEnumerable<DTO.Post> LoadChannelPosts(User user, Channel channel, bool onlyUnread, DateTimeOffset timestamp, int fromIndex, string orderBy)
-        //{
-        //    var posts = postRepo.PostsFromChannel(user.Id, onlyUnread, channel.Id, timestamp, fromIndex, orderBy).ToList();
-        //    //var commentCounts = commentRepo.CommentCounts(channel.Id);
-        //    var xx = posts.Select(p => Mapper.Map<DTO.Post>(p)).ToList();
-
-        //    foreach (var p in xx)
-        //    {
-        //        //LoadTags(p);
-        //        //var commentCount = commentCounts.SingleOrDefault(cc => cc.Id == p.Id);
-        //        //p.CommentCount = commentCount != null ? commentCount.Count : 0;
-        //        p.IsCollapsed = true;
-        //        //p.PublishedIn = postRepo.PublishedIn(p.Id, user.Id).Select(c => Mapper.Map<DTO.Channel>(c)).ToList();
-        //    }
-
-        //    return xx;
-        //}
     }
 }

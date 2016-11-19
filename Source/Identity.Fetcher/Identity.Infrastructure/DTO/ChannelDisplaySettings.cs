@@ -15,4 +15,11 @@ namespace Identity.Infrastructure.DTO
         public string ListType { get; set; }
 
     }
+
+    public class ChannelStatistics
+    {
+        public int PostPerDay { get; set; }
+
+        public int Popularity { get; set; }
+    }
 }
