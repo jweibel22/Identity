@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.IO;
 using System.Reflection;
 using System.Threading;
 using Identity.Domain;
@@ -64,7 +65,7 @@ namespace Identity.Fetcher.WindowsService
                 return;
             }
 
-            var feedRefresher = new RssFeedRefresher(connectionFactory);
+            var feedRefresher = new RssFeedRefresher(connectionFactory, TextWriter.Null);
             try
             {
                 feedRefresher.Run(rssFeederUser, feeders);

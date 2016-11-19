@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks.Dataflow;
@@ -11,17 +12,42 @@ using log4net;
 
 namespace Identity.Infrastructure.Rss
 {
-    public class RssFeedRefresher
+    class Logger
     {
         private readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private readonly TextWriter azureLog;
+
+        public Logger(TextWriter azureLog)
+        {
+            this.azureLog = azureLog;
+        }
+
+        public void Info(string message)
+        {
+            log.Info(message);
+            azureLog.WriteLine(message);
+        }
+
+        public void Error(string message, Exception ex)
+        {
+            log.Error(message, ex);
+            azureLog.WriteLine(String.Format("{0}. Reason: {1}", message, ex));
+        }
+    }
+
+    public class RssFeedRefresher
+    {
+        //private readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private readonly ConnectionFactory connectionFactory;
         private readonly FeederFactory feederFactory;
+        private readonly Logger log;
 
-        public RssFeedRefresher(ConnectionFactory connectionFactory)
+        public RssFeedRefresher(ConnectionFactory connectionFactory, TextWriter azureLog)
         {
             this.connectionFactory = connectionFactory;
             this.feederFactory = new FeederFactory();
+            log = new Logger(azureLog);
         }
 
         public void Run(User rssFeederUser, IEnumerable<Feed> feeders)

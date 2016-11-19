@@ -51,7 +51,7 @@ namespace FeederJob
                 return;
             }
 
-            var feedRefresher = new RssFeedRefresher(connectionFactory);
+            var feedRefresher = new RssFeedRefresher(connectionFactory, log);
             try
             {
                 Console.WriteLine("Rss feeder started");
@@ -86,7 +86,7 @@ namespace FeederJob
                 return;
             }
 
-            var feedRefresher = new RssFeedRefresher(connectionFactory);
+            var feedRefresher = new RssFeedRefresher(connectionFactory, log);
             try
             {
                 Console.WriteLine("Rss feeder started");
