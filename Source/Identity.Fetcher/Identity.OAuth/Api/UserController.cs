@@ -46,6 +46,26 @@ namespace Identity.Rest.Api
         {
             var unreadCounts = channelRepo.GetUneadCounts(user.Id).ToList();
 
+            var ownedByUser = userRepo.Owns(user.Id).ToList();
+            var ownedAsDto = ownedByUser.Select(c =>
+            {
+                var channel = Mapper.Map<Channel>(c);
+
+                var subs = channelRepo.GetSubscriptions(channel.Id).ToList();
+                channel.Subscriptions = subs.Where(ch => ownedByUser.Any(x => x.Id == ch.Id)).Select(Mapper.Map<Channel>).ToList();
+
+                foreach (var sub in channel.Subscriptions)
+                {
+                    sub.UnreadCount = unreadCounts.Where(x => x.ChannelId == sub.Id).Sum(x => x.Count);
+                }
+
+                channel.UnreadCount = unreadCounts.Where(x => x.ChannelId == channel.Id || subs.Any(s => s.Id == x.ChannelId)).Sum(x => x.Count);
+
+                return channel;
+            }).ToList();
+
+            
+
             return new User
             {
                 Id = user.Id,
@@ -53,21 +73,7 @@ namespace Identity.Rest.Api
                 Feed = new List<Post>(),
                 FollowsChannels = channelRepo.GetSubscriptions(user.SubscriptionChannel).Select(c => Mapper.Map<Channel>(c)).ToList(),
                 FollowsTags = new List<string>(),
-                Owns = userRepo.Owns(user.Id).Select(c =>
-                {
-                    var channel = Mapper.Map<Channel>(c);
-
-                    channel.Subscriptions = channelRepo.GetSubscriptions(channel.Id).Select(Mapper.Map<Channel>).ToList();
-
-                    foreach (var sub in channel.Subscriptions)
-                    {
-                        sub.UnreadCount = unreadCounts.Where(x => x.ChannelId == sub.Id).Sum(x => x.Count);
-                    }
-
-                    channel.UnreadCount = unreadCounts.Where(x => x.ChannelId == channel.Id).Sum(x => x.Count);
-                    
-                    return channel;
-                }).ToList(),
+                Owns = ownedAsDto.Where(x => !ownedAsDto.Any(y => y.Subscriptions.Any(s => s.Id == x.Id))).ToList(),
                 SavedChannel = user.SavedChannel,
                 StarredChannel = user.StarredChannel,
                 LikedChannel = user.LikedChannel,
