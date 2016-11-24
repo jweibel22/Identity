@@ -146,7 +146,7 @@ group by Tag.Name order by COUNT(*) desc",
 
         public void Delete(long userId, long channelId)
         {
-            var cnt = con.Connection.Query<int>("select count(*) from ChannelOwner where UserId=@UserId and ChannelId=@ChannelId and IsLocked=false",
+            var cnt = con.Connection.Query<int>("select count(*) from ChannelOwner where UserId=@UserId and ChannelId=@ChannelId and IsLocked=0",
                 new{ UserId = userId, ChannelId = channelId }, con).Single();
 
             if (cnt == 0)

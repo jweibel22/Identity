@@ -6,7 +6,7 @@
             $scope.user = userPromise.data;
 
             for (var i = 0; i < $scope.contents.TagCloud.length; i++) {
-                $scope.contents.TagCloud[i].link = "#/search?query=" + $scope.contents.TagCloud[i].text;
+                $scope.contents.TagCloud[i].link = "#/searchByTag?query=" + $scope.contents.TagCloud[i].text;
             }
 
             for (var i = 0; i < $scope.contents.Posts.length; i++) {

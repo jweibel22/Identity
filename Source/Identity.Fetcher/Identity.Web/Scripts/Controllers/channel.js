@@ -40,7 +40,7 @@ angular.module('inspire')
         $scope.showOnlyUnread = $scope.channel.DisplaySettings.ShowOnlyUnread;
 
         for (var i = 0; i < $scope.channel.TagCloud.length; i++) {
-            $scope.channel.TagCloud[i].link = "#/search?query=" + $scope.channel.TagCloud[i].text;
+            $scope.channel.TagCloud[i].link = "#/searchByTag?query=" + $scope.channel.TagCloud[i].text;
         }
 
         $("body").scrollTop(0);
@@ -58,39 +58,47 @@ angular.module('inspire')
             channel: $scope.channel,
             title: '',
             description: '',
-            tags: ''
-        
+            tags: ''        
         }
 
+        $scope.addFeederWindowdata = {
+            user: $scope.user,
+            channel: $scope.channel,
+            title: '',
+            description: '',
+            feedTypes : ["Rss", "Twitter"],
+            feedType : "Rss"
+        }
+
+        //$scope.subscribe = function () {
+        //    channelService.subscribe($scope.channel.Id).success(function (data) {
+        //        $scope.channelFollowed = true;
+
+        //        var subscriptionChannel = $filter('filter')($scope.user.Owns, { Id: $scope.user.SubscriptionChannel }, true)[0];
+        //        subscriptionChannel.Subscriptions.push($scope.channel);
+        //    });
+        //};
 
 
-        $scope.subscribe = function () {
-            channelService.subscribe($scope.channel.Id).success(function (data) {
-                $scope.channelFollowed = true;
+        //$scope.unsubscribe = function () {
+        //    channelService.unsubscribe($scope.channel.Id).success(function (data) {
+        //        $scope.channelFollowed = false;
 
-                var subscriptionChannel = $filter('filter')($scope.user.Owns, { Id: $scope.user.SubscriptionChannel }, true)[0];
-                subscriptionChannel.Subscriptions.push($scope.channel);
-            });
-        };
+        //        var subscriptionChannel = $filter('filter')($scope.user.Owns, { Id: $scope.user.SubscriptionChannel }, true)[0];
+        //        var channelToRemove = $filter('filter')(subscriptionChannel.Subscriptions, { Id: $scope.channel.Id }, true)[0];
+        //        var index = subscriptionChannel.Subscriptions.indexOf(channelToRemove);
+        //        if (index > -1) {
+        //            subscriptionChannel.Subscriptions.splice(index, 1);
+        //        }                
+        //    });
+        //};
 
         $scope.createLink = function () {
-            channelSelectorService.selectChannel($scope.user.Owns, function(id) {
-                 channelService.addSubscription(id, $scope.channel.Id);
-            });            
-        };
-
-        $scope.unsubscribe = function () {
-            channelService.unsubscribe($scope.channel.Id).success(function (data) {
-                $scope.channelFollowed = false;
-
-                var subscriptionChannel = $filter('filter')($scope.user.Owns, { Id: $scope.user.SubscriptionChannel }, true)[0];
-                var channelToRemove = $filter('filter')(subscriptionChannel.Subscriptions, { Id: $scope.channel.Id }, true)[0];
-                var index = subscriptionChannel.Subscriptions.indexOf(channelToRemove);
-                if (index > -1) {
-                    subscriptionChannel.Subscriptions.splice(index, 1);
-                }                
+            channelSelectorService.selectChannel($scope.user.Owns, function (id) {
+                channelService.addSubscription(id, $scope.channel.Id);
             });
         };
+
 
         $scope.markAllAsRead = function () {
             channelService.markAllAsRead($scope.channel.Id).success(function (data) {
@@ -106,6 +114,19 @@ angular.module('inspire')
                 $scope.channelOwned = false;
             });
         };
+
+        $scope.delete = function () {
+            channelService.delete($scope.channel).success(function (data) {
+
+                var index = $scope.user.Owns.indexOf($scope.channel);
+                if (index > -1) {
+                    $scope.user.Owns.splice(index, 1);
+                }
+
+                $location.replace().path('#/home');
+            });
+        };
+
 
         $scope.displaySettingsChanged = function (settings) {
             channelService.updateDisplaySettings($scope.channel.Id, $scope.user.Id, settings);
@@ -188,6 +209,43 @@ angular.module('inspire')
                 resolve: {
                     windowdata: function () {
                         return $scope.addPostWindowdata;
+                    }
+                }
+            });
+        };
+
+        $scope.addFeeder = function () {
+
+            $modal.open({
+                templateUrl: 'addFeeder.html',
+                backdrop: true,
+                windowClass: 'modal',
+                controller: function ($scope, $modalInstance, windowdata) {
+                    $scope.windowdata = windowdata;
+
+                    $scope.submit = function () {
+
+                        if (!$scope.windowdata.rssfeederUrl || $scope.windowdata.rssfeederUrl === '') {
+                            $modalInstance.dismiss('cancel');
+                            return;
+                        }
+
+                        channelService.addFeed($scope.windowdata.channel.Id, $scope.windowdata.rssfeederUrl, $scope.windowdata.feedType).then(function (res) {
+                            //TODO: show 'feed added' dialog + refresh stream
+                        });
+
+                        $modalInstance.dismiss('cancel');
+                    }
+                    $scope.cancel = function () {
+                        $modalInstance.dismiss('cancel');
+                    };
+                    $scope.changeFeedType = function (feedType) {
+                        $scope.windowdata.feedType = feedType;
+                    }
+                },
+                resolve: {
+                    windowdata: function () {
+                        return $scope.addFeederWindowdata;
                     }
                 }
             });

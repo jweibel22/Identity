@@ -31,8 +31,8 @@
                     </div>
 
                 </td>
-                <td>                                        
-                    <span>Only show unread</span> <input type="checkbox" ng-model="showonlyunread" ng-change="showOnlyUnreadChanged()" />                    
+                <td>
+                    <span>Only show unread</span> <input type="checkbox" ng-model="showonlyunread" ng-change="showOnlyUnreadChanged()" />
                 </td>
             </tr>
         </table>
@@ -99,24 +99,33 @@
                             </button>
 
                             <button class="btn btn-default btn-xs" ng-click="publishOnChannel(post)">
-                                <span class="glyphicon glyphicon-share"></span> Publish
+                                <span class="glyphicon glyphicon-share"></span> Forward
                             </button>
 
-                            <a href="#/viewpost/{{post.Id}}" class="btn btn-default btn-xs">
+                            <!--<a href="#/viewpost/{{post.Id}}" class="btn btn-default btn-xs">
                                 <span class="glyphicon glyphicon-eye-open"></span> View
                             </a>
 
                             <a href="#/editpost/{{post.Id}}" class="btn btn-default btn-xs">
                                 <span class="glyphicon glyphicon-edit"></span> Edit
-                            </a>
+                            </a>-->
 
                             <button class="btn btn-default btn-xs" ng-show="post.CanBeInlined" ng-click="fetchPostContent(post)">
                                 <span class="glyphicon glyphicon-edit"></span> Content
                             </button>
 
-                            <button class="btn btn-default btn-xs" ng-show="channelOwned" ng-click="deletePost(post)">
+                            <!--<button class="btn btn-default btn-xs" ng-show="channelOwned" ng-click="deletePost(post)">
                                 <span class="glyphicon glyphicon-remove"></span> Remove
-                            </button>
+                            </button>-->
+
+                            <div class="btn-group">
+                                <button type="button" data-toggle="dropdown" class="btn btn-xs glyphicon glyphicon-menu-hamburger"></button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#/viewpost/{{post.Id}}">View</a></li>
+                                    <li><a href="#/editpost/{{post.Id}}">Edit</a></li>
+                                    <li ng-show="channelOwned"><a ng-click="deletePost(post)">Remove</a></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 

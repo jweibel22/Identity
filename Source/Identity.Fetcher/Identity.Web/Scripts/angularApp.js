@@ -106,14 +106,26 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                         }
                     }
                 })
-                .state('root.search', {
-                    url: '/search?query',
+                .state('root.searchByTag', {
+                    url: '/searchByTag?query',
                     views: {
                         'container@': {
                             templateUrl: 'Content/templates/searchresults.html',
                             controller: 'SearchController',
                             resolve: {
                                 posts: ['$stateParams', 'postService', function ($stateParams, postService) { return postService.getByTag($stateParams.query); }],
+                                userPromise: ['userService', function (userService) { return userService.userPromise.promise; }]
+                            }
+                        }
+                    }
+                })
+                .state('root.search', {
+                    url: '/searchChannelOrUser?query',
+                    views: {
+                        'container@': {
+                            templateUrl: 'Content/templates/searchresults.html',
+                            controller: 'SearchController',
+                            resolve: {
                                 channels: ['$stateParams', 'channelService', function ($stateParams, channelService) { return channelService.findByName($stateParams.query); }],
                                 users: ['$stateParams', 'userService', function ($stateParams, userService) { return userService.findByName($stateParams.query); }],
                                 userPromise: ['userService', function (userService) { return userService.userPromise.promise; }]

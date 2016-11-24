@@ -7,21 +7,13 @@
             $scope.channels = channelService.channels;
 
             for (var i = 0; i < $scope.profile.TagCloud.length; i++) {
-                $scope.profile.TagCloud[i].link = "#/search?query=" + $scope.profile.TagCloud[i].text;
+                $scope.profile.TagCloud[i].link = "#/searchByTag?query=" + $scope.profile.TagCloud[i].text;
             }
 
             $scope.grantaccess = function() {
                 channelSelectorService.selectChannel($scope.user.Owns, function(channelId) {
                     channelService.grant(channelId, $scope.profile.Id);
                 });
-            }
-
-            $scope.addChannel = function() {
-                channelService.create({ Name: $scope.newChannelName }).success(function(data) {
-                    $scope.profile.Owns.push(data);
-                });
-
-                $scope.newChannelName = "";
             }
 
             $scope.delete = function (channel) {

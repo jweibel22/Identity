@@ -23,9 +23,13 @@ angular.module('inspire').factory('userService', ['$http', '$q', 'ngSettings', f
     };
 
     o.findByName = function (query) {
-        return $http.get(ngSettings.baseUrl + '/Api/User?query=' + query).success(function (data) {
+        
+        var result = $q.defer();
+        $http.get(ngSettings.baseUrl + '/Api/User?query=' + query).success(function (data) {
             angular.copy(data, o.searchResult);
+            result.resolve(data);
         });
+        return result.promise;
     }
 
     o.block = function (userId, tag) {

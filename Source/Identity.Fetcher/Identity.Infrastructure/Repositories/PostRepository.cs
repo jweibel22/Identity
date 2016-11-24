@@ -120,9 +120,9 @@ namespace Identity.Infrastructure.Repositories
         //TODO: add paging here
         public IEnumerable<Post> FindByTitleOrTag(string tag)
         {
-            var encodedTag = tag.Replace("%", "[%]").Replace("[", "[[]").Replace("]", "[]]") + "%";
+            var encodedTag = tag.Replace("%", "[%]").Replace("[", "[[]").Replace("]", "[]]");
 
-            return con.Connection.Query<Post>(@"select top 100 Post.* from Post left join Tagged t on t.PostId = Post.Id join Tag on Tag.Id = Tagged.TagId where Tag.Name = @EncodedTag", new { EncodedTag = encodedTag, Tag = tag }, con);
+            return con.Connection.Query<Post>(@"select top 100 Post.* from Post left join Tagged t on t.PostId = Post.Id join Tag on Tag.Id = t.TagId where Tag.Name = @EncodedTag", new { EncodedTag = encodedTag, Tag = tag }, con);
         }
 
         //TODO: add paging here

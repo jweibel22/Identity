@@ -5,6 +5,21 @@
     <table>
         <tr>
             <td>
+                <div class="btn-group">
+                    <button type="button" data-toggle="dropdown" class="btn btn-sm glyphicon glyphicon-menu-hamburger"></button>
+                    <ul class="dropdown-menu">
+                        <li><a ng-click="markAllAsRead()">Mark all as read</a></li>
+                        <li ng-show="channelOwned"><a ng-click="addLink()">Add link ...</a></li>
+                        <li ng-show="channelOwned"><a ng-click="addPost()">Add post ...</a></li>
+                        <li ng-show="channelOwned"><a ng-click="addFeeder()">Add feeder ...</a></li>
+                        <li><a ng-click="createLink()">Foward to ...</a></li>
+                        <li ng-show="channelOwned"><a href="#/editchannel/{{channel.Id}}">Configure</a></li>
+                        <li ng-show="channelOwned"><a ng-click="leave()">Leave</a></li>
+                        <li ng-show="channelOwned"><a ng-click="delete()">Delete</a></li>
+                    </ul>
+                </div>
+            </td>            
+            <td>
                 <h2>{{channel.Name}}</h2>
             </td>
             <td>
@@ -12,6 +27,7 @@
             </td>
         </tr>
         <tr>
+            <td></td>
             <td>
                 <div>
                     <span>Posts per day: </span> {{channel.Statistics.PostPerDay}}
@@ -19,7 +35,8 @@
                 </div>
             </td>
         </tr>
-        <tr>
+        <!--<tr>
+            <td></td>
             <td>
                 <button class="btn btn-default" ng-show="channelOwned" ng-click="addLink()">Add link</button>
                 <button class="btn btn-default" ng-show="channelOwned" ng-click="addPost()">Add post</button>
@@ -30,17 +47,18 @@
                 <button class="btn btn-default" ng-click="markAllAsRead()">Mark all as read</button>
                 <a ng-show="channelOwned" href="#/editchannel/{{channel.Id}}" class="btn btn-default">Edit</a>
             </td>
-        </tr>
+        </tr>-->
     </table>
 </div>
-
-
 
 
 <div style="margin-top:120px">
     <!--<button class="btn btn-default" ng-show="channelOwned" ng-click="rss()">RSS</button>-->
     <jqcloud words="channel.TagCloud" width="400" height="100" delay="10" steps="7" font-size="{from:0.09, to:0.04}"></jqcloud>
-    <stream posts="posts" user="user" showonlyunread="showOnlyUnread" display-settings-changed="displaySettingsChanged(settings)" channel="channel" autoloadonscroll="true" showcontrols="true" />
+    <div ng-show="posts.length == 0">
+        Empty channel disclaimer here!
+    </div>
+    <stream ng-show="posts.length > 0" posts="posts" user="user" showonlyunread="showOnlyUnread" display-settings-changed="displaySettingsChanged(settings)" channel="channel" autoloadonscroll="true" showcontrols="true" />
 </div>
 
     <script type="text/ng-template" id="channelSelector.html">
@@ -61,3 +79,35 @@
         </form>
     </script>
 
+<script type="text/ng-template" id="addFeeder.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Add a new feed</h4>
+    </div>
+    <form ng-submit="submit()">
+        <div class="modal-body">
+            <span>Type:</span>
+            <div class="btn-group" style="margin-bottom: 10px">
+                <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{windowdata.feedType}}  <span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                    <li ng-repeat="item in windowdata.feedTypes">
+                        <a ng-click="changeFeedType(item)">
+                            {{item}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="form-group">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Url"
+                       ng-model="windowdata.rssfeederUrl"></input>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-default">Close</button>
+            <input type="submit" class="btn btn-primary" value="Submit" />
+        </div>
+    </form>
+</script>

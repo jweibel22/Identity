@@ -1,5 +1,8 @@
 
-<h4>Channels</h4>    
+<h4>Channels</h4>
+<div>
+    <button class="btn btn-xs" ng-click="newChannel()" style="margin-left: 20px">New channel <span class="glyphicon glyphicon-plus"></span></button>
+</div>
 <div ng-repeat="channel in user.Owns" style="margin-left: 20px">
     <div ng-show="channel.IsLocked">
         <a href="#/home/{{channel.Id}}">
@@ -13,7 +16,7 @@
     </div>    
 </div>
 
-<div style="margin-top:10px">
+<div style="margin-top: 10px">
     <div ng-repeat="channel in user.Owns" style="margin-left: 20px">
         <div ng-show="!channel.IsLocked">
             <a href="#/home/{{channel.Id}}">
@@ -24,6 +27,28 @@
                     {{sub.Name}} <span ng-show="sub.ShowUnreadCounter && sub.UnreadCount > 0"> ({{sub.UnreadCount}})</span>
                 </a>
             </div>
-        </div>        
+        </div>
     </div>
 </div>
+
+<script type="text/ng-template" id="addNewChannel.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Add a new channel</h4>
+    </div>
+    <form ng-submit="submit()">
+        <div class="modal-body">
+            <div class="form-group">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Name"
+                       value=""
+                       ng-model="windowdata.name"></input>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-default">Close</button>
+            <input type="submit" class="btn btn-primary" value="Submit" />
+        </div>
+    </form>
+</script>
