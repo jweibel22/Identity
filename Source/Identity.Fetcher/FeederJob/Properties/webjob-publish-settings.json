@@ -3,7 +3,7 @@
   "webJobName": "FeederJob",
   "startTime": "2015-11-27T18:00:00+01:00",
   "endTime": null,
-  "jobRecurrenceFrequency": "Minute",
+  "jobRecurrenceFrequency": "Hour",
   "interval": 1,
   "runMode": "Scheduled"
 }
