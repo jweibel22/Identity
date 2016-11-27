@@ -3,7 +3,7 @@
   "webJobName": "FeederJob",
   "startTime": null,
   "endTime": null,
-  "jobRecurrenceFrequency": null,
-  "interval": null,
-  "runMode": "Continuous"
+  "jobRecurrenceFrequency": "Minute",
+  "interval": 1,
+  "runMode": "Scheduled"
 }
