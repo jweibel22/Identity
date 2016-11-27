@@ -42,6 +42,7 @@
     <Compile Include="Channel.cs" />
     <Compile Include="ChannelDisplaySettings.cs" />
     <Compile Include="ChannelItem.cs" />
+    <Compile Include="ChannelLinkGraph.cs" />
     <Compile Include="ChannelOwner.cs" />
     <Compile Include="InlineArticleSelector.cs" />
     <Compile Include="PublishedIn.cs" />

@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace Identity.Domain
 {
+    public class OwnChannel : Channel
+    {
+        public int UnreadCount { get; set; }
+    }
+
     public class Channel
     {
         public long Id { get; set; }

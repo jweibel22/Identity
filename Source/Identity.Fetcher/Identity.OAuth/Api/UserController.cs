@@ -44,7 +44,7 @@ namespace Identity.Rest.Api
 
         private User Map(Domain.User user, Domain.User loggedInUser)
         {
-            var unreadCounts = channelRepo.GetUneadCounts(user.Id).ToList();
+            //var unreadCounts = channelRepo.GetUneadCounts(user.Id).ToList();
 
             var ownedByUser = userRepo.Owns(user.Id).ToList();
             var ownedAsDto = ownedByUser.Select(c =>
@@ -52,14 +52,14 @@ namespace Identity.Rest.Api
                 var channel = Mapper.Map<Channel>(c);
 
                 var subs = channelRepo.GetSubscriptions(channel.Id).ToList();
-                channel.Subscriptions = subs.Where(ch => ownedByUser.Any(x => x.Id == ch.Id)).Select(Mapper.Map<Channel>).ToList();
+                channel.Subscriptions = subs.Join(ownedByUser, x => x.Id, x => x.Id, (c1, c2) => c2).Select(Mapper.Map<Channel>).ToList();
 
-                foreach (var sub in channel.Subscriptions)
-                {
-                    sub.UnreadCount = unreadCounts.Where(x => x.ChannelId == sub.Id).Sum(x => x.Count);
-                }
+                //foreach (var sub in channel.Subscriptions)
+                //{
+                //    sub.UnreadCount = unreadCounts.Where(x => x.ChannelId == sub.Id).Sum(x => x.Count);
+                //}
 
-                channel.UnreadCount = unreadCounts.Where(x => x.ChannelId == channel.Id || subs.Any(s => s.Id == x.ChannelId)).Sum(x => x.Count);
+                //channel.UnreadCount = unreadCounts.Where(x => x.ChannelId == channel.Id || subs.Any(s => s.Id == x.ChannelId)).Sum(x => x.Count);
 
                 return channel;
             }).ToList();

@@ -27,6 +27,8 @@ CREATE TABLE [dbo].[ChannelOwner](
 	[ChannelId] [bigint] NOT NULL,
 	[UserId] [bigint] NOT NULL,
 	[IsLocked] [bit] NOT NULL,
+	[UnreadCount] [int] NOT NULL,
+	[IsDirty] [bit] NOT NULL,
  CONSTRAINT [PK_ChannelOwner] PRIMARY KEY CLUSTERED 
 (
 	[ChannelId] ASC, UserId ASC
@@ -281,3 +283,13 @@ CREATE TABLE [dbo].[BlockedTag](
 	UserId ASC, TagId ASC
 )
 ) ON [PRIMARY]
+
+CREATE TABLE [dbo].[UnreadCountIsDirtyEvent](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[ChannelId] [bigint] NOT NULL,
+	[Created] [datetimeoffset] NOT NULL,
+ CONSTRAINT [PK_UnreadCountIsDirtyEvent] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)
+)

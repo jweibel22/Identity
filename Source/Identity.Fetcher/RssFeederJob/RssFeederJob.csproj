@@ -104,6 +104,10 @@
     <None Include="Properties\webjob-publish-settings.json" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Identity.Domain\Identity.Domain.csproj">
+      <Project>{37EB6744-B8BD-4958-A532-3FC7449211DC}</Project>
+      <Name>Identity.Domain</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Identity.Infrastructure\Identity.Infrastructure.csproj">
       <Project>{807dd115-d67c-462d-b4fc-f06abbc3112e}</Project>
       <Name>Identity.Infrastructure</Name>

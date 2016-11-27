@@ -36,6 +36,7 @@ namespace Identity.Rest.Api
         private readonly ChannelRepository channelRepo;
         private readonly PostRepository postRepo;
         private readonly UserRepository userRepo;
+        private readonly ChannelLinkRepository channelLinkRepository;
         private readonly ILoadDtos dtoLoader;
         private readonly Bus bus;
 
@@ -43,7 +44,7 @@ namespace Identity.Rest.Api
         private Domain.User user;
 
         public ChannelController(ILoadDtos dtoLoader, ChannelRepository channelRepo, PostRepository postRepo,
-            UserRepository userRepo, Bus bus, PostListLoader postListLoader)
+            UserRepository userRepo, Bus bus, PostListLoader postListLoader, ChannelLinkRepository channelLinkRepository)
         {
             var identity = User.Identity as ClaimsIdentity;
             user = userRepo.FindByName(identity.Name);
@@ -54,6 +55,7 @@ namespace Identity.Rest.Api
             this.userRepo = userRepo;
             this.bus = bus;
             this.postListLoader = postListLoader;
+            this.channelLinkRepository = channelLinkRepository;
         }
 
         [HttpGet]
@@ -95,20 +97,6 @@ namespace Identity.Rest.Api
         }
 
         [HttpPut]
-        public void Subscribe(long id)
-        {
-            channelRepo.AddSubscription(user.SubscriptionChannel, id);
-            //userRepo.Subscribe(user.Id, id);
-        }
-
-        [HttpPut]
-        public void Unsubscribe(long id)
-        {
-            channelRepo.RemoveSubscription(user.SubscriptionChannel, id);
-            //userRepo.Unsubscribe(user.Id, id);
-        }
-
-        [HttpPut]
         public void Leave(long id)
         {
             userRepo.Leave(user.Id, id);
@@ -124,12 +112,14 @@ namespace Identity.Rest.Api
         public void Posts(long id, long postId)
         {
             userRepo.Publish(user.Id, id, postId);
+            channelLinkRepository.ChannelIsDirty(id);
         }
 
         [HttpDelete]
         public void DeletePost(long id, long postId)
         {
-            userRepo.Remove(user.Id, id, postId);            
+            userRepo.Remove(user.Id, id, postId);
+            channelLinkRepository.ChannelIsDirty(id);
         }
 
         [HttpPost]
@@ -153,6 +143,7 @@ namespace Identity.Rest.Api
             c.Name = channel.Name;
 
             channelRepo.UpdateChannel(c, channel.Subscriptions.Select(x => x.Id));
+            channelLinkRepository.ChannelIsDirty(id);
 
             return dtoLoader.LoadChannel(user, channelRepo.GetById(id));
         }
@@ -161,12 +152,14 @@ namespace Identity.Rest.Api
         public void RemoveSubscription(long id, long childId)
         {
             channelRepo.RemoveSubscription(id, childId);
+            channelLinkRepository.ChannelIsDirty(id);
         }
 
         [HttpPut]
         public void AddSubscription(long id, long childId)
         {
             channelRepo.AddSubscription(id, childId);
+            channelLinkRepository.ChannelIsDirty(id);
         }
 
         [HttpPut]
@@ -174,6 +167,7 @@ namespace Identity.Rest.Api
         {
             var feed = channelRepo.GetFeed(url, type);
             channelRepo.AddSubscription(id, feed.ChannelId);
+            channelLinkRepository.ChannelIsDirty(id);
             bus.Publish("new-feeder-created", feed.Id.ToString());
         }
 
@@ -207,6 +201,7 @@ namespace Identity.Rest.Api
             }
             
             userRepo.Publish(user.Id, id, p.Id);
+            channelLinkRepository.ChannelIsDirty(id);
 
             if (post.Tags != null)
             {

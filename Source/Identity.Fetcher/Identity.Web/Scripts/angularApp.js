@@ -1,8 +1,8 @@
 angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-jqcloud', 'infinite-scroll', 'LocalStorageModule', 'angular-toasty'])
     .constant('ngSettings', {
         //baseUrl: "http://localhost:8011",
-        //baseUrl: "http://localhost:57294/",
-		baseUrl: "http://inspireserver.azurewebsites.net/",	
+        baseUrl: "http://localhost:57294/",
+		//baseUrl: "http://inspireserver.azurewebsites.net/",	
         clientId: 'ngAuthApp'
     })
     .config(function($httpProvider) {
@@ -11,6 +11,7 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
     .config([
         '$stateProvider',
         '$urlRouterProvider',
+        
         function($stateProvider, $urlRouterProvider) {
 
             $stateProvider

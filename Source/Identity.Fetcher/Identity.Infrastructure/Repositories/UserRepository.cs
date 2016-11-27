@@ -139,9 +139,9 @@ namespace Identity.Infrastructure.Repositories
             con.Connection.Execute("delete from ChannelOwner where UserId=@UserId and ChannelId=@ChannelId", new { UserId = userId, ChannelId = channelId }, con);
         }
 
-        public IEnumerable<Channel> Owns(long userId)
+        public IEnumerable<OwnChannel> Owns(long userId)
         {
-            return con.Connection.Query<Channel>("select c.*, s.IsLocked from Channel c join ChannelOwner s on c.Id = s.ChannelId where s.UserId = @UserId", new { UserId = userId }, con);
+            return con.Connection.Query<OwnChannel>("select c.*, s.IsLocked, s.UnreadCount from Channel c join ChannelOwner s on c.Id = s.ChannelId where s.UserId = @UserId", new { UserId = userId }, con);
         }
 
         public IEnumerable<WeightedTag> GetTagCloud(long userId, long forUserId)

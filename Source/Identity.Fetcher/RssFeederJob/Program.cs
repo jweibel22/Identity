@@ -16,7 +16,7 @@ namespace RssFeederJob
         // AzureWebJobsDashboard and AzureWebJobsStorage
         static void Main()
         {
-            //var host = new JobHost();
+            //var host = new JobHost();            
             //// The following code ensures that the WebJob will be running continuously
             //host.RunAndBlock();
 

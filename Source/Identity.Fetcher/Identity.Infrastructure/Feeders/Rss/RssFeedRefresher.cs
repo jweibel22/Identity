@@ -80,49 +80,59 @@ namespace Identity.Infrastructure.Rss
 
                 using (var session = connectionFactory.NewTransaction())
                 {
-                    var channelRepo = new ChannelRepository(session.Transaction);
-                    var postRepo = new PostRepository(session.Transaction);
-                    var userRepo = new UserRepository(session.Transaction);
-                    //var autoTagger = new AutoTagger(new TagCountRepository(session), postRepo);
-
-                    log.Info("Processing feed items from feed " + t.Item1.Url);
-                    
-                    var tags = channelRepo.GetFeedTags(t.Item1.Id);
-
-                    t.Item1.LastFetch = DateTimeOffset.Now;
-                    channelRepo.UpdateFeed(t.Item1);
-
                     try
                     {
+
+                        var channelRepo = new ChannelRepository(session.Transaction);
+                        var postRepo = new PostRepository(session.Transaction);
+                        var userRepo = new UserRepository(session.Transaction);
+                        var channelLinkRepo = new ChannelLinkRepository(session.Transaction);
+                        //var autoTagger = new AutoTagger(new TagCountRepository(session), postRepo);
+
+                        log.Info("Processing feed items from feed " + t.Item1.Url);
+
+                        var tags = channelRepo.GetFeedTags(t.Item1.Id);
+
+                        t.Item1.LastFetch = DateTimeOffset.Now;
+                        channelRepo.UpdateFeed(t.Item1);
+                        channelLinkRepo.ChannelIsDirty(t.Item1.ChannelId);
+
                         foreach (var feedItem in t.Item2)
                         {
-                            if (postRepo.FeedItemAlreadyPosted(feedItem.Title, feedItem.CreatedAt, t.Item1.Id))
-                                break;
-
-                            var url = feedItem.Links.First().ToString();
-                            var post = postRepo.GetByUrl(url);
-
-                            if (post == null)
+                            try
                             {
-                                log.Info("processing item " + feedItem.Title + " from feed " + t.Item1.Url);
+                                if (postRepo.FeedItemAlreadyPosted(feedItem.Title, feedItem.CreatedAt, t.Item1.Id))
+                                    break;
 
-                                post = new Post
+                                var url = feedItem.Links.First().ToString();
+                                var post = postRepo.GetByUrl(url);
+
+                                if (post == null)
                                 {
-                                    Created = feedItem.CreatedAt,
-                                    Description = feedItem.Content,
-                                    Title = feedItem.Title,
-                                    Uri = url,
-                                    PremiumContent = url.Contains("protected/premium")
-                                };
+                                    log.Info("processing item " + feedItem.Title + " from feed " + t.Item1.Url);
 
-                                postRepo.AddPost(post, true);
-                                postRepo.TagPost(post.Id, feedItem.Tags.Union(tags));
-                                //autoTagger.AutoTag(post);
+                                    post = new Post
+                                    {
+                                        Created = feedItem.CreatedAt,
+                                        Description = feedItem.Content,
+                                        Title = feedItem.Title,
+                                        Uri = url,
+                                        PremiumContent = url.Contains("protected/premium")
+                                    };
+
+                                    postRepo.AddPost(post, true);
+                                    postRepo.TagPost(post.Id, feedItem.Tags.Union(tags));
+                                    //autoTagger.AutoTag(post);
+                                }
+
+                                postRepo.AddFeedItem(t.Item1.Id, post.Id, feedItem.CreatedAt);
+
+                                userRepo.Publish(rssFeederUser.Id, t.Item1.ChannelId, post.Id);                                
                             }
-
-                            postRepo.AddFeedItem(t.Item1.Id, post.Id, feedItem.CreatedAt);
-
-                            userRepo.Publish(rssFeederUser.Id, t.Item1.ChannelId, post.Id);
+                            catch (Exception ex)
+                            {
+                                log.Error("Processing of feed item " + feedItem.Title + " failed", ex);
+                            }
                         }
 
                         session.Commit();

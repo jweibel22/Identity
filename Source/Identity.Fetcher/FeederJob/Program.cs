@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -19,9 +20,10 @@ namespace FeederJob
         {
             XmlConfigurator.Configure();
 
-            var host = new JobHost();
-            // The following code ensures that the WebJob will be running continuously
-            host.RunAndBlock();
+            //var host = new JobHost();            
+            //host.RunAndBlock();
+
+            Functions.SyncFeeds("", TextWriter.Null);
         }
     }
 }

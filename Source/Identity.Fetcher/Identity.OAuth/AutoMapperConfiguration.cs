@@ -13,6 +13,10 @@ namespace Identity.Rest
             AutoMapper.Mapper.CreateMap<Channel, Infrastructure.DTO.Channel>()
                 .ForMember(x => x.IsPrivate, _ => _.MapFrom(src => !src.IsPublic));
 
+            AutoMapper.Mapper.CreateMap<OwnChannel, Infrastructure.DTO.Channel>()
+                .ForMember(x => x.UnreadCount, _ => _.MapFrom(src => src.UnreadCount))
+                .ForMember(x => x.IsPrivate, _ => _.MapFrom(src => !src.IsPublic));
+
             AutoMapper.Mapper.CreateMap<Post, Infrastructure.DTO.Post>()
                 .ForMember(x => x.Type, _ => _.UseValue("link"))
                 .ForMember(x => x.EmbeddedUrl, _ => _.ResolveUsing(MapEmbeddedUrl))
