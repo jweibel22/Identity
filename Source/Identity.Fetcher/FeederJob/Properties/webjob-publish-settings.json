@@ -1,7 +1,7 @@
 ﻿{
   "$schema": "http://schemastore.org/schemas/json/webjob-publish-settings.json",
   "webJobName": "FeederJob",
-  "startTime": "2015-11-28T07:00:00+01:00",
+  "startTime": "2015-11-27T07:00:00+01:00",
   "endTime": null,
   "jobRecurrenceFrequency": "Hour",
   "interval": 1,
