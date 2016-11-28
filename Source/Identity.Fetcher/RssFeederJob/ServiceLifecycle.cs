@@ -22,43 +22,9 @@ namespace RssFeeder
 
         public void Run()
         {            
-            XmlConfigurator.Configure();
+            
 
-            var connectionFactory = new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
 
-            try
-            {
-                using (var session = connectionFactory.NewTransaction())
-                {
-                    var repo = new ChannelLinkRepository(session.Transaction);
-                    var events = repo.AllChannelIsDirtyEvents().ToList();
-
-                    if (!events.Any())
-                    {
-                        return;
-                    }
-
-                    var channelLinkGraph = repo.GetGraph();
-
-                    foreach (var e in events)
-                    {
-                        channelLinkGraph.MarkAsDirty(e.ChannelId);
-                    }
-
-                    foreach (var edge in channelLinkGraph.DirtyUserChannels)
-                    {
-                        repo.UpdateUnreadCounts(edge);
-                    }
-
-                    repo.ClearChannelIsDirtyEvents(events.Select(e => e.Id).Max());
-
-                    session.Commit();
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error("UnreadCounts update job failed", ex);
-            }
 
             //var feedRefresher = new RssFeedRefresher(connectionFactory);
             //try

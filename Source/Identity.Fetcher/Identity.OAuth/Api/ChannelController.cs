@@ -36,7 +36,6 @@ namespace Identity.Rest.Api
         private readonly ChannelRepository channelRepo;
         private readonly PostRepository postRepo;
         private readonly UserRepository userRepo;
-        private readonly ChannelLinkRepository channelLinkRepository;
         private readonly ILoadDtos dtoLoader;
         private readonly Bus bus;
 
@@ -44,7 +43,7 @@ namespace Identity.Rest.Api
         private Domain.User user;
 
         public ChannelController(ILoadDtos dtoLoader, ChannelRepository channelRepo, PostRepository postRepo,
-            UserRepository userRepo, Bus bus, PostListLoader postListLoader, ChannelLinkRepository channelLinkRepository)
+            UserRepository userRepo, Bus bus, PostListLoader postListLoader)
         {
             var identity = User.Identity as ClaimsIdentity;
             user = userRepo.FindByName(identity.Name);
@@ -55,7 +54,6 @@ namespace Identity.Rest.Api
             this.userRepo = userRepo;
             this.bus = bus;
             this.postListLoader = postListLoader;
-            this.channelLinkRepository = channelLinkRepository;
         }
 
         [HttpGet]
@@ -112,14 +110,14 @@ namespace Identity.Rest.Api
         public void Posts(long id, long postId)
         {
             userRepo.Publish(user.Id, id, postId);
-            channelLinkRepository.ChannelIsDirty(id);
+            bus.Publish("refresh-unread-counts", id.ToString());
         }
 
         [HttpDelete]
         public void DeletePost(long id, long postId)
         {
             userRepo.Remove(user.Id, id, postId);
-            channelLinkRepository.ChannelIsDirty(id);
+            bus.Publish("refresh-unread-counts", id.ToString());
         }
 
         [HttpPost]
@@ -143,7 +141,7 @@ namespace Identity.Rest.Api
             c.Name = channel.Name;
 
             channelRepo.UpdateChannel(c, channel.Subscriptions.Select(x => x.Id));
-            channelLinkRepository.ChannelIsDirty(id);
+            bus.Publish("refresh-unread-counts", id.ToString());
 
             return dtoLoader.LoadChannel(user, channelRepo.GetById(id));
         }
@@ -152,14 +150,14 @@ namespace Identity.Rest.Api
         public void RemoveSubscription(long id, long childId)
         {
             channelRepo.RemoveSubscription(id, childId);
-            channelLinkRepository.ChannelIsDirty(id);
+            bus.Publish("refresh-unread-counts", id.ToString());
         }
 
         [HttpPut]
         public void AddSubscription(long id, long childId)
         {
             channelRepo.AddSubscription(id, childId);
-            channelLinkRepository.ChannelIsDirty(id);
+            bus.Publish("refresh-unread-counts", id.ToString());
         }
 
         [HttpPut]
@@ -167,7 +165,7 @@ namespace Identity.Rest.Api
         {
             var feed = channelRepo.GetFeed(url, type);
             channelRepo.AddSubscription(id, feed.ChannelId);
-            channelLinkRepository.ChannelIsDirty(id);
+            bus.Publish("refresh-unread-counts", id.ToString());
             bus.Publish("new-feeder-created", feed.Id.ToString());
         }
 
@@ -201,7 +199,7 @@ namespace Identity.Rest.Api
             }
             
             userRepo.Publish(user.Id, id, p.Id);
-            channelLinkRepository.ChannelIsDirty(id);
+            bus.Publish("refresh-unread-counts", id.ToString());
 
             if (post.Tags != null)
             {

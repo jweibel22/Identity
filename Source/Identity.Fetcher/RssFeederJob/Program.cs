@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using log4net.Config;
 using Microsoft.Azure.WebJobs;
 using RssFeeder;
 
@@ -16,11 +17,13 @@ namespace RssFeederJob
         // AzureWebJobsDashboard and AzureWebJobsStorage
         static void Main()
         {
-            //var host = new JobHost();            
-            //// The following code ensures that the WebJob will be running continuously
-            //host.RunAndBlock();
+            XmlConfigurator.Configure();
 
-            new ServiceLifecycle().Run();
+            var host = new JobHost();            
+            // The following code ensures that the WebJob will be running continuously
+            host.RunAndBlock();
+
+            //new ServiceLifecycle().Run();
         }
     }
 }
