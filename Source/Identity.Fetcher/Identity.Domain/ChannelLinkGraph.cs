@@ -62,7 +62,7 @@ namespace Identity.Domain
 
         public void MarkAsDirty(long channelId)
         {
-            var node = nodes.SingleOrDefault(n => n.Id == channelId);
+            var node = nodes.SingleOrDefault(n => n.Id == channelId && n.NodeType == NodeType.Channel);
 
             if (node == null)
             {
@@ -95,7 +95,7 @@ namespace Identity.Domain
 
                 foreach (var userNode in userNodes)
                 {
-                    foreach (var outEdge in edges.Where(e => e.To.Id == userNode.Id && e.From.IsDirty))
+                    foreach (var outEdge in edges.Where(e => e.To == userNode && e.From.IsDirty))
                     {
                         yield return outEdge;
                     }

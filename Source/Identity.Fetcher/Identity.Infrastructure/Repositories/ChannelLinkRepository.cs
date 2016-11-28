@@ -52,21 +52,6 @@ namespace Identity.Infrastructure.Repositories
             return new ChannelLinkGraph(userNodes.Union(channelNodes), ownerEdges.Union(channelEdges));
         }
 
-        public void ChannelIsDirty(long channelId)
-        {
-            con.Connection.Execute("Insert into [UnreadCountIsDirtyEvent] (ChannelId,Created) values (@ChannelId,GETDATE())", new { ChannelId = channelId }, con);
-        }
-
-        public IEnumerable<ChannelIsDirtyEvent> AllChannelIsDirtyEvents()
-        {
-            return con.Connection.Query<ChannelIsDirtyEvent>("select * from [UnreadCountIsDirtyEvent]", new {}, con).ToList();
-        }
-
-        public void ClearChannelIsDirtyEvents(long sequenceId)
-        {
-            con.Connection.Execute("delete from [UnreadCountIsDirtyEvent] where Id <= @Id", new { Id = sequenceId }, con);
-        }
-
         public void UpdateUnreadCounts(ChannelLinkEdge edge)
         {
             var sql = @"Update ChannelOwner set UnreadCount = (SELECT Cnt FROM [dbo].[ftUnreadPosts] (@ChannelId,@UserId)) where ChannelId = @ChannelId and UserId = @UserId";

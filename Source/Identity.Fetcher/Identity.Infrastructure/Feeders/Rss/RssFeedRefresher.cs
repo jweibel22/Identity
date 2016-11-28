@@ -52,6 +52,14 @@ namespace Identity.Infrastructure.Rss
 
         public void Run(User rssFeederUser, IEnumerable<Feed> feeders)
         {
+            ChannelLinkGraph graph;
+
+            using (var session = connectionFactory.NewTransaction())
+            {
+                var channelLinkRepo = new ChannelLinkRepository(session.Transaction);
+                graph = channelLinkRepo.GetGraph();
+            }
+
             var fetchFeedItemsBlock = new TransformBlock<Feed, Tuple<Feed, IEnumerable<FeedItem>>>(rssFeeder =>
             {
                 log.Info("fetching feed " + rssFeeder.Url);
@@ -86,7 +94,6 @@ namespace Identity.Infrastructure.Rss
                         var channelRepo = new ChannelRepository(session.Transaction);
                         var postRepo = new PostRepository(session.Transaction);
                         var userRepo = new UserRepository(session.Transaction);
-                        var channelLinkRepo = new ChannelLinkRepository(session.Transaction);
                         //var autoTagger = new AutoTagger(new TagCountRepository(session), postRepo);
 
                         log.Info("Processing feed items from feed " + t.Item1.Url);
@@ -95,7 +102,7 @@ namespace Identity.Infrastructure.Rss
 
                         t.Item1.LastFetch = DateTimeOffset.Now;
                         channelRepo.UpdateFeed(t.Item1);
-                        channelLinkRepo.ChannelIsDirty(t.Item1.ChannelId);
+                        graph.MarkAsDirty(t.Item1.ChannelId);
 
                         foreach (var feedItem in t.Item2)
                         {
@@ -165,6 +172,20 @@ namespace Identity.Infrastructure.Rss
             fetchFeedItemsBlock.Complete();
 
             storeFeedItemBlock.Completion.Wait();
+
+            log.Info("Refreshing unread counts");
+
+            using (var session = connectionFactory.NewTransaction())
+            {
+                var repo = new ChannelLinkRepository(session.Transaction);
+
+                foreach (var edge in graph.DirtyUserChannels)
+                {
+                    repo.UpdateUnreadCounts(edge);
+                }
+
+                session.Commit();
+            }
         }
     }
 
