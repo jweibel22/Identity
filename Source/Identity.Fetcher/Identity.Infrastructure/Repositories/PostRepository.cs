@@ -76,7 +76,7 @@ namespace Identity.Infrastructure.Repositories
 
         public void AddPost(Post post, bool tokenizeTitle)
         {
-            post.Id = con.Connection.Query<long>("insert Post values(@Created,@Title,@Description,@Uri,@PremiumContent); SELECT CAST(SCOPE_IDENTITY() as bigint)", post, con).Single();
+            post.Id = con.Connection.Query<long>("insert Post (Created,Title,Description,Uri,PremiumContent) values(@Created,@Title,@Description,@Uri,@PremiumContent); SELECT CAST(SCOPE_IDENTITY() as bigint)", post, con).Single();
             if (tokenizeTitle)
             {
                 StoreTokenizedTitle(post);
