@@ -43,11 +43,6 @@ namespace Identity.Infrastructure.Repositories
                     .ToList()
                     .Join(channelNodes, x=> x.ParentId, x => x.Id, (u, n) => new { u.ChildId, To = n })
                     .Join(channelNodes, x => x.ChildId, x => x.Id, (u, n) => new ChannelLinkEdge { From = n, To = u.To });
-            //.Select(x => new ChannelLinkEdge
-            //{
-            //    From = channelNodes.Single(n => n.Id == x.ChildId),
-            //    To = userNodes.Single(n => n.Id == x.ParentId)
-            //});
 
             return new ChannelLinkGraph(userNodes.Union(channelNodes), ownerEdges.Union(channelEdges));
         }

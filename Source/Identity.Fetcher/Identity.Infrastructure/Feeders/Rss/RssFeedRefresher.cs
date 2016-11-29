@@ -50,6 +50,60 @@ namespace Identity.Infrastructure.Rss
             log = new Logger(azureLog);
         }
 
+        private void ProcessFeed(DbSession session, User rssFeederUser, Feed feed, ChannelLinkGraph graph, IEnumerable<FeedItem> items)
+        {
+            var channelRepo = new ChannelRepository(session.Transaction);
+            var postRepo = new PostRepository(session.Transaction);
+            var userRepo = new UserRepository(session.Transaction);
+            //var autoTagger = new AutoTagger(new TagCountRepository(session), postRepo);
+
+            log.Info("Processing feed items from feed " + feed.Url);
+
+            var tags = channelRepo.GetFeedTags(feed.Id);
+
+            feed.LastFetch = DateTimeOffset.Now;
+            channelRepo.UpdateFeed(feed);
+            graph.MarkAsDirty(feed.ChannelId);
+
+            foreach (var feedItem in items)
+            {
+                try
+                {
+                    if (postRepo.FeedItemAlreadyPosted(feedItem.Title, feedItem.CreatedAt, feed.Id))
+                        break;
+
+                    var url = feedItem.Links.First().ToString();
+                    var post = postRepo.GetByUrl(url);
+
+                    if (post == null)
+                    {
+                        log.Info("processing item " + feedItem.Title + " from feed " + feed.Url);
+
+                        post = new Post
+                        {
+                            Created = feedItem.CreatedAt,
+                            Description = feedItem.Content,
+                            Title = feedItem.Title,
+                            Uri = url,
+                            PremiumContent = url.Contains("protected/premium")
+                        };
+
+                        postRepo.AddPost(post, false);
+                        postRepo.TagPost(post.Id, feedItem.Tags.Union(tags));
+                        //autoTagger.AutoTag(post);
+                    }
+
+                    postRepo.AddFeedItem(feed.Id, post.Id, feedItem.CreatedAt);
+
+                    userRepo.Publish(rssFeederUser.Id, feed.ChannelId, post.Id);
+                }
+                catch (Exception ex)
+                {
+                    log.Error("Processing of feed item " + feedItem.Title + " failed", ex);
+                }
+            }
+        }
+
         public void Run(User rssFeederUser, IEnumerable<Feed> feeders)
         {
             ChannelLinkGraph graph;
@@ -90,58 +144,7 @@ namespace Identity.Infrastructure.Rss
                 {
                     try
                     {
-
-                        var channelRepo = new ChannelRepository(session.Transaction);
-                        var postRepo = new PostRepository(session.Transaction);
-                        var userRepo = new UserRepository(session.Transaction);
-                        //var autoTagger = new AutoTagger(new TagCountRepository(session), postRepo);
-
-                        log.Info("Processing feed items from feed " + t.Item1.Url);
-
-                        var tags = channelRepo.GetFeedTags(t.Item1.Id);
-
-                        t.Item1.LastFetch = DateTimeOffset.Now;
-                        channelRepo.UpdateFeed(t.Item1);
-                        graph.MarkAsDirty(t.Item1.ChannelId);
-
-                        foreach (var feedItem in t.Item2)
-                        {
-                            try
-                            {
-                                if (postRepo.FeedItemAlreadyPosted(feedItem.Title, feedItem.CreatedAt, t.Item1.Id))
-                                    break;
-
-                                var url = feedItem.Links.First().ToString();
-                                var post = postRepo.GetByUrl(url);
-
-                                if (post == null)
-                                {
-                                    log.Info("processing item " + feedItem.Title + " from feed " + t.Item1.Url);
-
-                                    post = new Post
-                                    {
-                                        Created = feedItem.CreatedAt,
-                                        Description = feedItem.Content,
-                                        Title = feedItem.Title,
-                                        Uri = url,
-                                        PremiumContent = url.Contains("protected/premium")
-                                    };
-
-                                    postRepo.AddPost(post, true);
-                                    postRepo.TagPost(post.Id, feedItem.Tags.Union(tags));
-                                    //autoTagger.AutoTag(post);
-                                }
-
-                                postRepo.AddFeedItem(t.Item1.Id, post.Id, feedItem.CreatedAt);
-
-                                userRepo.Publish(rssFeederUser.Id, t.Item1.ChannelId, post.Id);                                
-                            }
-                            catch (Exception ex)
-                            {
-                                log.Error("Processing of feed item " + feedItem.Title + " failed", ex);
-                            }
-                        }
-
+                        ProcessFeed(session, rssFeederUser, t.Item1, graph, t.Item2);   
                         session.Commit();
 
                         log.Info("Done processing feed items from feed " + t.Item1.Url);
