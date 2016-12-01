@@ -113,7 +113,24 @@ namespace Identity.Rest.Api
             foreach (var id in readHistory.PostIds)
             {
                 userRepo.Read(userId, id);    
-            }            
+            }                 
+        }
+
+        [HttpPost]
+        [Route("Api/Post/ReadAndDecrementUnreadCount")]
+        public void ReadAndDecrementUnreadCount(long userId, long channelId, ReadHistory readHistory)
+        {
+            var insertCount = 0;
+            foreach (var id in readHistory.PostIds)
+            {
+                insertCount += userRepo.Read(userId, id);
+            }
+
+            if (insertCount > 0)
+            {
+                userRepo.DecrementUnreadCount(userId, channelId, insertCount);
+            }
+            
         }
 
         [HttpGet]

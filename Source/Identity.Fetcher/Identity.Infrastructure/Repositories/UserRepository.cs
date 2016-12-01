@@ -103,7 +103,8 @@ namespace Identity.Infrastructure.Repositories
 
         public void Publish(long userId, long channelId, long postId)
         {
-            con.Connection.Execute("update ChannelItem set PostId=@PostId where PostId=@PostId and ChannelId=@ChannelId if @@rowcount = 0 insert ChannelItem values(@ChannelId, @PostId, @UserId, @Created)", new { UserId = userId, ChannelId = channelId, PostId = postId, Created = DateTimeOffset.Now }, con);
+            con.Connection.Execute("update ChannelItem set PostId=@PostId where PostId=@PostId and ChannelId=@ChannelId if @@rowcount = 0 insert ChannelItem values(@ChannelId, @PostId, @UserId, @Created)", 
+                new { UserId = userId, ChannelId = channelId, PostId = postId, Created = DateTimeOffset.Now }, con);
         }
 
         public void Remove(long userId, long channelId, long postId)
@@ -116,9 +117,19 @@ namespace Identity.Infrastructure.Repositories
             con.Connection.Execute("insert ChannelOwner values(@ChannelId, @UserId, @IsLocked)", new { UserId = userId, ChannelId = channelId, IsLocked = locked }, con);
         }
 
-        public void Read(long userId, long postId)
+        public int Read(long userId, long postId)
         {
-            con.Connection.Execute("update ReadHistory set Timestamp=@Timestamp where UserId=@UserId and PostId=@PostId if @@rowcount = 0 insert ReadHistory values(@UserId, @PostId, @Timestamp)", new { UserId = userId, PostId = postId, Timestamp = DateTimeOffset.Now }, con);
+            var sql = @"
+update ReadHistory set Timestamp=@Timestamp where UserId=@UserId and PostId=@PostId 
+if @@rowcount = 0 
+	begin
+		insert ReadHistory values(@UserId, @PostId, @Timestamp);
+		select 1;
+	end
+else
+	select 0;
+";
+            return con.Connection.Query<int>(sql, new { UserId = userId, PostId = postId, Timestamp = DateTimeOffset.Now }, con).Single();
         }
 
         public bool IsRead(long userId, long postId)
@@ -180,6 +191,11 @@ namespace Identity.Infrastructure.Repositories
         public void Grant(long userId, long channelId)
         {
             con.Connection.Execute("update ChannelOwner set UserId=@UserId, ChannelId=@ChannelId where UserId=@UserId and ChannelId=@ChannelId if @@rowcount = 0 insert ChannelOwner values(@ChannelId, @UserId, @IsLocked)", new { UserId = userId, ChannelId = channelId, IsLocked = false }, con);
+        }
+
+        public void DecrementUnreadCount(long userId, long channelId, int unreadCount)
+        {
+            con.Connection.Execute("update ChannelOwner set UnreadCount = UnreadCount - @UnreadCount where UserId=@UserId and ChannelId=@ChannelId", new { UserId = userId, ChannelId = channelId, UnreadCount = unreadCount }, con);
         }
     }
 }

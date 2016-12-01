@@ -17,10 +17,6 @@ using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
 using Identity.OAuth;
 using log4net;
-using Microsoft.Azure.WebJobs;
-using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Queue;
 using Channel = Identity.Infrastructure.DTO.Channel;
 using ChannelDisplaySettings = Identity.Infrastructure.DTO.ChannelDisplaySettings;
 using Post = Identity.Infrastructure.DTO.Post;
@@ -105,19 +101,24 @@ namespace Identity.Rest.Api
         {
             userRepo.Grant(userId, id);
         }
-        
+
+        private void RefreshUnreadCounts(long channelId)
+        {
+            bus.Publish("refresh-unread-counts", channelId.ToString());
+        }
+
         [HttpPut]
         public void Posts(long id, long postId)
         {
             userRepo.Publish(user.Id, id, postId);
-            bus.Publish("refresh-unread-counts", id.ToString());
+            RefreshUnreadCounts(id);
         }
 
         [HttpDelete]
         public void DeletePost(long id, long postId)
         {
             userRepo.Remove(user.Id, id, postId);
-            bus.Publish("refresh-unread-counts", id.ToString());
+            RefreshUnreadCounts(id);
         }
 
         [HttpPost]
@@ -141,7 +142,7 @@ namespace Identity.Rest.Api
             c.Name = channel.Name;
 
             channelRepo.UpdateChannel(c, channel.Subscriptions.Select(x => x.Id));
-            bus.Publish("refresh-unread-counts", id.ToString());
+            RefreshUnreadCounts(id);
 
             return dtoLoader.LoadChannel(user, channelRepo.GetById(id));
         }
@@ -150,14 +151,14 @@ namespace Identity.Rest.Api
         public void RemoveSubscription(long id, long childId)
         {
             channelRepo.RemoveSubscription(id, childId);
-            bus.Publish("refresh-unread-counts", id.ToString());
+            RefreshUnreadCounts(id);
         }
 
         [HttpPut]
         public void AddSubscription(long id, long childId)
         {
             channelRepo.AddSubscription(id, childId);
-            bus.Publish("refresh-unread-counts", id.ToString());
+            RefreshUnreadCounts(id);
         }
 
         [HttpPut]
@@ -165,7 +166,7 @@ namespace Identity.Rest.Api
         {
             var feed = channelRepo.GetFeed(url, type);
             channelRepo.AddSubscription(id, feed.ChannelId);
-            bus.Publish("refresh-unread-counts", id.ToString());
+            RefreshUnreadCounts(id);
             bus.Publish("new-feeder-created", feed.Id.ToString());
         }
 
@@ -199,7 +200,7 @@ namespace Identity.Rest.Api
             }
             
             userRepo.Publish(user.Id, id, p.Id);
-            bus.Publish("refresh-unread-counts", id.ToString());
+            RefreshUnreadCounts(id);
 
             if (post.Tags != null)
             {

@@ -106,7 +106,12 @@
 
                     if (pending.length > 0) {
                         console.log("Submitting " + pending.length + " posts");
-                        postService.read({ PostIds: pending.map(function(p) { return p.Id }) }, $scope.user.Id)
+
+                        var promise = $scope.channelOwned
+                            ? postService.readAndDecrementUnreadCount({ PostIds: pending.map(function (p) { return p.Id }) }, $scope.user.Id, $scope.channel.Id)
+                            : postService.read({ PostIds: pending.map(function(p) { return p.Id }) }, $scope.user.Id);
+
+                        promise
                             .success(function() {
 
                                 for (var i = 0; i < posts.length; i++) {
@@ -115,9 +120,7 @@
 
                                 if ($scope.channel) {
                                     $scope.channel.UnreadCount = $scope.initialUnread - $filter('filter')($scope.readHistory, { Read: true }, true).length;
-                                }
-
-                                
+                                }                                
                             });
                     }
                 }

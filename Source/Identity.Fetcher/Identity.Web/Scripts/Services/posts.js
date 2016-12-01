@@ -119,6 +119,10 @@ angular.module('inspire').factory('postService', ['$http', '$q', '$filter', 'ngS
         return $http.post(ngSettings.baseUrl + '/Api/Post/' + id + '/Comments', comment);
     };
 
+    o.readAndDecrementUnreadCount = function (ids, userId, channelId) {
+        return $http.post(ngSettings.baseUrl + '/Api/Post/ReadAndDecrementUnreadCount?userId=' + userId + '&channelId=' + channelId, ids);
+    };
+
     o.read = function (ids, userId) {
         return $http.post(ngSettings.baseUrl + '/Api/Post/Read?userId=' + userId, ids);
     };
