@@ -69,7 +69,7 @@ namespace Identity.Infrastructure.Rss
             {
                 try
                 {
-                    if (postRepo.FeedItemAlreadyPosted(feedItem.Title, feedItem.CreatedAt, feed.Id))
+                    if (postRepo.SimilarPostAlreadyExists(feedItem.Title, feedItem.CreatedAt, feed.ChannelId))
                         break;
 
                     var url = feedItem.Links.First().ToString();
@@ -92,8 +92,6 @@ namespace Identity.Infrastructure.Rss
                         postRepo.TagPost(post.Id, feedItem.Tags.Union(tags));
                         //autoTagger.AutoTag(post);
                     }
-
-                    postRepo.AddFeedItem(feed.Id, post.Id, feedItem.CreatedAt);
 
                     userRepo.Publish(rssFeederUser.Id, feed.ChannelId, post.Id);
                 }

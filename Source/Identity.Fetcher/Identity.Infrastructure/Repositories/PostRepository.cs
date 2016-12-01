@@ -45,20 +45,15 @@ namespace Identity.Infrastructure.Repositories
             con.Connection.Execute("update WebScraperItem set PostId=@PostId where PostId=@PostId and WebScraperId=@WebScraperId if @@rowcount = 0 insert WebScraperItem values(@WebScraperId, @PostId, @Created)", new { WebScraperId = webScraperId, PostId = postId, Created = created }, con);
         }
 
-        public bool FeedItemAlreadyPosted(string title, DateTimeOffset created, long rssFeederId)
+        public bool SimilarPostAlreadyExists(string title, DateTimeOffset created, long channelId)
         {
-            return con.Connection.Query<Post>(@"select * from Post join FeedItem fi on fi.PostId = Post.Id 
-                                                where Title=@Title and fi.Created=@Created and fi.RssFeederId=@RssFeederId", new
+            return con.Connection.Query<Post>(@"select * from Post join ChannelItem fi on fi.PostId = Post.Id 
+                                                where Title=@Title and Post.Created=@Created and fi.ChannelId=@ChannelId", new
             {
                 Title = title, 
-                Created = created, 
-                RssFeederId = rssFeederId
+                Created = created,
+                ChannelId = channelId
             }, con).Any();
-        }
-
-        public void AddFeedItem(long rssFeederId, long postId, DateTimeOffset created)
-        {
-            con.Connection.Execute("update FeedItem set PostId=@PostId where PostId=@PostId and RssFeederId=@RssFeederId if @@rowcount = 0 insert FeedItem values(@RssFeederId, @PostId, @Created)", new { RssFeederId = rssFeederId, PostId = postId, Created = created }, con);
         }
 
         public IEnumerable<Post> TopPosts(int count, long userId)

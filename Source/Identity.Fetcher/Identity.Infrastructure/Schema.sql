@@ -59,16 +59,6 @@ CREATE TABLE [dbo].[FeederTags](
 ) ON [PRIMARY]
 
 
-CREATE TABLE [dbo].[FeedInto](
-	[RssFeederId] [bigint] NOT NULL,
-	[ChannelId] [bigint] NOT NULL,
- CONSTRAINT [PK_FeedInto] PRIMARY KEY CLUSTERED 
-(
-	[ChannelId] ASC, RssFeederId ASC
-)
-) ON [PRIMARY]
-
-
 CREATE TABLE [dbo].[Post](
 	[Id] [bigint] IDENTITY(1,1) NOT NULL,
 	[Created] [datetimeoffset] NOT NULL,
@@ -166,17 +156,6 @@ CREATE TABLE [dbo].[ChannelLink](
 (
 	[ParentId] ASC,
 	[ChildId] ASC
-)
-) ON [PRIMARY]
-
-
-CREATE TABLE [dbo].[FeedItem](
-	[RssFeederId] [bigint] NOT NULL,
-	[PostId] [bigint] NOT NULL,
-	[Created] [datetimeoffset] NULL,
- CONSTRAINT [PK_FeedItem] PRIMARY KEY CLUSTERED 
-(
-	[RssFeederId] ASC, PostId ASC
 )
 ) ON [PRIMARY]
 
@@ -284,13 +263,3 @@ CREATE TABLE [dbo].[BlockedTag](
 	UserId ASC, TagId ASC
 )
 ) ON [PRIMARY]
-
-CREATE TABLE [dbo].[UnreadCountIsDirtyEvent](
-	[Id] [bigint] IDENTITY(1,1) NOT NULL,
-	[ChannelId] [bigint] NOT NULL,
-	[Created] [datetimeoffset] NOT NULL,
- CONSTRAINT [PK_UnreadCountIsDirtyEvent] PRIMARY KEY CLUSTERED 
-(
-	[Id] ASC
-)
-)
