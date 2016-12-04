@@ -22,8 +22,6 @@ namespace FeederJob2
             //host.RunAndBlock();
 
             Functions.SyncFeeds("", TextWriter.Null);
-
-            Console.ReadLine();
         }
     }
 }
