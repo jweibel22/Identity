@@ -114,7 +114,7 @@ namespace Identity.Infrastructure.Repositories
 
         public void Owns(long userId, long channelId, bool locked)
         {
-            con.Connection.Execute("insert ChannelOwner values(@ChannelId, @UserId, @IsLocked)", new { UserId = userId, ChannelId = channelId, IsLocked = locked }, con);
+            con.Connection.Execute("insert ChannelOwner (ChannelId, UserId, IsLocked) values(@ChannelId, @UserId, @IsLocked)", new { UserId = userId, ChannelId = channelId, IsLocked = locked }, con);
         }
 
         public int Read(long userId, long postId)

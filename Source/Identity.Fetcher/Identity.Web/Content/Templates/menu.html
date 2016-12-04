@@ -1,52 +1,63 @@
 
-    <div class="bs-docs-section clearfix">
-        <div class="row">
-            <div class="col-lg-12">
 
-                <div class="bs-component">
-                    <div class="navbar navbar-default navbar-fixed-top">
-                        <div class="navbar-header">
-                            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-                                <span class="icon-bar"></span>
-                                <span class="icon-bar"></span>
-                                <span class="icon-bar"></span>
-                            </button>
-                            <a class="navbar-brand" href="#/home">Inspire                </a>
-                        </div>
-                        <div class="navbar-collapse collapse navbar-responsive-collapse">
-                            <ul class="nav navbar-nav">
-                                <li ><a href="/#/home"><span class="glyphicon glyphicon-home"></span> Home</a></li>
-                                <!--{active: state.current.name == 'home'}--> 
-                            </ul>
-                            
-                            <form class="navbar-form navbar-left" ng-submit="search()">
-                                <input type="text" class="form-control col-lg-8" placeholder="Channel/User search" ng-model="searchFor">
-                            </form>
+<div class="bs-docs-section clearfix">
+    <div class="row">
+        <div class="col-lg-12">
 
-                            <!--<form class="navbar-form navbar-left" ng-submit="search()">
-                                <input type="text" class="form-control col-lg-8" placeholder="Post search" ng-model="searchFor">
-                            </form>
-                            
-                            <form class="navbar-form navbar-left" ng-submit="userSearch()">
-                                <input type="text" class="form-control col-lg-8" placeholder="User search" ng-model="usersearchFor">
-                            </form>-->
+            <div class="bs-component">
+                <div class="navbar navbar-default navbar-fixed-top">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="#/home">Inspire </a>
+                    </div>
+                    <div class="navbar-collapse collapse navbar-responsive-collapse">
+                        <ul class="nav navbar-nav">
+                            <li ><a href="/#/home"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+                            <!--{active: state.current.name == 'home'}-->
+                        </ul>
 
-                            <ul class="nav navbar-nav navbar-right">
-                                <li><a href="#/home" ng-click="logOut()"> Logout</a></li>
-                            </ul>
-                            
-                            <ul class="nav navbar-nav navbar-right">
-                                <li><a href="#/profile/{{user.Id}}">Logged in as {{user.DisplayName}}</a></li>
-                            </ul>
-                        </div>
+                        <form class="navbar-form navbar-left" ng-submit="search()">
+                            <input type="text" class="form-control col-lg-8" placeholder="Channel/User search" ng-model="searchFor">
+                        </form>
+
+                        <ul class="nav navbar-nav">
+                            <li><a href="" ng-click="newChannel()"><span class="glyphicon glyphicon-plus"></span> New channel</a></li>
+                            <!--{active: state.current.name == 'home'}-->
+                        </ul>
+
+                        <!--<form class="navbar-form navbar-left" ng-submit="search()">
+                            <input type="text" class="form-control col-lg-8" placeholder="Post search" ng-model="searchFor">
+                        </form>
+
+                        <form class="navbar-form navbar-left" ng-submit="userSearch()">
+                            <input type="text" class="form-control col-lg-8" placeholder="User search" ng-model="usersearchFor">
+                        </form>-->
+
+                        <ul class="nav navbar-nav navbar-right">
+                            <li><a href="#/home" ng-click="logOut()"> Logout</a></li>
+                        </ul>
+
+                        <ul class="nav navbar-nav navbar-right">
+                            <li><a href="#/profile/{{user.Id}}">Logged in as {{user.DisplayName}}</a></li>
+                        </ul>
                     </div>
                 </div>
-
             </div>
+
         </div>
     </div>
+</div>
 
-    <script type="text/ng-template" id="addLinkModal.html">
+<!--<div>
+    <button class="btn btn-sm" ng-click="newChannel()" style="margin-left: 10px;margin-bottom: 20px">New channel <span class="glyphicon glyphicon-plus"></span></button>
+</div>-->
+
+
+<script type="text/ng-template" id="addLinkModal.html">
         <div class="modal-header">
             <button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
             <h4 class="modal-title" id="myModalLabel">Add a new link</h4>
@@ -100,6 +111,28 @@
                        placeholder="Tags"
                        value=""
                        ng-model="windowdata.tags"></input>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-default">Close</button>
+            <input type="submit" class="btn btn-primary" value="Submit" />
+        </div>
+    </form>
+</script>
+
+<script type="text/ng-template" id="addNewChannel.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Add a new channel</h4>
+    </div>
+    <form ng-submit="submit()">
+        <div class="modal-body">
+            <div class="form-group">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Name"
+                       value=""
+                       ng-model="windowdata.name"></input>
             </div>
         </div>
         <div class="modal-footer">
