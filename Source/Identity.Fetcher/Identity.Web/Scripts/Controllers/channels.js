@@ -4,12 +4,25 @@ angular.module('inspire')
 
             $scope.user = userPromise.data;
 
+            var treeInitialized = false;
+
+            function tagsEqual(n1, n2) {
+
+                var n1Ok = n1.tags && n1.tags.length == 1;
+                var n2Ok = n2.tags && n2.tags.length == 1;
+
+                if (!n1Ok && !n2Ok)
+                    return true;
+                else if (n1Ok && n2Ok)
+                    return n1.tags[0] == n2.tags[0];
+                else
+                    return false;
+           }
 
             function createTreeViewNode(channel) {
 
-                //var isExpanded = $filter('filter')(expandedNodes, { nodeId: channel.Id }, true)[0];                
-
                 var result = {
+                    uid: channel.Id,
                     text: channel.Name,
                     href: "#/home/" + channel.Id
                 };
@@ -17,10 +30,6 @@ angular.module('inspire')
                 if (channel.UnreadCount > 0) {
                     result.tags = [channel.UnreadCount];
                 }
-
-                //if (isExpanded) {
-                //    result.state = { expanded: true };
-                //}
 
                 if (channel.Subscriptions.length > 0) {
                     result.nodes = channel.Subscriptions.map(createTreeViewNode);
@@ -30,34 +39,30 @@ angular.module('inspire')
             }            
 
             $scope.$watch('user.Owns', function (newValue, oldValue, scope) {
-                console.log("change detected");
+
+                if (!treeInitialized)
+                    return;
+
+                var treeNodes = $('#tree').treeview('getNodes');
+
+                for (var i = 0; i < treeNodes.length; i++) {
+                    var node = treeNodes[i];
+
+                    if (!node.parentId) {
+                        
+                        var x = $filter('filter')($scope.user.Owns, { Id: node.uid }, true)[0];
+
+                        if (x) {
+                            var newNode = createTreeViewNode(x);
+
+                            if (!tagsEqual(newNode, node)) {
+                                newNode.state = node.state; //TODO: copying of the state from old nodes to new nodes should be done recursively on all children
+                                $('#tree').treeview('updateNode', [node, newNode, { silent: true }]);
+                            }
+                        }
+                    }
+                }
                 
-                //var expandedNodes = $('#tree').treeview('getExpanded');
-                
-
-                                
-                //for (var i = 0; i < $scope.tree.length; i++) {
-
-                //    var x = $filter('filter')(expandedNodes, { nodeId: $scope.tree[i].nodeId }, true)[0];
-
-                //    if (x) {
-                //        $scope.tree[i].state = { expanded: x.state.expanded }
-                //    }
-                    
-                //    if ($scope.tree[i].nodes) {
-                //        for (var j = 0; j < $scope.tree[i].nodes.length; j++) {
-
-                //            var y = $filter('filter')(expandedNodes, { nodeId: $scope.tree[i].nodes[j].nodeId }, true)[0];
-                //            if (y) {
-                //                $scope.tree[i].nodes[j].state = { expanded: y.state.expanded }
-                //            }
-                            
-                //        }
-                //    }
-                //}
-
-                //$('#tree').treeview({ data: $scope.tree, levels: 1, enableLinks: true, showTags: true });
-
             }, true);
 
 
@@ -65,11 +70,19 @@ angular.module('inspire')
                 console.log('collection changed');
 
                 $scope.tree = $scope.user.Owns.map(createTreeViewNode);
-                $('#tree').treeview({ data: $scope.tree, levels: 1, enableLinks: true, showTags: true });
-            });
+                $('#tree').treeview({
+                    data: $scope.tree,
+                    levels: 1,
+                    enableLinks: true,
+                    showTags: true,
 
-            //var tree = $scope.user.Owns.map(recX);
-            //$('#tree').treeview({ data: tree, levels: 1, enableLinks: true, showTags: true});
+                    onNodeSelected: function (event, data) {
+                        $window.location.href = data.href;
+                    }
+                });
+
+                treeInitialized = true;
+            });
 
             $scope.totalUnreadCount = function(channel) {
                 var result = channel.UnreadCount;
