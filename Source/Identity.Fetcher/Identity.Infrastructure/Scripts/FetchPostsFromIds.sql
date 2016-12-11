@@ -11,12 +11,14 @@ Post.Created as Added,
 CASE WHEN liked.Created IS NULL THEN 'false' ELSE 'true' END as Liked, 
 CASE WHEN saved.Created IS NULL THEN 'false' ELSE 'true' END as Saved, 
 CASE WHEN starred.Created IS NULL THEN 'false' ELSE 'true' END as Starred,
-CASE WHEN ReadHistory.Timestamp IS NULL THEN 'false' ELSE 'true' END as [Read]
+CASE WHEN ReadHistory.Timestamp IS NULL THEN 'false' ELSE 'true' END as [Read],
+pcm.ClusterId
   FROM [dbo].[Post]
   join [User] u on u.Id = @UserId
   left join ReadHistory on ReadHistory.PostId = Post.Id and ReadHistory.UserId = @UserId
 left join ChannelItem liked on liked.ChannelId = u.LikedChannel and liked.PostId = Post.Id
 left join ChannelItem saved on saved.ChannelId = u.SavedChannel and saved.PostId = Post.Id
 left join ChannelItem starred on starred.ChannelId = u.StarredChannel and starred.PostId = Post.Id
+left join PostClusterMember pcm on pcm.OntologyId = 1 and pcm.PostId = Post.Id
   where Post.Id in (select id from @PostIds)
   end

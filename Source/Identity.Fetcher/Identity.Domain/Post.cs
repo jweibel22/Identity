@@ -43,5 +43,7 @@ namespace Identity.Domain
         public string PosterUsername { get; set; }
 
         public bool PremiumContent { get; set; }
+
+        public long? ClusterId { get; set; }
     }
 }

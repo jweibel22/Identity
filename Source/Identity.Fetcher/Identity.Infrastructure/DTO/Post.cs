@@ -36,6 +36,11 @@ namespace Identity.Infrastructure.DTO
         public string EmbeddedUrl { get; set; }
     }
 
+    public class PostGroup
+    {
+        public IList<Post> Posts { get; set; }
+    }
+
     public class Post
     {
         private string _title;
@@ -106,6 +111,8 @@ namespace Identity.Infrastructure.DTO
         public bool CanBeInlined { get; set; }
 
         public bool PremiumContent { get; set; }
+
+        public long? ClusterId { get; set; }
     }
 
     public class ChannelReference

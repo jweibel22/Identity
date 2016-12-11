@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Identity.Domain;
+using Identity.Domain.Clustering;
 using Identity.Infrastructure;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Rss;
@@ -55,6 +56,48 @@ namespace FeederJob2
                 logger.Error("RSS feeder failed", ex);
                 throw;
             }
+        }
+
+        public static void RefreshOntologies()
+        {
+            try
+            {
+                Console.WriteLine("Ontology refresh started");
+
+                var ontologyId = 1;
+                var commonWords = System.IO.File.ReadAllLines(@"commonwords-danish.txt").Select(w => w.Trim()).ToArray();
+                var connectionFactory = new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
+                IList<Document> articles;
+
+                using (var session = connectionFactory.NewTransaction())
+                {
+                    var repo = new OntologyRepository(session.Transaction);
+
+                    articles = repo.GetNextClusteringWindow(ontologyId);
+                }                               
+
+                var clusters = Algorithm.ComputeClusters(commonWords, articles);
+
+                using (var session = connectionFactory.NewTransaction())
+                {
+                    var repo = new OntologyRepository(session.Transaction);
+
+                    repo.UpdateClusters(ontologyId, clusters);
+
+                    session.Commit();
+                }
+
+                Console.WriteLine("Ontology refresh finished");
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Ontology refresh failed", ex);
+                throw;
+            }
+
+
+
+
         }
     }
 }

@@ -22,6 +22,7 @@ namespace FeederJob2
             //host.RunAndBlock();
 
             Functions.SyncFeeds("", TextWriter.Null);
+            Functions.RefreshOntologies();
         }
     }
 }

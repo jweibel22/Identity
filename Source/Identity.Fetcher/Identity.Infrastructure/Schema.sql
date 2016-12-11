@@ -263,3 +263,49 @@ CREATE TABLE [dbo].[BlockedTag](
 	UserId ASC, TagId ASC
 )
 ) ON [PRIMARY]
+
+CREATE TABLE [dbo].[Ontology](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[Updated] [datetimeoffset] NULL,
+ CONSTRAINT [PK_Ontology] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)
+) ON [PRIMARY]
+
+CREATE TABLE [dbo].[PostCluster](
+	[OntologyId] [bigint] NOT NULL,
+	[ClusterId] [bigint] NOT NULL,
+	[LatestAdded] [datetimeoffset] NULL,
+ CONSTRAINT [PK_PostCluster] PRIMARY KEY CLUSTERED 
+(
+	[OntologyId] ASC,
+	[ClusterId] ASC
+)
+) ON [PRIMARY]
+
+CREATE TABLE [dbo].[PostClusterMember](
+	[OntologyId] [bigint] NOT NULL,
+	[PostId] [bigint] NOT NULL,
+	[ClusterId] [bigint] NOT NULL,
+ CONSTRAINT [PK_PostClusterMember] PRIMARY KEY CLUSTERED 
+(
+	[OntologyId] ASC,
+	[ClusterId] ASC,
+	[PostId] ASC
+)
+) ON [PRIMARY]
+
+CREATE TABLE [dbo].[OntologyMembers](
+	[OntologyId] [bigint] NOT NULL,
+	[ChannelId] [bigint] NOT NULL,
+ CONSTRAINT [PK_OntologyMembers] PRIMARY KEY CLUSTERED 
+(
+	[OntologyId] ASC, [ChannelId] ASC
+)
+) ON [PRIMARY]
+
+CREATE UNIQUE NONCLUSTERED INDEX [OntologyMembers_UniqeIndex] ON [dbo].[OntologyMembers]
+(
+	[ChannelId] ASC
+)

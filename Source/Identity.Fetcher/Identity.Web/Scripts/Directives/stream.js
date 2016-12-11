@@ -27,8 +27,30 @@
 
                 $scope.readHistory = [];
                 $scope.initialUnread = 0;
-               
 
+                $scope.groupedPosts = groupByCluster([], $scope.posts);
+
+                function groupByCluster(result, posts) {
+
+                    var processedClusters = [];
+
+                    for (var i = 0; i < posts.length; i++) {
+
+                        var post = posts[i];
+
+                        if (post.ClusterId) {
+                            if (processedClusters.indexOf(post.ClusterId) == -1) {
+                                processedClusters.push(post.ClusterId);
+                                result.push({ Posts: $filter('filter')(posts, { ClusterId: post.ClusterId }, true) });
+                            }
+                        } else {
+                            result.push({ Posts: [post] });
+                        }
+                    }
+
+                    return result;
+                }
+               
                 $scope.publishOnChannelWindowdata = {
                     user: $scope.user,
                     channels: $scope.user.Owns,
@@ -134,6 +156,7 @@
 
                             postService.getFromChannel($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType, pageSize).then(function (data) {
                                 angular.copy(data.data, $scope.posts);
+                                $scope.groupedPosts = groupByCluster([], $scope.posts);
                                 $scope.loading = false;
 
                                 $scope.readHistory = [];
@@ -158,8 +181,8 @@
                                 $scope.loading = true;
 
                                 postService.loadMorePosts($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType, pageSize).then(function (data) {
-                                    //angular.copy($scope.posts.concat(data.data), $scope.posts);
                                     $scope.appendPosts($scope.posts, data.data);
+                                    $scope.groupedPosts = groupByCluster($scope.groupedPosts, data.data);
 
                                     $scope.loading = false;
 
@@ -257,27 +280,6 @@
                 if ($scope.channel) {
                     $scope.reloadPosts();
                 }
-                
-
-                //$scope.incrementUpvotes = function (post) {
-                //    postService.upvote(post);
-                //};
-
-                //$scope.follows = function (tag) {
-                //    return $scope.user.FollowsTags.indexOf(tag) > -1;
-                //}
-
-                //$scope.follow = function (tag) {
-                //    tagService.follow(tag).success(function (data) {
-                //        $scope.user.FollowsTags.push(tag);
-                //    });
-                //}
-
-                //$scope.unfollow = function (tag) {
-                //    tagService.unfollow(tag).success(function (data) {
-                //        $scope.user.FollowsTags.splice($scope.user.FollowsTags.indexOf(tag), 1);
-                //    });
-                //}
             }
         };
 

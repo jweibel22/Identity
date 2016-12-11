@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MoreLinq, Version=1.4.18916.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
+      <HintPath>..\packages\morelinq.1.4.0\lib\net35\MoreLinq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -44,7 +48,13 @@
     <Compile Include="ChannelItem.cs" />
     <Compile Include="ChannelLinkGraph.cs" />
     <Compile Include="ChannelOwner.cs" />
+    <Compile Include="Clustering\Algorithm.cs" />
+    <Compile Include="Clustering\Cluster.cs" />
+    <Compile Include="Clustering\Document.cs" />
+    <Compile Include="Clustering\DistanceMeasure.cs" />
+    <Compile Include="Clustering\World.cs" />
     <Compile Include="InlineArticleSelector.cs" />
+    <Compile Include="Ontology.cs" />
     <Compile Include="PublishedIn.cs" />
     <Compile Include="Comment.cs" />
     <Compile Include="Post.cs" />
@@ -55,6 +65,9 @@
     <Compile Include="Tagged.cs" />
     <Compile Include="User.cs" />
     <Compile Include="WeightedTag.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
