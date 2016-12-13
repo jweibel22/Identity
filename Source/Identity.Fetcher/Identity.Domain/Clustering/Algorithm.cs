@@ -20,9 +20,7 @@ namespace Identity.Domain.Clustering
     }
 
     public class Algorithm
-    {
-        private const double threshold = 3;
-
+    {        
         static bool IsInt(string s)
         {
             int i;
@@ -50,8 +48,8 @@ namespace Identity.Domain.Clustering
             return vocabList.Select(word => text.Contains(word) ? 1 : 0).ToArray();
         }
 
-        public static IList<Cluster> ComputeClusters(string[] commonWords, IList<Document> articles)
-        {            
+        public static void CalculateWordVectors(string[] commonWords, IList<Document> articles)
+        {
             var tokenized = articles.ToDictionary(a => a.Id, a => Tokenize(commonWords, a.Title + " " + a.Description.Trim()));
             var vocabList = CreateVocabList(tokenized.Values.ToList());
 
@@ -59,15 +57,6 @@ namespace Identity.Domain.Clustering
             {
                 article.WordVector = GetWordVector(vocabList, tokenized[article.Id]);
             }
-
-            var world = new World(threshold);
-
-            foreach (var article in articles)
-            {
-                world.Add(article);
-            }
-
-            return world.Clusters.Where(c => c.Documents.Count > 1).ToList();
         }
     }
 }

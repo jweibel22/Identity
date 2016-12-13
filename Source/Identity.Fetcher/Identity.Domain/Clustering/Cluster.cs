@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Identity.Domain.Clustering
 {
+
     public class Cluster
     {
         public double[] Centroid { get; set; }
@@ -13,6 +14,20 @@ namespace Identity.Domain.Clustering
         public List<Document> Documents { get; set; }
 
         private readonly int n;
+
+        public Cluster(List<Document> documents)
+        {
+            this.Documents = documents;
+            this.n = documents.First().WordVector.Length;
+            Sums = new double[n];
+            
+            for (int i = 0; i < n; i++)
+            {
+                Sums[i] += documents.Sum(x => x.WordVector[i]);
+            }
+
+            ComputeCentroid();
+        }
 
         public Cluster(Document d)
         {

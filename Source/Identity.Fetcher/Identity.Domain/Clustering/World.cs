@@ -4,7 +4,7 @@ using MoreLinq;
 
 namespace Identity.Domain.Clustering
 {
-    internal class World
+    public class World
     {
         public IList<Cluster> Clusters { get; set; }
 
@@ -14,6 +14,12 @@ namespace Identity.Domain.Clustering
         {
             this.threshold = threshold;
             Clusters = new List<Cluster>();
+        }
+
+        public World(double threshold, List<Cluster> clusters)
+        {
+            this.threshold = threshold;
+            Clusters = clusters;
         }
 
         public void Add(Document d)
