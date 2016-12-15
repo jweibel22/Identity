@@ -105,6 +105,8 @@ namespace FeederJob2
                     articles = repo.GetPostsFromOntology(ontologyId, from);
                     Algorithm.CalculateWordVectors(commonWords, articles);
 
+                    articles = articles.Where(a => DistanceMeasure.Magnitude(a.WordVector) > 0).ToList();
+
                     if (reset)
                     {
                         clusters = new List<Cluster>();

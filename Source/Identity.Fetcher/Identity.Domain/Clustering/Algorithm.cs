@@ -43,9 +43,9 @@ namespace Identity.Domain.Clustering
             return dataSet.SelectMany(l => l).Distinct().ToList();
         }
 
-        static int[] GetWordVector(IEnumerable<string> vocabList, string[] text)
+        static double[] GetWordVector(IEnumerable<string> vocabList, string[] text)
         {
-            return vocabList.Select(word => text.Contains(word) ? 1 : 0).ToArray();
+            return vocabList.Select(word => text.Contains(word) ? 1.0 : 0.0).ToArray();
         }
 
         public static void CalculateWordVectors(string[] commonWords, IList<Document> articles)

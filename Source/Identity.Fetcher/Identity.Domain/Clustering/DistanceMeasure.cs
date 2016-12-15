@@ -4,14 +4,14 @@ using System.Linq;
 
 namespace Identity.Domain.Clustering
 {
-    static class DistanceMeasure
+    public static class DistanceMeasure
     {
         static double DotProduct(double[] s1, double[] s2)
         {
             return System.Linq.Enumerable.Zip(s1, s2, (a, b) => a * b).Sum();
         }
 
-        static double Magnitude(double[] v)
+        public static double Magnitude(double[] v)
         {
             return Math.Sqrt(v.Select(x => x * x).Sum());
         }
@@ -24,6 +24,10 @@ namespace Identity.Domain.Clustering
         public static double Get(double[] v1, double[] v2)
         {
             var sim = CosineSim(v1, v2);
+            if (Double.IsNaN(sim))
+            {
+                throw new Exception("NaN");
+            }
             if (sim == 0.0)
                 return Double.MaxValue;
             else

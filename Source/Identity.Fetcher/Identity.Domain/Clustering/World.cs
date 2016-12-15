@@ -29,9 +29,8 @@ namespace Identity.Domain.Clustering
                 Clusters.Add(new Cluster(d));
                 return;
             }
-
-            var wordVector = d.WordVector.Select(x => (double)x).ToArray();
-            var distances = Clusters.Select(c => new { Cluster = c, Distance = DistanceMeasure.Get(c.Centroid, wordVector) });
+            
+            var distances = Clusters.Select(c => new { Cluster = c, Distance = DistanceMeasure.Get(c.Centroid, d.WordVector) });
             var min = distances.MinBy(x => x.Distance);
 
             if (min.Distance < threshold)
