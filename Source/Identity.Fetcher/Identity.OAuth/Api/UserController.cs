@@ -9,8 +9,11 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Web.Http;
 using AutoMapper;
-using Identity.Infrastructure.DTO;
+using Identity.Domain;
 using Identity.Infrastructure.Repositories;
+using Channel = Identity.Infrastructure.DTO.Channel;
+using Post = Identity.Infrastructure.DTO.Post;
+using User = Identity.Infrastructure.DTO.User;
 
 namespace Identity.Rest.Api
 {
@@ -42,29 +45,24 @@ namespace Identity.Rest.Api
             return u;
         }
 
+
+        private Infrastructure.DTO.Channel MapChannel(OwnChannel root, IList<OwnChannel> ownedByUser, IList<ChannelLink> channelLinks)
+        {
+            var channel = Mapper.Map<Channel>(root);
+
+            var subs = channelLinks
+                            .Where(l => l.DownStreamChannelId == channel.Id && ownedByUser.Any(x => x.Id == l.UpStreamChannelId))
+                            .Select(l => l.UpStreamChannelId);
+            channel.Subscriptions = ownedByUser.Where(x => subs.Contains(x.Id)).Select(x => MapChannel(x, ownedByUser, channelLinks)).ToList();
+
+            return channel;
+        }
+
         private User Map(Domain.User user, Domain.User loggedInUser)
         {
-            //var unreadCounts = channelRepo.GetUneadCounts(user.Id).ToList();
-
+            var channelLinks = userRepo.ChannelLinks(user.Id).ToList();
             var ownedByUser = userRepo.Owns(user.Id).ToList();
-            var ownedAsDto = ownedByUser.Select(c =>
-            {
-                var channel = Mapper.Map<Channel>(c);
-
-                var subs = channelRepo.GetSubscriptions(channel.Id).ToList();
-                channel.Subscriptions = subs.Join(ownedByUser, x => x.Id, x => x.Id, (c1, c2) => c2).Select(Mapper.Map<Channel>).ToList();
-
-                //foreach (var sub in channel.Subscriptions)
-                //{
-                //    sub.UnreadCount = unreadCounts.Where(x => x.ChannelId == sub.Id).Sum(x => x.Count);
-                //}
-
-                //channel.UnreadCount = unreadCounts.Where(x => x.ChannelId == channel.Id || subs.Any(s => s.Id == x.ChannelId)).Sum(x => x.Count);
-
-                return channel;
-            }).ToList();
-
-            
+            var ownedAsDto = ownedByUser.Select(c => MapChannel(c, ownedByUser, channelLinks)).ToList();           
 
             return new User
             {
@@ -73,7 +71,8 @@ namespace Identity.Rest.Api
                 Feed = new List<Post>(),
                 FollowsChannels = channelRepo.GetSubscriptions(user.SubscriptionChannel).Select(c => Mapper.Map<Channel>(c)).ToList(),
                 FollowsTags = new List<string>(),
-                Owns = ownedAsDto.Where(x => !ownedAsDto.Any(y => y.Subscriptions.Any(s => s.Id == x.Id))).ToList(),
+                Owns = ownedAsDto,
+                ChannelMenuItems = ownedAsDto.Where(x => !ownedAsDto.Any(y => y.Subscriptions.Any(s => s.Id == x.Id))).ToList(),
                 SavedChannel = user.SavedChannel,
                 StarredChannel = user.StarredChannel,
                 LikedChannel = user.LikedChannel,

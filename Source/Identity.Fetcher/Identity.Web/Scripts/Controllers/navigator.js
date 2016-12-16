@@ -54,6 +54,7 @@ angular.module('inspire')
 
                             channelService.create({ Name: $scope.windowdata.name }).success(function (data) {
                                 $scope.windowdata.user.Owns.push(data);
+                                $scope.windowdata.user.ChannelMenuItems.push(data);
                                 $window.location.href = '#/home/' + data.Id;
                             });
 

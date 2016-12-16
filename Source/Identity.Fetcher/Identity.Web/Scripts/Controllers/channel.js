@@ -9,15 +9,7 @@ angular.module('inspire')
 
             if (x) {
                 return x;
-            } else {
-                for (var i = 0; i < $scope.user.Owns.length; i++) {
-                    var y = $filter('filter')($scope.user.Owns[i].Subscriptions, { Id: channelId }, true)[0];
-
-                    if (y) {
-                        return y;
-                    }
-                }
-            }
+            } 
             return null;
         }
 

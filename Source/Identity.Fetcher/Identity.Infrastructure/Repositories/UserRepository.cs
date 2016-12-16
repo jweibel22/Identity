@@ -155,6 +155,11 @@ else
             return con.Connection.Query<OwnChannel>("select c.*, s.IsLocked, s.UnreadCount from Channel c join ChannelOwner s on c.Id = s.ChannelId where s.UserId = @UserId", new { UserId = userId }, con);
         }
 
+        public IEnumerable<ChannelLink> ChannelLinks(long userId)
+        {
+            return con.Connection.Query<ChannelLink>("select co.ChannelId as DownStreamChannelId, c.Id as UpStreamChannelId from ChannelLink cl join ChannelOwner co on co.UserId = @UserId and co.ChannelId = cl.ParentId join Channel c on c.Id = cl.ChildId", new { UserId = userId }, con);
+        }
+
         public IEnumerable<WeightedTag> GetTagCloud(long userId, long forUserId)
         {
             return con.Connection.Query<WeightedTag>(@"

@@ -50,7 +50,7 @@ angular.module('inspire')
 
                     if (!node.parentId) {
                         
-                        var x = $filter('filter')($scope.user.Owns, { Id: node.uid }, true)[0];
+                        var x = $filter('filter')($scope.user.ChannelMenuItems, { Id: node.uid }, true)[0];
 
                         if (x) {
                             var newNode = createTreeViewNode(x);
@@ -69,7 +69,7 @@ angular.module('inspire')
             $scope.$watchCollection('user.Owns', function (newArray) {
                 console.log('collection changed');
 
-                $scope.tree = $scope.user.Owns.map(createTreeViewNode);
+                $scope.tree = $scope.user.ChannelMenuItems.map(createTreeViewNode);
                 $('#tree').treeview({
                     data: $scope.tree,
                     levels: 1,

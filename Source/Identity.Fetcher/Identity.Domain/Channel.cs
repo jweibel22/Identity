@@ -11,6 +11,13 @@ namespace Identity.Domain
         public int UnreadCount { get; set; }
     }
 
+    public class ChannelLink
+    {
+        public long UpStreamChannelId { get; set; }
+
+        public long DownStreamChannelId { get; set; }
+    }
+
     public class Channel
     {
         public long Id { get; set; }

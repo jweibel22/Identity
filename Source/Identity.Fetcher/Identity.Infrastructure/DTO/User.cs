@@ -14,6 +14,8 @@ namespace Identity.Infrastructure.DTO
 
         public IList<Channel> Owns { get; set; }
 
+        public IList<Channel> ChannelMenuItems { get; set; }
+
         public long SavedChannel { get; set; }
 
         public long StarredChannel { get; set; }
