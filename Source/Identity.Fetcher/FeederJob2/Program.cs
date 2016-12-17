@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using log4net.Config;
 using Microsoft.Azure.WebJobs;
@@ -21,8 +22,13 @@ namespace FeederJob2
             //var host = new JobHost();            
             //host.RunAndBlock();
 
-            Functions.SyncFeeds("", TextWriter.Null);
-            Functions.ReloadOntology();
+            //Functions.SyncFeeds("", TextWriter.Null);
+
+            Console.WriteLine("Sleep started");
+            Thread.Sleep(300000);
+            Console.WriteLine("Sleep finished");
+
+            //Functions.ReloadOntology();
         }
     }
 }
