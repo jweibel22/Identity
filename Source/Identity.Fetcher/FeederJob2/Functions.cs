@@ -133,8 +133,8 @@ namespace FeederJob2
                     if (sw.Elapsed > TimeSpan.FromMinutes(1))
                     {
                         sw.Reset();
-                        logger.Info("More than 1 minute of CPU time consumed, idling for 10 seconds to avoid exceeding Azure CpuTime Quota");
-                        Thread.Sleep(10000);
+                        logger.Info("More than 1 minute of CPU time consumed, idling for 60 seconds to avoid exceeding Azure CpuTime Quota");
+                        Thread.Sleep(60000);
                         sw.Start();
                     }
 
