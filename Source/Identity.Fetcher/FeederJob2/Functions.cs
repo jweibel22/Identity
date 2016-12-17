@@ -109,7 +109,7 @@ namespace FeederJob2
 
                     articles = articles.Where(a => DistanceMeasure.Magnitude(a.WordVector) > 0).ToList();
 
-                    if (reset)
+                    if (true)
                     {
                         clusters = new List<Cluster>();
                         newArticles = articles;
