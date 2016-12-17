@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Identity.Domain;
 using Identity.Domain.Clustering;
@@ -123,10 +125,23 @@ namespace FeederJob2
                 
                 var world = new World(threshold, clusters);
 
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+
                 foreach (var article in newArticles)
                 {
+                    if (sw.Elapsed > TimeSpan.FromMinutes(1))
+                    {
+                        sw.Reset();
+                        logger.Info("More than 1 minute of CPU time consumed, idling for 10 seconds to avoid exceeding Azure CpuTime Quota");
+                        Thread.Sleep(10000);
+                        sw.Start();
+                    }
+
                     world.Add(article);
                 }
+
+                sw.Stop();
 
                 var nonTrivialClusters = world.Clusters.Where(c => c.Documents.Count > 1).ToList();
 
