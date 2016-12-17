@@ -22,12 +22,7 @@ namespace FeederJob2
             //var host = new JobHost();            
             //host.RunAndBlock();
 
-            //Functions.SyncFeeds("", TextWriter.Null);
-
-            //Console.WriteLine("Sleep started");
-            //Thread.Sleep(300000);
-            //Console.WriteLine("Sleep finished");
-
+            Functions.SyncFeeds("", TextWriter.Null);
             Functions.ReloadOntology();
         }
     }
