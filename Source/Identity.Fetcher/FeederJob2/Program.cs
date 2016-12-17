@@ -24,11 +24,11 @@ namespace FeederJob2
 
             //Functions.SyncFeeds("", TextWriter.Null);
 
-            Console.WriteLine("Sleep started");
-            Thread.Sleep(300000);
-            Console.WriteLine("Sleep finished");
+            //Console.WriteLine("Sleep started");
+            //Thread.Sleep(300000);
+            //Console.WriteLine("Sleep finished");
 
-            //Functions.ReloadOntology();
+            Functions.ReloadOntology();
         }
     }
 }
