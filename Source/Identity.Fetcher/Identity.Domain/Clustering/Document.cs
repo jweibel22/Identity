@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace Identity.Domain.Clustering
 {
@@ -10,6 +11,6 @@ namespace Identity.Domain.Clustering
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTimeOffset Added { get; set; }
-        public double[] WordVector { get; set; }
+        public Vector<double> WordVector { get; set; }
     }
 }

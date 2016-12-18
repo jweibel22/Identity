@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace Identity.Domain.Clustering
 {
 
     public class Cluster
     {
-        public double[] Centroid { get; set; }
+        public Vector<double> Centroid { get; set; }
 
         public double[] Sums { get; set; }
 
@@ -18,7 +19,7 @@ namespace Identity.Domain.Clustering
         public Cluster(List<Document> documents)
         {
             this.Documents = documents;
-            this.n = documents.First().WordVector.Length;
+            this.n = documents.First().WordVector.Count;
             Sums = new double[n];
             
             for (int i = 0; i < n; i++)
@@ -32,7 +33,7 @@ namespace Identity.Domain.Clustering
         public Cluster(Document d)
         {
             Documents = new List<Document>();
-            n = d.WordVector.Length;
+            n = d.WordVector.Count;
             Sums = new double[n];
             Add(d);
         }
@@ -49,7 +50,7 @@ namespace Identity.Domain.Clustering
             //			String.Format("Adding Id={0}, Title={3}. CosineSim={1},Get={2}", d.Id, CosineSim(Centroid, v), Get(Centroid, v), d.Title).Dump();
             //		}
 
-            if (d.WordVector.Length != n)
+            if (d.WordVector.Count != n)
             {
                 throw new ApplicationException("Expected a vector with " + n + " elements");
             }
@@ -77,7 +78,7 @@ namespace Identity.Domain.Clustering
 
         private void ComputeCentroid()
         {
-            Centroid = Enumerable.Range(0, n).Select(i => Sums[i] / Documents.Count).ToArray();
+            Centroid = Vector<double>.Build.SparseOfEnumerable(Enumerable.Range(0, n).Select(i => Sums[i] / Documents.Count));
         }
 
         public string FriendlyName

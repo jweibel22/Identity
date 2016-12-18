@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace Identity.Domain.Clustering
 {
@@ -43,9 +44,9 @@ namespace Identity.Domain.Clustering
             return dataSet.SelectMany(l => l).Distinct().ToList();
         }
 
-        static double[] GetWordVector(IEnumerable<string> vocabList, string[] text)
+        static IEnumerable<double> GetWordVector(IEnumerable<string> vocabList, string[] text)
         {
-            return vocabList.Select(word => text.Contains(word) ? 1.0 : 0.0).ToArray();
+            return vocabList.Select(word => text.Contains(word) ? 1.0 : 0.0);
         }
 
         public static void CalculateWordVectors(string[] commonWords, IList<Document> articles)
@@ -55,7 +56,7 @@ namespace Identity.Domain.Clustering
 
             foreach (var article in articles)
             {
-                article.WordVector = GetWordVector(vocabList, tokenized[article.Id]);
+                article.WordVector = Vector<double>.Build.SparseOfEnumerable(GetWordVector(vocabList, tokenized[article.Id]));
             }
         }
     }
