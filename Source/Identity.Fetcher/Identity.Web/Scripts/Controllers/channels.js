@@ -50,7 +50,7 @@ angular.module('inspire')
 
                     if (!node.parentId) {
                         
-                        var x = $filter('filter')($scope.user.ChannelMenuItems, { Id: node.uid }, true)[0];
+                        var x = $filter('filter')($scope.user.Owns, { Id: node.uid }, true)[0];
 
                         if (x) {
                             var newNode = createTreeViewNode(x);
