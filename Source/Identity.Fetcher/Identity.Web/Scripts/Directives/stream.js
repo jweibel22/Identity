@@ -85,14 +85,24 @@
                     $scope.reloadPosts();
                 }
 
-                $scope.appendPosts = function (list, toAppend) {
+                function filterDuplicates(list, toAppend) {
 
+                    var result = [];
                     for (var i = 0; i < toAppend.length; i++) {
                         var exists = $filter('filter')(list, { Id: toAppend[i].Id }, true).length > 0;
 
                         if (!exists) {
-                            list.push(toAppend[i]);
+                            result.push(toAppend[i]);
                         }
+                    }
+
+                    return result;
+                }
+
+                $scope.appendPosts = function (list, toAppend) {
+
+                    for (var i = 0; i < toAppend.length; i++) {
+                        list.push(toAppend[i]);
                     }
                 }
 
@@ -116,7 +126,8 @@
 
                     for (var i = 0; i < posts.length; i++) {
                         var post = posts[i];
-                        var exists = $filter('filter')($scope.readHistory, { Id: post.Id }, true).length > 0;
+                        var postId = post.Id;
+                        var exists = $filter('filter')($scope.readHistory, { Id: postId }, true).length > 0;
 
                         if (!exists) {
                             console.log("Adding to history: " + post.Title);
@@ -181,8 +192,9 @@
                                 $scope.loading = true;
 
                                 postService.loadMorePosts($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType, pageSize).then(function (data) {
-                                    $scope.appendPosts($scope.posts, data.data);
-                                    $scope.groupedPosts = groupByCluster($scope.groupedPosts, data.data);
+                                    var toAppend = filterDuplicates($scope.posts, data.data);
+                                    $scope.appendPosts($scope.posts, toAppend);
+                                    $scope.groupedPosts = groupByCluster($scope.groupedPosts, toAppend);
 
                                     $scope.loading = false;
 
