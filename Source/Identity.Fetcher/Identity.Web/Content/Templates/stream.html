@@ -1,44 +1,55 @@
 ﻿
-<div>
-    <div ng-show="showcontrols">
-        <table style="border-spacing: 10px; border-collapse: separate">
-            <tr>
-                <td>
-                    <span>Sort by</span>
-                    <div class="btn-group">
-                        <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{selectedSortType}}  <span class="caret"></span></button>
-                        <ul class="dropdown-menu">
-                            <li ng-repeat="item in sortTypes">
-                                <a ng-click="changeSortBy(item)">
-                                    {{item}}
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
 
-                </td>
-                <td>
-                    <span>List by</span>
-                    <div class="btn-group">
-                        <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{selectedListType}}  <span class="caret"></span></button>
-                        <ul class="dropdown-menu">
-                            <li ng-repeat="item in listTypes">
-                                <a ng-click="changeListBy(item)">
-                                    {{item}}
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+<div ng-show="showcontrols">
+    <table style="border-spacing: 10px; border-collapse: separate">
+        <tr>
+            <td>
+                <span>Sort by</span>
+                <div class="btn-group">
+                    <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{selectedSortType}} <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li ng-repeat="item in sortTypes">
+                            <a ng-click="changeSortBy(item)">
+                                {{item}}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
 
-                </td>
-                <td>
-                    <span>Only show unread</span> <input type="checkbox" ng-model="showonlyunread" ng-change="showOnlyUnreadChanged()" />
-                </td>
-            </tr>
-        </table>
+            </td>
+            <td>
+                <span>List by</span>
+                <div class="btn-group">
+                    <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{selectedListType}} <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li ng-repeat="item in listTypes">
+                            <a ng-click="changeListBy(item)">
+                                {{item}}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+            </td>
+            <td>
+                <span>Only show unread</span> <input type="checkbox" ng-model="showonlyunread" ng-change="showOnlyUnreadChanged()"/>
+            </td>
+        </tr>
+    </table>
+</div>
+
+    <div ng-show="channel && groupedPosts.length == 0 && !loading">
+        <p>This channel appears to be empty!</p>
+        If you created this channel or if you are a participator you can add content:
+        <ul>
+            <li>Add a single link by selecting "add link ..." in the burger menu</li>
+            <li>Add an RSS or Twitter feed by selecting "add feeder ..." in the burger menu</li>
+            <li>Click the "Forward" button on an article you find in another channel and forward the article to this channel</li>
+            <li>Select "Forward to ..." in the burger menu of another channel and forward the entire channel to this channel</li>
+        </ul>
     </div>
 
-    <div style="margin-top: 10px; margin-bottom: 1000px" scroll infinite-scroll="loadMorePosts()" infinite-scroll-distance="2">
+<div style="margin-top: 10px; margin-bottom: 1000px" scroll infinite-scroll="loadMorePosts()" infinite-scroll-distance="2">
         <div ng-repeat="group in groupedPosts " ng-class="{expandedGroup: group.IsExpanded}">
             <div ng-repeat="post in group.Posts " class="readable">
                 <div ng-show="postVisible(post) && (group.IsExpanded || post == group.Posts[0])">
