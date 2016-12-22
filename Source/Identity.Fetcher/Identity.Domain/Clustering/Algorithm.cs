@@ -32,7 +32,7 @@ namespace Identity.Domain.Clustering
         {
             var ignoredCharacters = new[] { ":", ",", "»", "«", "'" };
             return text.Trim()
-                .Replace("-", " ").Replace("–", " ")
+                .Replace("-", " ").Replace("–", " ").Replace(".", " ")
                 .RemoveAll(ignoredCharacters)
                 .ToLower()
                 .Split(' ')
