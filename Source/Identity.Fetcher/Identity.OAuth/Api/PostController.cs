@@ -16,6 +16,8 @@ using Identity.Infrastructure.DTO;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
 using log4net;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Comment = Identity.Domain.Comment;
 using Post = Identity.Infrastructure.DTO.Post;
 using ReadHistory = Identity.OAuth.Models.ReadHistory;
@@ -33,16 +35,13 @@ namespace Identity.Rest.Api
         private readonly UserRepository userRepo;
         private readonly ILoadDtos dtoLoader;
         private Domain.User user;
-        private readonly IEnumerable<InlineArticleSelector> inlineArticleSelectors;
 
-        public PostController(ILoadDtos dtoLoader, PostRepository postRepo, UserRepository userRepo, CommentRepostitory commentRepo, 
-            InlineArticleSelectorRepository inlineArticleSelectorRepo)
+        public PostController(ILoadDtos dtoLoader, PostRepository postRepo, UserRepository userRepo, CommentRepostitory commentRepo)
         {
             this.dtoLoader = dtoLoader;
             this.postRepo = postRepo;
             this.userRepo = userRepo;
             this.commentRepo = commentRepo;
-            this.inlineArticleSelectors = inlineArticleSelectorRepo.GetAll();
 
             var identity = User.Identity as ClaimsIdentity;
             user = userRepo.FindByName(identity.Name);
@@ -149,7 +148,7 @@ namespace Identity.Rest.Api
         }
 
         [HttpGet]
-        [Route("Api/Post/{id}/Contents")]        
+        [Route("Api/Post/{id}/Contents")]
         public HttpResponseMessage FetchContents(long id)
         {
             var post = postRepo.GetById(id, user.Id);
@@ -158,26 +157,13 @@ namespace Identity.Rest.Api
 
             using (var webClient = new WebClient())
             {
-                var selector = inlineArticleSelectors.FirstOrDefault(s => url.Contains(s.UrlPattern));
-
-                if (selector == null)
-                {
-                    return RawStringResponse("");
-                }
-
                 webClient.Encoding = Encoding.UTF8;
-                var result = webClient.DownloadString(url);
+                webClient.Headers.Add("x-api-key", "WPDWyRQP3PGbktd9wB4UYGplQEDR778RrySYaAGv");
+                var result = webClient.DownloadString(String.Format("https://mercury.postlight.com/parser?url={0}", url));
 
-                var doc = new HtmlDocument();
-                doc.LoadHtml(result);
-                var elm = doc.DocumentNode.SelectSingleNode(selector.Selector);
-                
-                if (elm == null)
-                {
-                    return RawStringResponse("");
-                }
-
-                return RawStringResponse(elm.InnerHtml.Replace("\r\n", "").Replace("\n", "").Replace("\t", ""));
+                dynamic json = JObject.Parse(result);
+                string content = json.content;
+                return RawStringResponse(content);
             }
         }
     }
