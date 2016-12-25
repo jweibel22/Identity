@@ -6,7 +6,7 @@
             <td>
                 <span>Sort by</span>
                 <div class="btn-group">
-                    <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{selectedSortType}} <span class="caret"></span></button>
+                    <button type="button" data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">{{selectedSortType}} <span class="caret"></span></button>
                     <ul class="dropdown-menu">
                         <li ng-repeat="item in sortTypes">
                             <a ng-click="changeSortBy(item)">
@@ -20,7 +20,7 @@
             <td>
                 <span>List by</span>
                 <div class="btn-group">
-                    <button type="button" data-toggle="dropdown" class="btn btn-sm dropdown-toggle">{{selectedListType}} <span class="caret"></span></button>
+                    <button type="button" data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">{{selectedListType}} <span class="caret"></span></button>
                     <ul class="dropdown-menu">
                         <li ng-repeat="item in listTypes">
                             <a ng-click="changeListBy(item)">
@@ -127,7 +127,7 @@
                                     <span class="glyphicon glyphicon-edit"></span> Edit
                                 </a>-->
 
-                                <button class="btn btn-default btn-xs" ng-show="post.CanBeInlined" ng-click="fetchPostContent(post)">
+                                <button class="btn btn-default btn-xs"  ng-click="fetchPostContent(post)"> <!--ng-show="post.CanBeInlined"-->
                                     <span class="glyphicon glyphicon-edit"></span> Content
                                 </button>
 
@@ -136,7 +136,7 @@
                                 </button>-->
 
                                 <div class="btn-group">
-                                    <button type="button" data-toggle="dropdown" class="btn btn-xs glyphicon glyphicon-menu-hamburger"></button>
+                                    <button type="button" data-toggle="dropdown" class="btn btn-default btn-xs glyphicon glyphicon-menu-hamburger"></button>
                                     <ul class="dropdown-menu">
                                         <li><a href="#/viewpost/{{post.Id}}">View</a></li>
                                         <li><a href="#/editpost/{{post.Id}}">Edit</a></li>
