@@ -6,6 +6,10 @@ angular.module('inspire')
 
             var treeInitialized = false;
 
+            $scope.showMenu = function() {
+                return $window.innerWidth > 1000;
+            }
+
             function tagsEqual(n1, n2) {
 
                 var n1Ok = n1.tags && n1.tags.length == 1;

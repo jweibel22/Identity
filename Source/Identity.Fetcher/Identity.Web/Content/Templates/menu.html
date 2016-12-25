@@ -16,12 +16,20 @@
                     </div>
                     <div class="navbar-collapse collapse navbar-responsive-collapse">
                         <ul class="nav navbar-nav">
-                            <li ><a href="/#/home"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+                            <li><a href="/#/home"><span class="glyphicon glyphicon-home"></span> Home</a></li>
                             <!--{active: state.current.name == 'home'}-->
                         </ul>
 
                         <form class="navbar-form navbar-left" ng-submit="search()">
-                            <input type="text" class="form-control col-lg-8" placeholder="Channel/User search" ng-model="searchFor">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Channel/User search" ng-model="searchFor">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-default btn-xs" type="submit">
+                                        <i class="glyphicon glyphicon-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!--<input type="text" class="form-control col-lg-8" placeholder="Channel/User search" ng-model="searchFor">-->
                         </form>
 
                         <ul class="nav navbar-nav">
@@ -29,23 +37,26 @@
                             <!--{active: state.current.name == 'home'}-->
                         </ul>
 
-                        <!--<form class="navbar-form navbar-left" ng-submit="search()">
-                            <input type="text" class="form-control col-lg-8" placeholder="Post search" ng-model="searchFor">
-                        </form>
+                            <ul class="nav navbar-nav">
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Channels <b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                                        <li ng-repeat="channel in user.ChannelMenuItems">
+                                            <a href="/#/home/{{channel.Id}}">{{channel.Name}}</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
 
-                        <form class="navbar-form navbar-left" ng-submit="userSearch()">
-                            <input type="text" class="form-control col-lg-8" placeholder="User search" ng-model="usersearchFor">
-                        </form>-->
+                                <ul class="nav navbar-nav navbar-right">
+                                    <li><a href="#/home" ng-click="logOut()"> Logout</a></li>
+                                </ul>
 
-                        <ul class="nav navbar-nav navbar-right">
-                            <li><a href="#/home" ng-click="logOut()"> Logout</a></li>
-                        </ul>
-
-                        <ul class="nav navbar-nav navbar-right">
-                            <li><a href="#/profile/{{user.Id}}">Logged in as {{user.DisplayName}}</a></li>
-                        </ul>
+                                <ul class="nav navbar-nav navbar-right">
+                                    <li><a href="#/profile/{{user.Id}}">Logged in as {{user.DisplayName}}</a></li>
+                                </ul>
+                        </div>
                     </div>
-                </div>
             </div>
 
         </div>
