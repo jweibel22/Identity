@@ -32,6 +32,7 @@ namespace Identity.Rest.Api
         private readonly ChannelRepository channelRepo;
         private readonly PostRepository postRepo;
         private readonly UserRepository userRepo;
+        private readonly ChannelLinkRepository channelLinkRepo;
         private readonly ILoadDtos dtoLoader;
         private readonly Bus bus;
 
@@ -39,7 +40,7 @@ namespace Identity.Rest.Api
         private Domain.User user;
 
         public ChannelController(ILoadDtos dtoLoader, ChannelRepository channelRepo, PostRepository postRepo,
-            UserRepository userRepo, Bus bus, PostListLoader postListLoader)
+            UserRepository userRepo, Bus bus, PostListLoader postListLoader, ChannelLinkRepository channelLinkRepo)
         {
             var identity = User.Identity as ClaimsIdentity;
             user = userRepo.FindByName(identity.Name);
@@ -50,6 +51,7 @@ namespace Identity.Rest.Api
             this.userRepo = userRepo;
             this.bus = bus;
             this.postListLoader = postListLoader;
+            this.channelLinkRepo = channelLinkRepo;
         }
 
         [HttpGet]
@@ -157,6 +159,16 @@ namespace Identity.Rest.Api
         [HttpPut]
         public void AddSubscription(long id, long childId)
         {
+            var graph = channelLinkRepo.GetGraph(); //TODO: cache the ChannelLinkGraph
+            var newEdge = new ChannelLinkEdge
+            {
+                From = graph.GetChannelNode(childId),
+                To = graph.GetChannelNode(id)
+            };
+            if (graph.IntroducesCycle(newEdge))
+            {
+                throw new ApplicationException("Unable to add subscription because it would introduce a cycle");
+            }
             channelRepo.AddSubscription(id, childId);
             RefreshUnreadCounts(id);
         }

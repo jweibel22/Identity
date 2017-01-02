@@ -60,6 +60,19 @@ namespace Identity.Domain
             }
         }
 
+        public bool IntroducesCycle(ChannelLinkEdge edge)
+        {
+            try
+            {
+                edges.Add(edge);
+                return IsCyclic();
+            }
+            finally
+            {
+                edges.Remove(edge);
+            }
+        }
+
         public void MarkAsDirty(long channelId)
         {
             var node = nodes.SingleOrDefault(n => n.Id == channelId && n.NodeType == NodeType.Channel);
@@ -143,6 +156,18 @@ namespace Identity.Domain
             }
 
             return false;
+        }
+
+        public ChannelLinkNode GetChannelNode(long channelId)
+        {
+            var result = nodes.SingleOrDefault(n => n.Id == channelId && n.NodeType == NodeType.Channel);
+
+            if (result == null)
+            {
+                throw new ApplicationException("Channel node with id " + channelId + " was not found");
+            }
+
+            return result;
         }
     }
 
