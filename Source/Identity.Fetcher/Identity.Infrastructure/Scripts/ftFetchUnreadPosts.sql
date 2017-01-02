@@ -19,8 +19,7 @@ CASE WHEN Min(pc.LatestAdded) IS NULL THEN Min(ci.Created) ELSE Min(pc.LatestAdd
 Min(pcm.ClusterId) as PostClusterId
 from ChannelItem ci
 inner join cte on ci.ChannelId = cte.Id
-left join ReadHistory on ReadHistory.PostId = ci.PostId and ReadHistory.UserId = @UserId
 left join PostClusterMember pcm on pcm.OntologyId = 1 and pcm.PostId = ci.PostId
 left join PostCluster pc on pc.OntologyId = 1 and pc.ClusterId = pcm.ClusterId
-where ReadHistory.Timestamp is null
+where NOT EXISTS (SELECT PostId from ReadHistory where UserId = @UserId and PostId = ci.PostId)
 group by ci.PostId) as AllPosts
