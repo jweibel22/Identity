@@ -30,10 +30,10 @@ namespace Identity.Domain.Clustering
                 return;
             }
             
-            var distances = Clusters.Select(c => new { Cluster = c, Distance = VectorDistanceMeasure.Get(c.Centroid, d.WordVector) }).ToList();
-            var min = distances.MinBy(x => x.Distance);
+            var distances = Clusters.Select(c => new { Cluster = c, Distance = VectorDistanceMeasure.Get(c.Centroid, d.WordVector) }).ToList();      
+            var min = distances.Any() ? distances.MinBy(x => x.Distance) : null;
 
-            if (min.Distance < threshold)
+            if (min != null && min.Distance < threshold)
             {
                 min.Cluster.Add(d);
                 Merge(min.Cluster);
@@ -47,9 +47,9 @@ namespace Identity.Domain.Clustering
         private void Merge(Cluster cluster)
         {
             var distances = Clusters.Where(c => c != cluster).Select(c => new { Cluster = c, Distance = VectorDistanceMeasure.Get(c.Centroid, cluster.Centroid) }).ToList();
-            var min = distances.MinBy(x => x.Distance);
+            var min = distances.Any() ? distances.MinBy(x => x.Distance) : null;
 
-            if (min.Distance < threshold)
+            if (min != null && min.Distance < threshold)
             {
                 //			if (cluster.Documents.First().Id == 361899 || min.Cluster.Documents.First().Id == 361899)
                 //			{
@@ -59,7 +59,6 @@ namespace Identity.Domain.Clustering
                 cluster.Merge(min.Cluster);
                 Clusters.Remove(min.Cluster);
                 Merge(cluster);
-
             }
         }
     }
