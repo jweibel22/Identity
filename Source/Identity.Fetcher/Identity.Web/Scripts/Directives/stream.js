@@ -28,9 +28,20 @@
                 $scope.readHistory = [];
                 $scope.initialUnread = 0;
 
-                $scope.groupedPosts = groupByCluster([], $scope.posts);
+                $scope.internalPosts = [];
+                angular.copy($scope.posts, $scope.internalPosts);
 
-                function groupByCluster(result, posts) {
+                $scope.groupedPosts = groupByCluster([], $scope.internalPosts);
+
+                $scope.$watchCollection('posts', function (newArray) {
+                    if (newArray.length > 0) {
+                        var toAppend = filterDuplicates($scope.internalPosts, newArray);
+                        $scope.appendPosts($scope.internalPosts, toAppend);
+                        $scope.groupedPosts = groupByCluster($scope.groupedPosts, toAppend, true);
+                    }                    
+                });
+
+                function groupByCluster(result, posts, prepend) {
 
                     var processedClusters = [];
 
@@ -41,10 +52,19 @@
                         if (post.ClusterId) {
                             if (processedClusters.indexOf(post.ClusterId) == -1) {
                                 processedClusters.push(post.ClusterId);
-                                result.push({ Posts: $filter('filter')(posts, { ClusterId: post.ClusterId }, true) });
+                                if (prepend) {
+                                    result.splice(0, 0, { Posts: $filter('filter')(posts, { ClusterId: post.ClusterId }, true) });
+                                } else {
+                                    result.push({ Posts: $filter('filter')(posts, { ClusterId: post.ClusterId }, true) });
+                                }                                
                             }
                         } else {
-                            result.push({ Posts: [post] });
+                            if (prepend) {
+                                result.splice(0, 0, { Posts: [post] });
+                            } else {
+                                result.push({ Posts: [post] });
+                            }
+                            
                         }
                     }
 
@@ -166,16 +186,16 @@
                             $scope.loading = true;
 
                             postService.getFromChannel($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType, pageSize).then(function (data) {
-                                angular.copy(data.data, $scope.posts);
-                                $scope.groupedPosts = groupByCluster([], $scope.posts);
+                                angular.copy(data.data, $scope.internalPosts);
+                                $scope.groupedPosts = groupByCluster([], $scope.internalPosts);
                                 $scope.loading = false;
 
                                 $scope.readHistory = [];
                                 $scope.initialUnread = $scope.channel.UnreadCount;
 
-                                for (var i = 0; i < $scope.posts.length; i++) {
-                                    if ($scope.posts[i].EmbeddedUrl) {
-                                        $scope.posts[i].TrustedEmbeddedUrl = $sce.trustAsResourceUrl($scope.posts[i].EmbeddedUrl);
+                                for (var i = 0; i < $scope.internalPosts.length; i++) {
+                                    if ($scope.internalPosts[i].EmbeddedUrl) {
+                                        $scope.internalPosts[i].TrustedEmbeddedUrl = $sce.trustAsResourceUrl($scope.internalPosts[i].EmbeddedUrl);
                                     }
                                 }
                             });
@@ -192,15 +212,15 @@
                                 $scope.loading = true;
 
                                 postService.loadMorePosts($scope.channel.Id, $scope.showonlyunread, $scope.selectedSortType, pageSize).then(function (data) {
-                                    var toAppend = filterDuplicates($scope.posts, data.data);
-                                    $scope.appendPosts($scope.posts, toAppend);
+                                    var toAppend = filterDuplicates($scope.internalPosts, data.data);
+                                    $scope.appendPosts($scope.internalPosts, toAppend);
                                     $scope.groupedPosts = groupByCluster($scope.groupedPosts, toAppend);
 
                                     $scope.loading = false;
 
-                                    for (var i = 0; i < $scope.posts.length; i++) {
-                                        if ($scope.posts[i].EmbeddedUrl) {
-                                            $scope.posts[i].TrustedEmbeddedUrl = $sce.trustAsResourceUrl($scope.posts[i].EmbeddedUrl);
+                                    for (var i = 0; i < $scope.internalPosts.length; i++) {
+                                        if ($scope.internalPosts[i].EmbeddedUrl) {
+                                            $scope.internalPosts[i].TrustedEmbeddedUrl = $sce.trustAsResourceUrl($scope.internalPosts[i].EmbeddedUrl);
                                         }
                                     }
                                 });
@@ -243,8 +263,8 @@
 
                 $scope.loadComments = function (post) {
                     postService.get(post.Id).then(function (data) {
-                        var index = $scope.posts.indexOf(post);
-                        $scope.posts[index].Comments = data.Comments;
+                        var index = $scope.internalPosts.indexOf(post);
+                        $scope.internalPosts[index].Comments = data.Comments;
                     });
                 }
 
@@ -252,10 +272,10 @@
                     if ($scope.channel) {
                         postService.deletePost($scope.channel.Id, post)
                             .success(function(post1) {
-                                var index = $scope.posts.indexOf(post);
+                                var index = $scope.internalPosts.indexOf(post);
                                 if (index > -1) {
                                     console.log("removing post");
-                                    $scope.posts.splice(index, 1);
+                                    $scope.internalPosts.splice(index, 1);
                                 }
                             });
                     }

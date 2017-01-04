@@ -208,7 +208,7 @@ namespace Identity.Rest.Api
                     PopulateMetaData(p);
                 }
 
-                postRepo.AddPost(p, true);
+                postRepo.AddPost(p, false);
             }
             
             userRepo.Publish(user.Id, id, p.Id);
