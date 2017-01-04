@@ -50,7 +50,8 @@ angular.module('inspire')
             channel: $scope.channel,
             title: '',
             description: '',
-            tags: ''        
+            tags: '',
+            posts: $scope.posts
         }
 
         $scope.addFeederWindowdata = {

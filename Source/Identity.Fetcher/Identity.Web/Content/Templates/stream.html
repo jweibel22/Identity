@@ -158,8 +158,8 @@
 
                         <div ng-bind-html="post.Teaser" style="margin-left: 40px;"></div>
                     </div>
-                    <!--selectedListType == 'Titles' &&-->
-                    <div ng-show="post.IsCollapsed" style="margin-top: 5px">
+                    
+                    <div ng-show="selectedListType == 'Titles' && post.IsCollapsed" style="margin-top: 5px">
                         <span style="font-size: 16px; margin-left: 10px;">
                             <a ng-show="post.Uri" href="" ng-click="post.IsCollapsed = false" ng-bind-html="post.Title" target="_blank"></a>
                             <button class="btn btn-default btn-xs" ng-show="!group.IsExpanded && group.Posts.length > 1" ng-click="group.IsExpanded = true">
