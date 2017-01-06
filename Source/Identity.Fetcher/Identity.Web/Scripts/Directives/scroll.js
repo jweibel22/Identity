@@ -30,7 +30,7 @@
             for (var i = 0; i < divs.length; i++) {
                 var top = 150; //TODO: this corresponds to the height of Menu+ChannelName+ChannelButtonMenu. (which corresponds to the place where an article goes out of sight) Replace this constant with a calculated value.  //$(element).offset().top
                 if (aboveWindow(top, divs[i])) {
-                    readPosts.push(scope.posts[i]);
+                    readPosts.push(scope.internalPosts[i]);
                 }
             }
 
