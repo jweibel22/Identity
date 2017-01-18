@@ -1,6 +1,6 @@
 angular.module('inspire')
-    .controller('ChannelsController', ['$scope', '$http', '$stateParams', '$modal', '$window', '$filter', 'userPromise', 'channelService',
-        function ($scope, $http, $stateParams, $modal, $window, $filter, userPromise, channelService) {
+    .controller('ChannelsController', ['$scope', '$http', '$stateParams', '$modal', '$window', '$filter', 'userPromise', 'channelService', 'postService',
+        function ($scope, $http, $stateParams, $modal, $window, $filter, userPromise, channelService, postService) {
 
             $scope.user = userPromise.data;
 
@@ -83,6 +83,16 @@ angular.module('inspire')
                     onNodeSelected: function (event, data) {
                         $window.location.href = data.href;
                     }
+                });
+
+                var allNodes = $('#tree').treeview('getNodes');
+                $(allNodes).each(function (index, element) {
+
+                    function handleDropEvent(event, ui) {
+                        postService.savePost2(element.uid, ui.draggable.attr('id'));
+                    }
+
+                    $(this.$el[0]).droppable({ drop: handleDropEvent, hoverClass: "drop-hover", });
                 });
 
                 treeInitialized = true;

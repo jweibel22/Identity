@@ -14,13 +14,16 @@ namespace Identity.Domain
 
         public string ListType { get; set; }
 
+        public bool DraggingEnabled { get; set; }
+
         public static ChannelDisplaySettings New()
         {
             return new ChannelDisplaySettings
             {
                 ListType = "Full",
                 OrderBy = "Added",
-                ShowOnlyUnread = true
+                ShowOnlyUnread = true,
+                DraggingEnabled = false
             };
         }
     }

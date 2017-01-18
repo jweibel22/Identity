@@ -28,6 +28,8 @@
                 $scope.readHistory = [];
                 $scope.initialUnread = 0;
 
+                $scope.dndEnabled = $scope.channel ? $scope.channel.DisplaySettings.DraggingEnabled : false;
+
                 $scope.internalPosts = [];
                 angular.copy($scope.posts, $scope.internalPosts);
 
@@ -89,13 +91,18 @@
                     $scope.reloadPosts();                    
                 }
 
+                $scope.changeDraggingEnabled = function () {
+                    $scope.onDisplaySettingsChanged();
+                }
+
                 $scope.onDisplaySettingsChanged = function () {
 
                     $scope.displaySettingsChanged({
                         settings: {
                             ShowOnlyUnread: $scope.showonlyunread,
                             OrderBy: $scope.selectedSortType,
-                            ListType: $scope.selectedListType
+                            ListType: $scope.selectedListType,
+                            DraggingEnabled: $scope.dndEnabled
                         }
                     });
                 }

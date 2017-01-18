@@ -10,8 +10,12 @@
             }
 
             for (var i = 0; i < $scope.contents.Posts.length; i++) {
-                if ($scope.contents.Posts[i].EmbeddedUrl) {
-                    $scope.contents.Posts[i].TrustedEmbeddedUrl = $sce.trustAsResourceUrl($scope.contents.Posts[i].EmbeddedUrl);
-                }
+
+                //TODO: this code throws exceptions in the console, fix it!
+                //if ($scope.contents.Posts[i].EmbeddedUrl) {
+                //    $scope.contents.Posts[i].TrustedEmbeddedUrl = $sce.trustAsResourceUrl($scope.contents.Posts[i].EmbeddedUrl);
+                //}
+
+                $scope.contents.Posts[i].TrustedEmbeddedUrl = null;
             }
         }]);

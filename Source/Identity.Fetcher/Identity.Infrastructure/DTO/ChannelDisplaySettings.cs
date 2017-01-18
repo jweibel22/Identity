@@ -14,6 +14,7 @@ namespace Identity.Infrastructure.DTO
 
         public string ListType { get; set; }
 
+        public bool DraggingEnabled { get; set; }
     }
 
     public class ChannelStatistics

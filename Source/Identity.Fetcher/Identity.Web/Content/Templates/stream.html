@@ -32,142 +32,150 @@
 
             </td>
             <td>
-                <span>Only show unread</span> <input type="checkbox" ng-model="showonlyunread" ng-change="showOnlyUnreadChanged()"/>
+                <span>Only show unread</span> <input type="checkbox" ng-model="showonlyunread" ng-change="showOnlyUnreadChanged()" />
+            </td>
+            <td>
+                <span>Enable dragging</span> <input type="checkbox" ng-model="dndEnabled" ng-change="changeDraggingEnabled()" />
             </td>
         </tr>
     </table>
 </div>
 
-    <div ng-show="channel && groupedPosts.length == 0 && !loading">
-        <p>This channel appears to be empty!</p>
-        If you created this channel or if you are a participator you can add content:
-        <ul>
-            <li>Add a single link by selecting "add link ..." in the burger menu</li>
-            <li>Add an RSS or Twitter feed by selecting "add feeder ..." in the burger menu</li>
-            <li>Click the "Forward" button on an article you find in another channel and forward the article to this channel</li>
-            <li>Select "Forward to ..." in the burger menu of another channel and forward the entire channel to this channel</li>
-        </ul>
-    </div>
+<div ng-show="channel && groupedPosts.length == 0 && !loading">
+    <p>This channel appears to be empty!</p>
+    If you created this channel or if you are a participator you can add content:
+    <ul>
+        <li>Add a single link by selecting "add link ..." in the burger menu</li>
+        <li>Add an RSS or Twitter feed by selecting "add feeder ..." in the burger menu</li>
+        <li>Click the "Forward" button on an article you find in another channel and forward the article to this channel</li>
+        <li>Select "Forward to ..." in the burger menu of another channel and forward the entire channel to this channel</li>
+    </ul>
+</div>
 
 <div style="margin-top: 10px; margin-bottom: 1000px" scroll infinite-scroll="loadMorePosts()" infinite-scroll-distance="2">
-        <div ng-repeat="group in groupedPosts " ng-class="{expandedGroup: group.IsExpanded}">
-            <div ng-repeat="post in group.Posts " class="readable">
-                <div ng-show="postVisible(post) && (group.IsExpanded || post == group.Posts[0])">
+    <div ng-repeat="group in groupedPosts " ng-class="{expandedGroup: group.IsExpanded}">
+        <div ng-repeat="post in group.Posts " class="readable">
+            <div ng-show="postVisible(post) && (group.IsExpanded || post == group.Posts[0])">
 
-                    <div ng-show="selectedListType == 'Full' || !post.IsCollapsed" style="margin-top: 20px">
-                        <span style="font-size: 20px; margin-left: 10px;">
-                            <a ng-show="post.Uri" href="{{post.Uri}}" ng-bind-html="post.Title" target="_blank"></a>
-                            <span ng-hide="post.Uri">{{post.Title}}</span>
-                            <button class="btn btn-default btn-xs" ng-show="!group.IsExpanded && group.Posts.length > 1" ng-click="group.IsExpanded = true">
-                                <span class="glyphicon glyphicon-expand"></span>
-                            </button>
-                        </span>
+                <div ng-show="selectedListType == 'Full' || !post.IsCollapsed" style="margin-top: 20px">
+                    <span style="font-size: 20px; margin-left: 10px;">
+                        <span ng-show="dndEnabled" class="glyphicon glyphicon-th" data-drag="true" jqyoui-draggable="{animate:false}" data-jqyoui-options="{revert: true, revertDuration: 0}" id="{{post.Id}}"></span>
+                        <a ng-show="post.Uri" href="{{post.Uri}}" ng-bind-html="post.Title" target="_blank"></a>
+                        <span ng-hide="post.Uri">{{post.Title}}</span>
+                        <button class="btn btn-default btn-xs" ng-show="!group.IsExpanded && group.Posts.length > 1" ng-click="group.IsExpanded = true">
+                            <span class="glyphicon glyphicon-expand"></span>
+                        </button>
+                    </span>
 
-                        <div ng-bind-html="post.Description" style="margin-left: 30px;"/>
+                    <div ng-bind-html="post.Description" style="margin-left: 30px;" />
 
-                        <iframe ng-show="post.EmbeddedUrl" width="560" height="315" ng-src="{{post.TrustedEmbeddedUrl}}" frameborder="0" allowfullscreen></iframe>
+                    <iframe ng-show="post.EmbeddedUrl" width="560" height="315" ng-src="{{post.TrustedEmbeddedUrl}}" frameborder="0" allowfullscreen></iframe>
 
-                        <div>
-                            <div style="margin-left: 30px;">
-                                <span style="font-weight: bold" ng-repeat="tag in post.Tags">{{tag}} <a href="" ng-click="block(tag)">[!]</a> <a href="" ng-show="follows(tag)" ng-click="unfollow(tag)">[-]</a></span>
-                            </div>
-                            <div style="margin-left: 30px;" ng-show="post.PublishedIn">
-                                Published in
-                                <a style="font-weight: bold" ng-repeat="channel in post.PublishedIn" href="#/home/{{channel.Id}}"> {{channel.Name}}</a><span> at {{post.Created | date:'dd/MM/yyyy HH:mm:ss'}}</span>
-                            </div>
-                            <div style="margin-left: 30px;">
-                                <span ng-show="post.PosterUsername">by <a href="#/profile/{{post.PosterId}}">{{post.PosterUsername}}</a> at {{post.Created | date:'dd/MM/yyyy HH:mm:ss'}} </span>
-                            </div>
-                            <div style="margin-left: 30px;">
-                                <span style="cursor: pointer;" ng-show="post.CommentCount > 0" ng-click="loadComments(post)">{{post.CommentCount}} comments</span>
-                                <div ng-show="post.CommentCount > 0 && post.Comments" style="margin-top: 10px; margin-bottom: 10px">
+                    <div>
+                        <div style="margin-left: 30px;">
+                            <span style="font-weight: bold" ng-repeat="tag in post.Tags">{{tag}} <a href="" ng-click="block(tag)">[!]</a> <a href="" ng-show="follows(tag)" ng-click="unfollow(tag)">[-]</a></span>
+                        </div>
+                        <div style="margin-left: 30px;" ng-show="post.PublishedIn">
+                            Published in
+                            <a style="font-weight: bold" ng-repeat="channel in post.PublishedIn" href="#/home/{{channel.Id}}"> {{channel.Name}}</a><span> at {{post.Created | date:'dd/MM/yyyy HH:mm:ss'}}</span>
+                        </div>
+                        <div style="margin-left: 30px;">
+                            <span ng-show="post.PosterUsername">by <a href="#/profile/{{post.PosterId}}">{{post.PosterUsername}}</a> at {{post.Created | date:'dd/MM/yyyy HH:mm:ss'}} </span>
+                        </div>
+                        <div style="margin-left: 30px;">
+                            <span style="cursor: pointer;" ng-show="post.CommentCount > 0" ng-click="loadComments(post)">{{post.CommentCount}} comments</span>
+                            <div ng-show="post.CommentCount > 0 && post.Comments" style="margin-top: 10px; margin-bottom: 10px">
 
-                                    <div style="background: #E8E8E8; margin-top: 1px; font-size: medium;">
-                                        <div>
-                                            <input type="text" class="form-control col-lg-8" placeholder="Write a comment">
-                                        </div>
-                                    </div>
-
-                                    <div ng-repeat="comment in post.Comments | orderBy:'Created'" style="background: #E8E8E8; margin-top: 1px; font-size: medium;">
-                                        <div>
-                                            <a href="#/profile/{{comment.UserId}}">{{comment.Author}}</a>
-                                            <span style="font-size: medium; margin-left: 2px;">
-                                                {{comment.Body}}
-                                            </span>
-                                        </div>
-                                        <div style="color: #888888; font-size: small">
-                                            {{comment.CreatedHoursAgo}} hours ago <a>Reply</a>
-                                        </div>
+                                <div style="background: #E8E8E8; margin-top: 1px; font-size: medium;">
+                                    <div>
+                                        <input type="text" class="form-control col-lg-8" placeholder="Write a comment">
                                     </div>
                                 </div>
-                            </div>
-                            <div style="margin-left: 30px;">
 
-                                <button class="btn btn-default btn-xs" ng-click="starPost(post)">
-                                    <span ng-class="post.Starred ? 'glyphicon glyphicon-star' : 'glyphicon glyphicon-star-empty'"></span> Star
-                                </button>
-
-                                <button class="btn btn-default btn-xs" ng-click="likePost(post)">
-                                    <span ng-class="post.Liked ? 'glyphicon glyphicon-heart' : 'glyphicon glyphicon-heart-empty'"></span> Like
-                                </button>
-
-                                <button class="btn btn-default btn-xs" ng-click="savePost(post)">
-                                    <span ng-class="post.Saved ? 'glyphicon glyphicon-floppy-remove' : 'glyphicon glyphicon-floppy-save'"></span> History
-                                </button>
-
-                                <button class="btn btn-default btn-xs" ng-click="publishOnChannel(post)">
-                                    <span class="glyphicon glyphicon-share"></span> Forward
-                                </button>
-
-                                <!--<a href="#/viewpost/{{post.Id}}" class="btn btn-default btn-xs">
-                                    <span class="glyphicon glyphicon-eye-open"></span> View
-                                </a>
-
-                                <a href="#/editpost/{{post.Id}}" class="btn btn-default btn-xs">
-                                    <span class="glyphicon glyphicon-edit"></span> Edit
-                                </a>-->
-
-                                <button class="btn btn-default btn-xs"  ng-click="fetchPostContent(post)"> <!--ng-show="post.CanBeInlined"-->
-                                    <span class="glyphicon glyphicon-edit"></span> Content
-                                </button>
-
-                                <!--<button class="btn btn-default btn-xs" ng-show="channelOwned" ng-click="deletePost(post)">
-                                    <span class="glyphicon glyphicon-remove"></span> Remove
-                                </button>-->
-
-                                <div class="btn-group">
-                                    <button type="button" data-toggle="dropdown" class="btn btn-default btn-xs glyphicon glyphicon-menu-hamburger"></button>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="#/viewpost/{{post.Id}}">View</a></li>
-                                        <li><a href="#/editpost/{{post.Id}}">Edit</a></li>
-                                        <li ng-show="channelOwned"><a ng-click="deletePost(post)">Remove</a></li>
-                                    </ul>
+                                <div ng-repeat="comment in post.Comments | orderBy:'Created'" style="background: #E8E8E8; margin-top: 1px; font-size: medium;">
+                                    <div>
+                                        <a href="#/profile/{{comment.UserId}}">{{comment.Author}}</a>
+                                        <span style="font-size: medium; margin-left: 2px;">
+                                            {{comment.Body}}
+                                        </span>
+                                    </div>
+                                    <div style="color: #888888; font-size: small">
+                                        {{comment.CreatedHoursAgo}} hours ago <a>Reply</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <div style="margin-left: 30px;">
 
-                    </div>
-
-                    <div ng-show="selectedListType == 'List' && post.IsCollapsed" style="margin-top: 20px">
-                        <span style="font-size: 20px; margin-left: 10px;">
-                            <a ng-show="post.Uri" href="" ng-click="post.IsCollapsed = false" ng-bind-html="post.Title" target="_blank"></a>
-                            <button class="btn btn-default btn-xs" ng-show="!group.IsExpanded && group.Posts.length > 1" ng-click="group.IsExpanded = true">
-                                <span class="glyphicon glyphicon-expand"></span>
+                            <button class="btn btn-default btn-xs" ng-click="starPost(post)">
+                                <span ng-class="post.Starred ? 'glyphicon glyphicon-star' : 'glyphicon glyphicon-star-empty'"></span> Star
                             </button>
-                        </span>
 
-                        <div ng-bind-html="post.Teaser" style="margin-left: 40px;"></div>
+                            <button class="btn btn-default btn-xs" ng-click="likePost(post)">
+                                <span ng-class="post.Liked ? 'glyphicon glyphicon-heart' : 'glyphicon glyphicon-heart-empty'"></span> Like
+                            </button>
+
+                            <button class="btn btn-default btn-xs" ng-click="savePost(post)">
+                                <span ng-class="post.Saved ? 'glyphicon glyphicon-floppy-remove' : 'glyphicon glyphicon-floppy-save'"></span> History
+                            </button>
+
+                            <button class="btn btn-default btn-xs" ng-click="publishOnChannel(post)">
+                                <span class="glyphicon glyphicon-share"></span> Forward
+                            </button>
+
+                            <!--<a href="#/viewpost/{{post.Id}}" class="btn btn-default btn-xs">
+                                <span class="glyphicon glyphicon-eye-open"></span> View
+                            </a>
+
+                            <a href="#/editpost/{{post.Id}}" class="btn btn-default btn-xs">
+                                <span class="glyphicon glyphicon-edit"></span> Edit
+                            </a>-->
+
+                            <button class="btn btn-default btn-xs" ng-click="fetchPostContent(post)">
+                                <!--ng-show="post.CanBeInlined"-->
+                                <span class="glyphicon glyphicon-edit"></span> Content
+                            </button>
+
+                            <!--<button class="btn btn-default btn-xs" ng-show="channelOwned" ng-click="deletePost(post)">
+                                <span class="glyphicon glyphicon-remove"></span> Remove
+                            </button>-->
+
+                            <div class="btn-group">
+                                <button type="button" data-toggle="dropdown" class="btn btn-default btn-xs glyphicon glyphicon-menu-hamburger"></button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#/viewpost/{{post.Id}}">View</a></li>
+                                    <li><a href="#/editpost/{{post.Id}}">Edit</a></li>
+                                    <li ng-show="channelOwned"><a ng-click="deletePost(post)">Remove</a></li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div ng-show="selectedListType == 'Titles' && post.IsCollapsed" style="margin-top: 5px">
+
+                </div>
+
+                <div ng-show="selectedListType == 'List' && post.IsCollapsed" style="margin-top: 20px">
+                    <span style="font-size: 20px; margin-left: 10px;">
+                        <span ng-show="dndEnabled" class="glyphicon glyphicon-th" data-drag="true" jqyoui-draggable="{animate:false}" data-jqyoui-options="{revert: true, revertDuration: 0}" id="{{post.Id}}"></span>
+                        <a ng-show="post.Uri" href="" ng-click="post.IsCollapsed = false" ng-bind-html="post.Title" target="_blank"></a>
+                        <button class="btn btn-default btn-xs" ng-show="!group.IsExpanded && group.Posts.length > 1" ng-click="group.IsExpanded = true">
+                            <span class="glyphicon glyphicon-expand"></span>
+                        </button>
+                    </span>
+
+                    <div ng-bind-html="post.Teaser" style="margin-left: 40px;"></div>
+                </div>
+
+                <div ng-show="selectedListType == 'Titles' && post.IsCollapsed" style="margin-top: 5px;">                    
+                    <!--<span ng-show="dndEnabled" style="width: 200px; height: 18px; overflow: hidden" class="glyphicon glyphicon-th" data-drag="true" jqyoui-draggable="{animate:false}" data-jqyoui-options="{revert: true, revertDuration: 0}" id="ssss"><span style="visibility: hidden" ng-bind-html="post.Title"></span></span>-->
+                    <span ng-show="dndEnabled" class="glyphicon glyphicon-th" data-drag="true" jqyoui-draggable="{animate:false}" data-jqyoui-options="{revert: true, revertDuration: 0}" id="{{post.Id}}"></span>
                         <span style="font-size: 16px; margin-left: 10px;">
                             <a ng-show="post.Uri" href="" ng-click="post.IsCollapsed = false" ng-bind-html="post.Title" target="_blank"></a>
                             <button class="btn btn-default btn-xs" ng-show="!group.IsExpanded && group.Posts.length > 1" ng-click="group.IsExpanded = true">
                                 <span class="glyphicon glyphicon-expand"></span>
                             </button>
-                        </span>
-                    </div>
+                        </span>                    
                 </div>
             </div>
         </div>
+    </div>
 </div>

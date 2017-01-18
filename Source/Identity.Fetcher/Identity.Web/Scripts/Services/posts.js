@@ -102,6 +102,11 @@ angular.module('inspire').factory('postService', ['$http', '$q', '$filter', 'ngS
         });
     };
 
+    o.savePost2 = function (channelId, postId) {
+        return $http.put(ngSettings.baseUrl + '/Api/Channel/' + channelId + '/Posts?postId=' + postId).success(function (data) {
+        });
+    };
+
     o.upvote = function(post) {
         return $http.put(ngSettings.baseUrl + '/Api/Post/' + post.Id + '/Upvote')
             .success(function(data){

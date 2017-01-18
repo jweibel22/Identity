@@ -15,6 +15,7 @@
     <link href="/Content/bootstrap-treeview.css" rel="stylesheet">
 
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="Scripts/jquery-ui.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.1/angular-sanitize.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
@@ -24,7 +25,8 @@
     <script src="/Scripts/angular-jqcloud.js"></script>    
     <script src="/Scripts/angular-toasty.min.js"></script>    
     <script src="/Scripts/angular-local-storage.min.js"></script>
-    <script src="/Scripts/ng-infinite-scroll.min.js"></script>
+    <script src="/Scripts/ng-infinite-scroll.min.js"></script>    
+    <script src="/Scripts/angular-dragdrop.min.js"></script>    
     <script src="/Scripts/bootstrap-treeview.js"></script>
     <script src="/Scripts/angularApp.js"></script>    
     <script src="/Scripts/Controllers/allChannels.js"></script>
@@ -109,6 +111,13 @@
         div.expandedGroup {
             margin-top: 20px;
             margin-bottom: 20px;
+        }
+
+        .drop-hover {
+            background-color: darkgray !important;
+        }
+        span.ui-draggable-dragging span {
+            visibility: visible !important;
         }
     </style>
 </head>
