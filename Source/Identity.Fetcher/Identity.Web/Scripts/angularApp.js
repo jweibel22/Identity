@@ -1,4 +1,4 @@
-angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-jqcloud', 'infinite-scroll', 'LocalStorageModule', 'angular-toasty'])
+angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-jqcloud', 'infinite-scroll', 'LocalStorageModule', 'angular-toasty', 'ngDragDrop'])
     .constant('ngSettings', {
         //baseUrl: "http://localhost:8011",
         //baseUrl: "http://localhost:57294/",
