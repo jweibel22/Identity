@@ -98,6 +98,7 @@
     <Compile Include="DTO\User.cs" />
     <Compile Include="Feeders\FeedItem.cs" />
     <Compile Include="Feeders\TwitterFeeder.cs" />
+    <Compile Include="Helpers\BulkCopy.cs" />
     <Compile Include="PerfCounter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\ChannelLinkRepository.cs" />
@@ -114,6 +115,9 @@
     <Compile Include="Feeders\WebScrapers\IWebScraper.cs" />
     <Compile Include="Feeders\WebScrapers\WebScraperJob.cs" />
     <Compile Include="Services\DtoLoader.cs" />
+    <Compile Include="Services\NLP\GoogleNLPClient.cs" />
+    <Compile Include="Services\NLP\Entities.cs" />
+    <Compile Include="Services\NLP\Text.cs" />
     <Compile Include="Services\PostListLoader.cs" />
     <Compile Include="Services\TinyUrlResolver.cs" />
     <Compile Include="TagCloudRefresher.cs" />
