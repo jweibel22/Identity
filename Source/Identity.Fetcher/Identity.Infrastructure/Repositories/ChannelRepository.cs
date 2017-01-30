@@ -144,6 +144,13 @@ group by Tag.Name order by COUNT(*) desc",
             }            
         }
 
+        public IEnumerable<Channel> GetAllDirectUpStreamChannels(long downStreamChannelId)
+        {
+            return con.Connection
+                .Query<Channel>("select c.* from ChannelLink cl join Channel c on c.Id = cl.ChildId where cl.ParentId = @DownStreamChannelId", 
+                new { DownStreamChannelId = downStreamChannelId }, con);
+        }
+
         public void Delete(long userId, long channelId)
         {
             var cnt = con.Connection.Query<int>("select count(*) from ChannelOwner where UserId=@UserId and ChannelId=@ChannelId and IsLocked=0",

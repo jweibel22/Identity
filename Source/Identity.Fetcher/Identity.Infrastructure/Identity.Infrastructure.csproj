@@ -137,6 +137,8 @@
     <Compile Include="DTO\RssFeeder.cs" />
     <Compile Include="DTO\User.cs" />
     <Compile Include="Feeders\FeedItem.cs" />
+    <Compile Include="Feeders\FeederFactory.cs" />
+    <Compile Include="Feeders\Logger.cs" />
     <Compile Include="Feeders\TwitterFeeder.cs" />
     <Compile Include="Helpers\BulkCopy.cs" />
     <Compile Include="Helpers\NLPHelper.cs" />
@@ -154,7 +156,7 @@
     <Compile Include="Repositories\InlineArticleSelectorRepository.cs" />
     <Compile Include="Repositories\PostRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
-    <Compile Include="Feeders\Rss\RssFeedRefresher.cs" />
+    <Compile Include="Feeders\FeedRefresher.cs" />
     <Compile Include="Feeders\Rss\RssReader.cs" />
     <Compile Include="Feeders\WebScrapers\AlScraper.cs" />
     <Compile Include="Feeders\WebScrapers\IWebScraper.cs" />

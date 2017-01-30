@@ -2,40 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks.Dataflow;
 using Identity.Domain;
 using Identity.Infrastructure.Feeders;
 using Identity.Infrastructure.Repositories;
-using log4net;
 
 
 namespace Identity.Infrastructure.Rss
 {
-    class Logger
-    {
-        private readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private readonly TextWriter azureLog;
-
-        public Logger(TextWriter azureLog)
-        {
-            this.azureLog = azureLog;
-        }
-
-        public void Info(string message)
-        {
-            log.Info(message);
-            azureLog.WriteLine(message);
-        }
-
-        public void Error(string message, Exception ex)
-        {
-            log.Error(message, ex);
-            azureLog.WriteLine(String.Format("{0}. Reason: {1}", message, ex));
-        }
-    }
-
-    public class RssFeedRefresher
+    public class FeedRefresher
     {
         //private readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -43,23 +18,86 @@ namespace Identity.Infrastructure.Rss
         private readonly FeederFactory feederFactory;
         private readonly Logger log;
 
-        public RssFeedRefresher(ConnectionFactory connectionFactory, TextWriter azureLog)
+        public FeedRefresher(ConnectionFactory connectionFactory, TextWriter azureLog)
         {
             this.connectionFactory = connectionFactory;
             this.feederFactory = new FeederFactory();
             log = new Logger(azureLog);
         }
 
+        private void ProcessFeedItem(DbSession session, Feed feed, User rssFeederUser, FeedItem feedItem, IDictionary<string, long> upstreamChannels)
+        {
+            var userRepo = new UserRepository(session.Transaction);
+            var postRepo = new PostRepository(session.Transaction);
+
+            if (postRepo.SimilarPostAlreadyExists(feedItem.Title, feedItem.CreatedAt, feed.ChannelId))
+                return;
+
+            var url = feedItem.Links.First().ToString();
+            var post = postRepo.GetByUrl(url);
+
+            if (post == null)
+            {
+                log.Info("processing item " + feedItem.Title + " from feed " + feed.Url);
+
+                post = new Post
+                {
+                    Created = feedItem.CreatedAt,
+                    Description = feedItem.Content,
+                    Title = feedItem.Title,
+                    Uri = url,
+                    PremiumContent = url.Contains("protected/premium")
+                };
+
+                postRepo.AddPost(post, false);
+
+                if (feed.Id == 2)
+                {
+                    foreach (var tag in feedItem.Tags)
+                    {
+                        userRepo.Publish(rssFeederUser.Id, upstreamChannels[tag], post.Id);
+                    }
+                }
+
+                postRepo.TagPost(post.Id, feedItem.Tags);
+            }
+
+            userRepo.Publish(rssFeederUser.Id, feed.ChannelId, post.Id);
+        }
+
         private void ProcessFeed(DbSession session, User rssFeederUser, Feed feed, ChannelLinkGraph graph, IEnumerable<FeedItem> items)
         {
             var channelRepo = new ChannelRepository(session.Transaction);
-            var postRepo = new PostRepository(session.Transaction);
-            var userRepo = new UserRepository(session.Transaction);
             //var autoTagger = new AutoTagger(new TagCountRepository(session), postRepo);
-
+            
             log.Info("Processing feed items from feed " + feed.Url);
 
-            var tags = channelRepo.GetFeedTags(feed.Id);
+            //var tags = channelRepo.GetFeedTags(feed.Id);
+
+            var existingUpstreamChannels = channelRepo.GetAllDirectUpStreamChannels(feed.ChannelId).ToList();
+            var allUpstreamChannels = existingUpstreamChannels.ToDictionary(channel => channel.Name, channel => channel.Id);
+
+            if (feed.Id == 2)
+            {
+                var allTags = items.SelectMany(i => i.Tags).Distinct();
+
+                foreach (var tag in allTags)
+                {
+                    if (!allUpstreamChannels.ContainsKey(tag))
+                    {
+                        var newChannel = new Channel
+                        {
+                            Created = DateTimeOffset.Now,
+                            IsPublic = true,
+                            Name = tag
+                        };
+
+                        channelRepo.AddChannel(newChannel);
+                        channelRepo.AddSubscription(feed.ChannelId, newChannel.Id);
+                        allUpstreamChannels[newChannel.Name] = newChannel.Id;
+                    }
+                }
+            }
 
             feed.LastFetch = DateTimeOffset.Now;
             channelRepo.UpdateFeed(feed);
@@ -69,31 +107,7 @@ namespace Identity.Infrastructure.Rss
             {
                 try
                 {
-                    if (postRepo.SimilarPostAlreadyExists(feedItem.Title, feedItem.CreatedAt, feed.ChannelId))
-                        break;
-
-                    var url = feedItem.Links.First().ToString();
-                    var post = postRepo.GetByUrl(url);
-
-                    if (post == null)
-                    {
-                        log.Info("processing item " + feedItem.Title + " from feed " + feed.Url);
-
-                        post = new Post
-                        {
-                            Created = feedItem.CreatedAt,
-                            Description = feedItem.Content,
-                            Title = feedItem.Title,
-                            Uri = url,
-                            PremiumContent = url.Contains("protected/premium")
-                        };
-
-                        postRepo.AddPost(post, false);
-                        postRepo.TagPost(post.Id, feedItem.Tags.Union(tags));
-                        //autoTagger.AutoTag(post);
-                    }
-
-                    userRepo.Publish(rssFeederUser.Id, feed.ChannelId, post.Id);
+                    ProcessFeedItem(session, feed, rssFeederUser, feedItem, allUpstreamChannels);
                 }
                 catch (Exception ex)
                 {
@@ -186,31 +200,6 @@ namespace Identity.Infrastructure.Rss
                 }
 
                 session.Commit();
-            }
-        }
-    }
-
-    class FeederFactory
-    {
-        private readonly TwitterFeeder twitter;
-        private readonly RssReader rss;
-
-        public FeederFactory()
-        {
-            twitter = new TwitterFeeder();
-            rss = new RssReader();
-        }
-
-        public IFeederReader GetReader(Feed feeder)
-        {
-            switch (feeder.Type)
-            {
-                case FeedType.Rss:
-                    return rss;
-                case FeedType.Twitter:
-                    return twitter;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
         }
     }

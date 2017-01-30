@@ -65,7 +65,7 @@ namespace Identity.Fetcher.WindowsService
                 return;
             }
 
-            var feedRefresher = new RssFeedRefresher(connectionFactory, TextWriter.Null);
+            var feedRefresher = new FeedRefresher(connectionFactory, TextWriter.Null);
             try
             {
                 feedRefresher.Run(rssFeederUser, feeders);

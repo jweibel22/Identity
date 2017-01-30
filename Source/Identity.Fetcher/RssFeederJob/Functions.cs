@@ -87,7 +87,7 @@ namespace RssFeederJob
                 return;
             }
 
-            var feedRefresher = new RssFeedRefresher(connectionFactory, log);
+            var feedRefresher = new FeedRefresher(connectionFactory, log);
             try
             {
                 Console.WriteLine("Rss feeder started");
