@@ -49,7 +49,7 @@ namespace FeederJob2
                     return;
                 }
 
-                var feedRefresher = new RssFeedRefresher(connectionFactory, log);
+                var feedRefresher = new FeedRefresher(connectionFactory, log);
                 Console.WriteLine("Rss feeder started");
                 feedRefresher.Run(rssFeederUser, feeders);
                 Console.WriteLine("Rss feeder finished");
