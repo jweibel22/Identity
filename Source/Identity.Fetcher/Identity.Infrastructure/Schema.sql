@@ -309,3 +309,53 @@ CREATE UNIQUE NONCLUSTERED INDEX [OntologyMembers_UniqeIndex] ON [dbo].[Ontology
 (
 	[ChannelId] ASC
 )
+
+CREATE TABLE [dbo].[RedditIndex_Index](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[StorageLocation] [int] NOT NULL DEFAULT ((0)),
+CONSTRAINT [PK_RedditIndex_Index] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+))
+
+CREATE TABLE [dbo].[RedditIndex_Text](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[IndexId] [bigint] NOT NULL,
+	[Content] [varchar](100) NOT NULL,
+	[Type] [varchar](50) NULL,
+	[CommonWord] [bit] NOT NULL,
+	[Noun] [bit] NOT NULL,
+CONSTRAINT [PK_RedditIndex_Text] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+))
+
+
+CREATE TABLE [dbo].[RedditIndex_SubReddit](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[IndexId] [bigint] NOT NULL,
+	[Name] [varchar](100) NULL,
+	[PostCount] [int] NOT NULL CONSTRAINT [DF_RedditIndex_SubReddit_PostCount]  DEFAULT ((0)),
+	[Ignore] [bit] NOT NULL CONSTRAINT [DF_RedditIndex_SubReddit_Ignore]  DEFAULT ((0)),
+CONSTRAINT [PK_RedditIndex_SubReddit] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)
+)
+
+CREATE TABLE [dbo].[RedditIndex_Occurences](
+	[TextId] [bigint] NOT NULL,
+	[SubRedditId] [bigint] NOT NULL,
+	[IndexId] [bigint] NOT NULL,
+	[Occurences] [int] NOT NULL
+)
+
+CREATE NONCLUSTERED INDEX [RedditIndex_Occurences_TextId] ON [dbo].[RedditIndex_Occurences]
+(
+	[TextId] ASC
+)
+
+CREATE NONCLUSTERED INDEX [RedditIndex_Occurences_IndexId] ON [dbo].[RedditIndex_Occurences]
+(
+	[IndexId] ASC
+)

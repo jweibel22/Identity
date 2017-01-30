@@ -176,7 +176,7 @@ namespace Identity.Infrastructure.Repositories
                 .ToList();
         }
 
-        private IEnumerable<Post> GetByIds(IEnumerable<long> ids, long userId)
+        public IEnumerable<Post> GetByIds(IEnumerable<long> ids, long userId)
         {
             var idTable = new DataTable();
             idTable.Columns.Add("id", typeof(long));

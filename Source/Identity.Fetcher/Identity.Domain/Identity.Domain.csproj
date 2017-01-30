@@ -63,6 +63,15 @@
     <Compile Include="Comment.cs" />
     <Compile Include="Post.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RedditIndexes\Entity.cs" />
+    <Compile Include="RedditIndexes\IndexStorageLocation.cs" />
+    <Compile Include="RedditIndexes\Occurences.cs" />
+    <Compile Include="RedditIndexes\RedditIndex.cs" />
+    <Compile Include="RedditIndexes\SubReddit.cs" />
+    <Compile Include="RedditIndexes\SubRedditScore.cs" />
+    <Compile Include="RedditIndexes\SuggestedSubReddits.cs" />
+    <Compile Include="RedditIndexes\SuggestedSubRedditsDebugInfo.cs" />
+    <Compile Include="RedditIndexes\Text.cs" />
     <Compile Include="UnreadCount.cs" />
     <Compile Include="ReadHistory.cs" />
     <Compile Include="Feed.cs" />
@@ -73,6 +82,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
