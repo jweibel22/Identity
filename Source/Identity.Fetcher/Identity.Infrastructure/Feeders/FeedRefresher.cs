@@ -6,7 +6,7 @@ using System.Threading.Tasks.Dataflow;
 using Identity.Domain;
 using Identity.Infrastructure.Feeders;
 using Identity.Infrastructure.Repositories;
-
+using MoreLinq;
 
 namespace Identity.Infrastructure.Rss
 {
@@ -74,7 +74,7 @@ namespace Identity.Infrastructure.Rss
 
             //var tags = channelRepo.GetFeedTags(feed.Id);
 
-            var existingUpstreamChannels = channelRepo.GetAllDirectUpStreamChannels(feed.ChannelId).ToList();
+            var existingUpstreamChannels = channelRepo.GetAllDirectUpStreamChannels(feed.ChannelId).DistinctBy(c => c.Name).ToList();
             var allUpstreamChannels = existingUpstreamChannels.ToDictionary(channel => channel.Name, channel => channel.Id);
 
             if (feed.Id == 2)
