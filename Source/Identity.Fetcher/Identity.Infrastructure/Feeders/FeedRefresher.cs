@@ -18,6 +18,8 @@ namespace Identity.Infrastructure.Rss
         private readonly FeederFactory feederFactory;
         private readonly Logger log;
 
+        private readonly long[] FeedersWithTagsAsUpstreams = new[] {1L, 2L, 4L, 5L, 6L, 7L};
+
         public FeedRefresher(ConnectionFactory connectionFactory, TextWriter azureLog)
         {
             this.connectionFactory = connectionFactory;
@@ -51,7 +53,7 @@ namespace Identity.Infrastructure.Rss
 
                 postRepo.AddPost(post, false);
 
-                if (feed.Id == 2)
+                if (FeedersWithTagsAsUpstreams.Contains(feed.Id))
                 {
                     foreach (var tag in feedItem.Tags)
                     {
@@ -77,7 +79,7 @@ namespace Identity.Infrastructure.Rss
             var existingUpstreamChannels = channelRepo.GetAllDirectUpStreamChannels(feed.ChannelId).DistinctBy(c => c.Name).ToList();
             var allUpstreamChannels = existingUpstreamChannels.ToDictionary(channel => channel.Name.Trim(), channel => channel.Id);
 
-            if (feed.Id == 2)
+            if (FeedersWithTagsAsUpstreams.Contains(feed.Id))
             {
                 var allTags = items.SelectMany(i => i.Tags).Distinct().Select(tag => tag.Trim());
 
