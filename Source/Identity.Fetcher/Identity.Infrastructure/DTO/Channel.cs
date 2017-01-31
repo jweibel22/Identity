@@ -2,6 +2,13 @@
 
 namespace Identity.Infrastructure.DTO
 {
+    public class ChannelListItem
+    {
+        public long Id { get; set; }
+
+        public string Name { get; set; }
+    }
+
     public class Channel
     {
         public Channel()

@@ -61,10 +61,15 @@ namespace Identity.Rest.Api
         }
 
         [HttpGet]
-        public IEnumerable<Channel> Get(string query)
+        public IEnumerable<ChannelListItem> Get(string query)
         {
             var channels = channelRepo.FindPublicChannelsByName(query);
-            return dtoLoader.LoadChannelList(user, channels);
+
+            return channels.Select(c => new ChannelListItem
+            {
+                Name = c.Name,
+                Id = c.Id
+            });
         }
 
         [HttpGet]
