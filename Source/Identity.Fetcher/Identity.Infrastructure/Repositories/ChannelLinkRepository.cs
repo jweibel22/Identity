@@ -65,8 +65,6 @@ namespace Identity.Infrastructure.Repositories
                 var sql = @"Update ChannelOwner set IsDirty = 1 where ChannelId = @ChannelId and UserId = @UserId";
                 con.Connection.Execute(sql, new { UserId = edge.To.Id, ChannelId = edge.From.Id }, con);
             }
-
-
         }
     }
 }

@@ -38,6 +38,11 @@ namespace Identity.Rest
                 .ForMember(x => x.weight, _ => _.MapFrom(src => src.Weight))
                 .ForMember(x => x.text, _ => _.MapFrom(src => src.Text));
 
+            AutoMapper.Mapper.CreateMap<ChannelScore, Infrastructure.DTO.WeightedTag>()
+                .ForMember(x => x.weight, _ => _.MapFrom(src => src.Score))
+                .ForMember(x => x.text, _ => _.MapFrom(src => src.ChannelName))
+                .ForMember(x => x.id, _ => _.MapFrom(src => src.ChannelId));
+
             AutoMapper.Mapper.CreateMap<ChannelDisplaySettings, Infrastructure.DTO.ChannelDisplaySettings>();
             Mapper.CreateMap<Infrastructure.DTO.ChannelDisplaySettings, ChannelDisplaySettings>();
 

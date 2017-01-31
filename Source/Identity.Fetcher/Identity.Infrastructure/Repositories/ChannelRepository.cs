@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using Dapper;
 using Identity.Domain;
-using Identity.Infrastructure.DTO;
+using Identity.Infrastructure.Helpers;
 using Channel = Identity.Domain.Channel;
 using Newtonsoft.Json;
 using ChannelDisplaySettings = Identity.Domain.ChannelDisplaySettings;
@@ -54,19 +55,6 @@ inner join cte on ci.ChannelId = cte.Id";
             return con.Connection.Query<Channel>("select * from Channel where IsPublic = 1 and Name like @Name", new { Name = encoded }, con);
         }
 
-        public IEnumerable<Channel> TopChannels(int count, long userId)
-        {
-            var sql = @"select * from Channel where Id in 
-  (select top {0} ci.ChannelId from ChannelItem ci
-    join Channel c on c.Id = ci.ChannelId
-    left join ChannelOwner co on co.ChannelId = c.Id and co.UserId = @UserId
-  where (co.ChannelId is not null or c.IsPublic = 1) and ci.Created > @Timestamp and ci.UserId <> 2 and ci.UserId <> 5
-  group by ci.ChannelId
-  order by count(*) desc)";
-
-            return con.Connection.Query<Channel>(String.Format(sql, count), new { UserId = userId, Timestamp = DateTimeOffset.Now.Subtract(TimeSpan.FromDays(7)) }, con);
-        }
-
         public IEnumerable<Channel> All()
         {
             return con.Connection.Query<Channel>("select * from Channel", null, con);
@@ -78,41 +66,27 @@ inner join cte on ci.ChannelId = cte.Id";
             return con.Connection.Query<Channel>("select top 1000 * from Channel where IsPublic = 1", null, con);
         }
 
-        public IEnumerable<WeightedTag> CalculateTagCloud(long channelId)
+        public IEnumerable<Domain.ChannelScore> GetChannelScores(long channelId)
         {
-            using (var pc = new PerfCounter("CalculateTagCloud"))
-            {
-                return 
-                    con.Connection.Query<WeightedTag>(@"select top 20 count(*) as Weight, Tag.Name as Text from Tagged                                                       
-left join ChannelLink cl on cl.ParentId = 5
-join ChannelItem ci on ci.PostId = Tagged.PostId and (ci.ChannelId = 5 or ci.ChannelId = cl.ChildId)
-join Tag on Tag.Id = TagId
-group by Tag.Name order by COUNT(*) desc",
-                        new {ChannelId = channelId}, con);
-            }
+            var sql = @"with cte as 
+(
+    select @ChannelId as Id
+    union all
+    select t.ChildId as Id from cte 
+        inner join [ChannelLink] t on cte.Id = t.Parentid
+)
+select cs.ChannelId, c.Name as ChannelName, cs.Score
+from ChannelScore cs
+inner join cte on cs.ChannelId = cte.Id
+inner join Channel c on c.Id = cs.ChannelId
+where cs.ChannelId <> @ChannelId";
+            return con.Connection.Query<Domain.ChannelScore>(sql, new {ChannelId = channelId}, con).ToList();
         }
 
-        public IEnumerable<WeightedTag> GetTagCloud(long channelId)
+        public IEnumerable<Domain.ChannelScore> GetTopChannelScores(int limit)
         {
-            using (var pc = new PerfCounter("GetTagCloud"))
-            {
-                return
-                    con.Connection.Query<WeightedTag>(@"select Tag as Text, Count as Weight from ChannelTag where ChannelId = @ChannelId",
-                        new { ChannelId = channelId }, con);
-            }
-        }
-
-        public void UpdateTagCloud(long channelId, IEnumerable<WeightedTag> tags)
-        {
-            using (var pc = new PerfCounter("UpdateTagCloud"))
-            {
-                con.Connection.Execute("delete from ChannelTag where ChannelId=@ChannelId", new { ChannelId = channelId }, con);
-
-                foreach (var tag in tags)
-                {
-                    con.Connection.Execute("insert ChannelTag (ChannelId, Tag, Count) values(@ChannelId, @Text, @Weight)", new { ChannelId = channelId, Text = tag.Text, tag.Weight }, con);
-                }            
-            }
+            var sql = String.Format("select top {0} c.Id as ChannelId, c.Name as ChannelName, cs.Score from ChannelScore cs join Channel c on c.Id = cs.ChannelId order by Score desc", limit);
+            return con.Connection.Query<Domain.ChannelScore>(sql, new { }, con).ToList();
         }
 
         public int UnreadCount(long userId, long channelId)
@@ -142,6 +116,24 @@ group by Tag.Name order by COUNT(*) desc",
             {
                 con.Connection.Execute("update ChannelLink set ChildId=@ChildId where ChildId=@ChildId and ParentId=@ParentId if @@rowcount = 0 insert ChannelLink values(@ParentId, @ChildId)", new { ParentId = channel.Id, ChildId = childId }, con);    
             }            
+        }
+
+        public IDictionary<long, int> PostCounts(DateTimeOffset since)
+        {
+            var sql = "select ci.ChannelId, count(*) as Cnt from ChannelItem ci join Channel c on c.Id = ci.ChannelId where ci.Created > @Since group by ci.ChannelId";
+            return con.Connection
+                .Query(sql, new {Since = since}, con)
+                .Cast<IDictionary<string, object>>()
+                .ToDictionary(row => (long)row["ChannelId"], row => (int)row["Cnt"]); 
+        }
+
+        public IDictionary<long, int> ReadCounts(DateTimeOffset since)
+        {
+            var sql = "select ci.ChannelId, count(*) as Cnt from ReadHistory his join ChannelItem ci on ci.PostId = his.PostId join Channel c on c.Id = ci.ChannelId where ci.Created > @Since group by ci.ChannelId";
+            return con.Connection
+                .Query(sql, new { Since = since }, con)
+                .Cast<IDictionary<string, object>>()
+                .ToDictionary(row => (long)row["ChannelId"], row => (int)row["Cnt"]);
         }
 
         public IEnumerable<Channel> GetAllDirectUpStreamChannels(long downStreamChannelId)
@@ -293,7 +285,7 @@ where (ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId) and (co.ChannelId is n
                             select co.ChannelId as Id from ChannelOwner co where co.UserId = @UserId
                             union select cl.ChildId as Id from ChannelLink cl join ChannelOwner co on cl.ParentId = co.ChannelId and co.UserId = @UserId
                         ) Channels
-                        join ChannelItem ci on Channels.Id = ci.ChannelId
+                        join ChannelItem ci on Channels.Id = ci.ChannelId                        
                         left join ReadHistory on ci.PostId = ReadHistory.PostId and ReadHistory.UserId = @UserId
                         where ReadHistory.UserId IS NULL
                         group by Channels.Id";
@@ -301,6 +293,30 @@ where (ci.ChannelId=@ChannelId or cl.ParentId=@ChannelId) and (co.ChannelId is n
             return con.Connection.Query<UnreadCount>(sql, new { UserId = userId }, con);
         }
 
+        public void UpdateChannelScores(IEnumerable<KeyValuePair<long, double>> scores)
+        {
+            con.Connection.Execute(@"delete from ChannelScore", new { }, con);
+
+            var table = new DataTable();
+            table.TableName = "ChannelScore";
+            table.Columns.Add(new DataColumn("ChannelId", typeof(long)));
+            table.Columns.Add(new DataColumn("Score", typeof(double)));
+
+            var rows = scores.Select(x =>
+            {
+                var row = table.NewRow();
+                row["Score"] = x.Value;
+                row["ChannelId"] = x.Key;
+                return row;
+            });
+
+            foreach (var row in rows)
+            {
+                table.Rows.Add(row);
+            }
+
+            BulkCopy.Copy((SqlConnection)con.Connection, table, (SqlTransaction)con);
+        }
 
         public void UpdateChannelDisplaySettings(long userId, long channelId, ChannelDisplaySettings settings)
         {

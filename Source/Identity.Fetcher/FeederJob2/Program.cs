@@ -24,6 +24,11 @@ namespace FeederJob2
 
             Functions.SyncFeeds("", TextWriter.Null);
             Functions.ReloadOntology();
+
+            if (DateTime.Now.Hour == 0)
+            {
+                Functions.RefreshChannelScores();
+            }
         }
     }
 }

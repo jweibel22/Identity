@@ -227,18 +227,6 @@ namespace Identity.Infrastructure.Repositories
             }
         }
 
-        public IEnumerable<WeightedTag> TopTags(int count)
-        {
-            var sql = @"select top {0} count(*) as Weight, Tag.Name as Text from Tagged 
-                        join Tag on Tag.Id = Tagged.TagId
-                        join ChannelItem ci on ci.PostId = Tagged.PostId
-                        where ci.Created > @Timestamp and ci.UserId <> 2 and ci.UserId <> 5
-                        group by Tag.Name
-                        order by count(*) desc";
-
-            return con.Connection.Query<WeightedTag>(String.Format(sql, count), new { Timestamp = DateTimeOffset.Now.Subtract(TimeSpan.FromDays(7)) }, con);
-        }
-
         public void Dispose()
         {
         }

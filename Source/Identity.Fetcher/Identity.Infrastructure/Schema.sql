@@ -359,3 +359,12 @@ CREATE NONCLUSTERED INDEX [RedditIndex_Occurences_IndexId] ON [dbo].[RedditIndex
 (
 	[IndexId] ASC
 )
+
+CREATE TABLE [dbo].[ChannelScore](
+	[ChannelId] [bigint] NOT NULL,
+	[Score] decimal(18,5)  NOT NULL,
+ CONSTRAINT [PK_ChannelScore] PRIMARY KEY CLUSTERED 
+(
+	[ChannelId] ASC
+)
+) ON [PRIMARY]

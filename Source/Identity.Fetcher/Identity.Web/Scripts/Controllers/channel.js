@@ -24,15 +24,15 @@ angular.module('inspire')
         $scope.channel = x ? x : channelPromise.data;
         $scope.channel.DisplaySettings = channelPromise.data.DisplaySettings; //Dirty hack, please fix this! The channels from the channel list don't have the DisplaySettings!!
 
-        $scope.channel.TagCloud = channelPromise.data.TagCloud; //TODO: find a better way!
+        $scope.channel.Scores = channelPromise.data.Scores; //TODO: find a better way!
         $scope.channel.Statistics = channelPromise.data.Statistics; //TODO: find a better way!
 
         $scope.channelFollowed = $filter('filter')($scope.user.FollowsChannels, {Id: $scope.channel.Id}, true).length > 0;
         $scope.channelOwned = $filter('filter')($scope.user.Owns, { Id: $scope.channel.Id }, true).length > 0;
         $scope.showOnlyUnread = $scope.channel.DisplaySettings.ShowOnlyUnread;
 
-        for (var i = 0; i < $scope.channel.TagCloud.length; i++) {
-            $scope.channel.TagCloud[i].link = "#/searchByTag?query=" + $scope.channel.TagCloud[i].text;
+        for (var i = 0; i < $scope.channel.Scores.length; i++) {
+            $scope.channel.Scores[i].link = "#/home/" + $scope.channel.Scores[i].id;
         }
 
         $("body").scrollTop(0);

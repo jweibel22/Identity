@@ -100,6 +100,19 @@ namespace Identity.Domain
             }
         }
 
+        public IEnumerable<ChannelLinkNode> VisitAllDownstreams(ChannelLinkNode node)
+        {
+            yield return node;
+
+            foreach (var outEdge in edges.Where(e => e.From == node))
+            {
+                foreach (var x in VisitAllDownstreams(outEdge.To))
+                {
+                    yield return x;
+                }                
+            }
+        }
+
         public IEnumerable<ChannelLinkEdge> DirtyUserChannels
         {
             get

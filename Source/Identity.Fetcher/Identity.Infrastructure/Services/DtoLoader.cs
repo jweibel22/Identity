@@ -9,6 +9,7 @@ using Identity.Infrastructure.Repositories;
 using Channel = Identity.Domain.Channel;
 using Post = Identity.Domain.Post;
 using User = Identity.Domain.User;
+using WeightedTag = Identity.Infrastructure.DTO.WeightedTag;
 
 namespace Identity.Infrastructure.Services
 {
@@ -92,7 +93,8 @@ namespace Identity.Infrastructure.Services
             var result = Mapper.Map<DTO.Channel>(channel);
 
             //result.UnreadCount = channelRepo.UnreadCount(user.Id, result.Id);
-            result.TagCloud = channelRepo.GetTagCloud(channel.Id).Select(Mapper.Map<DTO.WeightedTag>).ToList();
+            result.TagCloud = new List<WeightedTag>(); //channelRepo.GetTagCloud(channel.Id).Select(Mapper.Map<DTO.WeightedTag>).ToList();
+            result.Scores = channelRepo.GetChannelScores(channel.Id).Select(Mapper.Map<DTO.WeightedTag>).ToList();
             result.Subscriptions = channelRepo.GetSubscriptions(channel.Id).Select(Mapper.Map<DTO.Channel>).ToList();
             result.DisplaySettings = Mapper.Map <DTO.ChannelDisplaySettings>(channelRepo.GetChannelDisplaySettings(user.Id, channel.Id));
             result.Statistics = new ChannelStatistics

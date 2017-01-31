@@ -162,6 +162,61 @@ namespace FeederJob2
                 throw;
             }
 
-        }        
+        }
+
+        public static void RefreshChannelScores()
+        {
+            var connectionFactory =
+                new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
+
+            using (var session = connectionFactory.NewTransaction())
+            {
+                var channelRepo = new ChannelRepository(session.Transaction);
+                var channeLinkRepo = new ChannelLinkRepository(session.Transaction);
+                var since = DateTimeOffset.Now.Subtract(TimeSpan.FromDays(30));
+
+                var postCounts = channelRepo.PostCounts(since);
+                var readCounts = channelRepo.ReadCounts(since);
+                var graph = channeLinkRepo.GetGraph();
+
+                var allPostCounts = new Dictionary<long, int>();
+                var allReadCounts = new Dictionary<long, int>();
+
+                foreach (var kv in postCounts)
+                {
+                    foreach (var n in graph.VisitAllDownstreams(graph.GetChannelNode(kv.Key)).Where(x => x.NodeType == NodeType.Channel))
+                    {
+                        if (!allPostCounts.ContainsKey(n.Id))
+                        {
+                            allPostCounts.Add(n.Id, 0);
+                        }
+
+                        allPostCounts[n.Id] = allPostCounts[n.Id] + kv.Value;
+                    }
+                }
+
+                foreach (var kv in readCounts)
+                {
+                    foreach (var n in graph.VisitAllDownstreams(graph.GetChannelNode(kv.Key)).Where(x => x.NodeType == NodeType.Channel))
+                    {
+                        if (!allReadCounts.ContainsKey(n.Id))
+                        {
+                            allReadCounts.Add(n.Id, 0);
+                        }
+
+                        allReadCounts[n.Id] = allReadCounts[n.Id] + kv.Value;
+                    }
+                }
+
+                Func<double, double, double> scoring = (postCount, readCount) => (readCount / postCount) * Math.Log(postCount);
+
+                var allScores = allPostCounts
+                    .Join(allReadCounts, kv => kv.Key, kv => kv.Key, (pc, rc) => new KeyValuePair<long, double>(pc.Key, scoring((double)pc.Value, (double)rc.Value)));
+
+                channelRepo.UpdateChannelScores(allScores);
+
+                session.Commit();
+            }
+        }
     }
 }

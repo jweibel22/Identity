@@ -1,15 +1,5 @@
 ﻿<div style="margin-top:50px">
     <h3>Top Channels</h3>
-    <div ng-repeat="channel in contents.Channels" style="margin-left: 20px">
-        <a href="#/home/{{channel.Id}}">
-            {{channel.Name}}
-        </a>
-    </div>
-    <a href="#/allchannels">More channels ...</a>
-</div>
-
-<div style="margin-top:50px">
-    <h3>Top Tags</h3>
     <jqcloud words="contents.TagCloud" width="400" height="100" delay="10" steps="7" font-size="{from:0.09, to:0.04}"></jqcloud>
 </div>
 <div style="margin-top:50px">

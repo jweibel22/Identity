@@ -34,6 +34,8 @@ namespace Identity.Infrastructure.DTO
 
         public IList<WeightedTag> TagCloud { get; set; }
 
+        public IEnumerable<WeightedTag> Scores { get; set; }
+
         public ChannelDisplaySettings DisplaySettings { get; set; }
 
         public ChannelStatistics Statistics { get; set; }
@@ -41,8 +43,11 @@ namespace Identity.Infrastructure.DTO
 
     public class WeightedTag
     {
+        public long id { get; set; }
+
         public string text { get; set; }
 
         public decimal weight { get; set; }
     }
+
 }

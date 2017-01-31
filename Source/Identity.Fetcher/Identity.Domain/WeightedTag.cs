@@ -12,4 +12,13 @@ namespace Identity.Domain
 
         public decimal Weight { get; set; }
     }
+
+    public class ChannelScore
+    {
+        public long ChannelId { get; set; }
+
+        public string ChannelName { get; set; }
+
+        public double Score { get; set; }
+    }
 }
