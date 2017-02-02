@@ -128,6 +128,7 @@ CREATE TABLE [dbo].[User](
 	[IdentityId] [nvarchar](64) NULL,
 	[Inbox] [bigint] NOT NULL,
 	[SubscriptionChannel] [bigint] NOT NULL,
+	IsAnonymous bit NOT NULL DEFAULT (0),
  CONSTRAINT [PK_User] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC

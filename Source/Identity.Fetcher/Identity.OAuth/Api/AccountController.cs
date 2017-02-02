@@ -36,6 +36,30 @@ namespace Identity.OAuth.Api
             this.con = con;
         }
 
+        [AllowAnonymous]
+        [Route("RegisterAnon")]
+        public async Task<IHttpActionResult> RegisterAnon()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            User user;
+
+            try
+            {
+                user = CreateNewUser(Guid.NewGuid().ToString(), true);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return BadRequest(ModelState);
+            }
+
+            return Ok(new { Username = user.Username});
+        }
+
         // POST api/Account/Register
         [AllowAnonymous]
         [Route("Register")]
@@ -48,7 +72,7 @@ namespace Identity.OAuth.Api
 
             try
             {
-                CreateNewUser(userModel.UserName);
+                CreateNewUser(userModel.UserName, false);
             }
             catch (Exception ex)
             {
@@ -113,13 +137,14 @@ namespace Identity.OAuth.Api
 
         }
 
-        private User CreateNewUser(string username)
+        private User CreateNewUser(string username, bool isAnon)
         {
-            var starredChannel = Channel.New(String.Format("{0}'s starred", username));
-            var savedChannel = Channel.New(String.Format("{0}'s saved", username));
-            var likedChannel = Channel.New(String.Format("{0}'s liked", username));
-            var inbox = Channel.New(String.Format("{0}'s inbox", username));
-            var subscriptionChannel = Channel.New(String.Format("{0}'s subscriptions", username));
+            var channelUsername = isAnon ? "Anon" : username;
+            var starredChannel = Channel.New(String.Format("{0}'s starred", channelUsername));
+            var savedChannel = Channel.New(String.Format("{0}'s saved", channelUsername));
+            var likedChannel = Channel.New(String.Format("{0}'s liked", channelUsername));
+            var inbox = Channel.New(String.Format("{0}'s inbox", channelUsername));
+            var subscriptionChannel = Channel.New(String.Format("{0}'s subscriptions", channelUsername));
                 
             channelRepository.AddChannel(starredChannel);
             channelRepository.AddChannel(savedChannel);
@@ -139,7 +164,14 @@ namespace Identity.OAuth.Api
                 SubscriptionChannel = subscriptionChannel.Id
             };
 
-            userRepository.AddUser(user);
+            if (isAnon)
+            {
+                userRepository.AddAnonUser(user);
+            }
+            else
+            {
+                userRepository.AddUser(user);
+            }            
 
             userRepository.Owns(user.Id, starredChannel.Id, true);
             userRepository.Owns(user.Id, savedChannel.Id, true);
@@ -177,7 +209,7 @@ namespace Identity.OAuth.Api
 
             try
             {
-                user = CreateNewUser(model.UserName);                
+                user = CreateNewUser(model.UserName, false);                
             }
             catch (Exception ex)
             {

@@ -67,7 +67,7 @@ namespace Identity.Rest.Api
             return new User
             {
                 Id = user.Id,
-                DisplayName = user.Username,
+                DisplayName = user.IsAnonymous ? "Anon" : user.Username,
                 Feed = new List<Post>(),
                 FollowsChannels = channelRepo.GetSubscriptions(user.SubscriptionChannel).Select(c => Mapper.Map<Channel>(c)).ToList(),
                 FollowsTags = new List<string>(),

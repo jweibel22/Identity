@@ -21,7 +21,12 @@ namespace Identity.Infrastructure.Repositories
 
         public void AddUser(User user)
         {
-            user.Id = con.Connection.Query<int>("insert [User] values (@Username, @SavedChannel, @StarredChannel, @LikedChannel, @IdentityId, @Inbox, @SubscriptionChannel); SELECT CAST(SCOPE_IDENTITY() as bigint)", user, con).Single();
+            user.Id = con.Connection.Query<long>("insert [User] values (@Username, @SavedChannel, @StarredChannel, @LikedChannel, @IdentityId, @Inbox, @SubscriptionChannel, 0); SELECT CAST(SCOPE_IDENTITY() as bigint)", user, con).Single();
+        }
+
+        public void AddAnonUser(User user)
+        {
+            user.Id = con.Connection.Query<long>("insert [User] values (@Username, @SavedChannel, @StarredChannel, @LikedChannel, @IdentityId, @Inbox, @SubscriptionChannel, 1); SELECT CAST(SCOPE_IDENTITY() as bigint)", user, con).Single();
         }
 
         public void AddLogin(User user, string loginProvider, string providerKey)
@@ -74,7 +79,7 @@ namespace Identity.Infrastructure.Repositories
                 .SingleOrDefault();
         }
 
-        public User GetById(int userId)
+        public User GetById(long userId)
         {
             return con.Connection.Query<User>("select * from [User] where Id=@Id", new { Id = userId }, con).SingleOrDefault();
         }

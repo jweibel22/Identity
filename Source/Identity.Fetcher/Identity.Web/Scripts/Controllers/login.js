@@ -22,6 +22,19 @@ angular.module('inspire').controller('LoginController', ['$scope', '$location', 
          });
     };
 
+    $scope.anonymousLogin = function () {
+
+        authService.anonymousLogin().then(function (response) {
+
+            var tmp = userService.getCurrentUser();
+            $location.replace().path('/#/home');
+
+        },
+         function (err) {
+             $scope.message = err.error_description;
+         });
+    };
+
     $scope.authExternalProvider = function (provider) {
 
         var redirectUri = location.protocol + '//' + location.host + '/authcomplete.html';

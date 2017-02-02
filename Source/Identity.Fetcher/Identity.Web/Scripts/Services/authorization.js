@@ -60,6 +60,22 @@ angular.module('inspire')
 
     };
 
+    var _anonymousLogin = function() {
+        
+        var deferred = $q.defer();
+
+        _logOut();
+
+        $http.post(serviceBase + '/Api/account/registerAnon').then(function (response) {
+
+            _login({ userName : response.data.Username, password: ""}).then(function(response2) {
+                deferred.resolve(response2);
+            });            
+        });
+        
+        return deferred.promise;
+    }
+
     var _logOut = function () {
 
         localStorageService.remove('authorizationData');
@@ -159,6 +175,7 @@ angular.module('inspire')
 
     authServiceFactory.saveRegistration = _saveRegistration;
     authServiceFactory.login = _login;
+    authServiceFactory.anonymousLogin = _anonymousLogin;
     authServiceFactory.logOut = _logOut;
     authServiceFactory.fillAuthData = _fillAuthData;
     authServiceFactory.authentication = _authentication;
