@@ -22,13 +22,19 @@ namespace FeederJob2
             //var host = new JobHost();            
             //host.RunAndBlock();
 
-            Functions.SyncFeeds("", TextWriter.Null);
-            Functions.ReloadOntology();
+            //Functions.ProcessQueueMessage("5", TextWriter.Null);
 
-            if (DateTime.Now.Hour == 0)
-            {
-                Functions.RefreshChannelScores();
-            }
+            //Functions.SyncFeeds("", TextWriter.Null);
+            //Functions.ReloadOntology();
+
+            //if (DateTime.Now.Hour == 0)
+            //{
+            //    Functions.RefreshChannelScores();
+            //}
+
+            //NlpTest.Run();
+
+            Console.ReadLine();
         }
     }
 }
