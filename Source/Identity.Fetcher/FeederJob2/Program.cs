@@ -24,13 +24,13 @@ namespace FeederJob2
 
             //Functions.ProcessQueueMessage("5", TextWriter.Null);
 
-            //Functions.SyncFeeds("", TextWriter.Null);
-            //Functions.ReloadOntology();
+            Functions.SyncFeeds("", TextWriter.Null);
+            Functions.ReloadOntology();
 
-            //if (DateTime.Now.Hour == 0)
-            //{
-            //    Functions.RefreshChannelScores();
-            //}
+            if (DateTime.Now.Hour == 0)
+            {
+                Functions.RefreshChannelScores();
+            }
 
             //NlpTest.Run();
 
