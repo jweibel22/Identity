@@ -162,9 +162,7 @@
     <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Feeders\FeedRefresher.cs" />
     <Compile Include="Feeders\Rss\RssReader.cs" />
-    <Compile Include="Feeders\WebScrapers\AlScraper.cs" />
     <Compile Include="Feeders\WebScrapers\IWebScraper.cs" />
-    <Compile Include="Feeders\WebScrapers\WebScraperJob.cs" />
     <Compile Include="Services\DtoLoader.cs" />
     <Compile Include="Services\NLP\GoogleNLPClient.cs" />
     <Compile Include="Services\NLP\Entities.cs" />
