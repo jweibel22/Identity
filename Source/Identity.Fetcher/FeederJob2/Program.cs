@@ -33,8 +33,6 @@ namespace FeederJob2
             }
 
             //NlpTest.Run();
-
-            Console.ReadLine();
         }
     }
 }
