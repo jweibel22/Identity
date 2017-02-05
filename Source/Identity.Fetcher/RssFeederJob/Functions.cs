@@ -26,41 +26,41 @@ namespace RssFeederJob
         {
             log.WriteLine("UnreadCounts updater was called. " + message);
 
-            var channelIds = message.Split(';').Select(Int64.Parse);
+            //var channelIds = message.Split(';').Select(Int64.Parse);
 
-            var connectionFactory =
-                new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
+            //var connectionFactory =
+            //    new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
 
-            try
-            {
-                using (var session = connectionFactory.NewTransaction())
-                {
-                    log.WriteLine("Loading graph");
-                    var repo = new ChannelLinkRepository(session.Transaction);
-                    var channelLinkGraph = repo.GetGraph();
+            //try
+            //{
+            //    using (var session = connectionFactory.NewTransaction())
+            //    {
+            //        log.WriteLine("Loading graph");
+            //        var repo = new ChannelLinkRepository(session.Transaction);
+            //        var channelLinkGraph = repo.GetGraph();
 
-                    log.WriteLine("updating unread counts");
+            //        log.WriteLine("updating unread counts");
 
-                    foreach (var e in channelIds)
-                    {
-                        channelLinkGraph.MarkAsDirty(e);
-                    }
+            //        foreach (var e in channelIds)
+            //        {
+            //            channelLinkGraph.MarkAsDirty(e);
+            //        }
 
-                    foreach (var edge in channelLinkGraph.DirtyUserChannels)
-                    {
-                        repo.UpdateUnreadCounts(edge);
-                    }
+            //        foreach (var edge in channelLinkGraph.DirtyUserChannels)
+            //        {
+            //            repo.UpdateUnreadCounts(edge);
+            //        }
 
-                    log.WriteLine("Committing session");
+            //        log.WriteLine("Committing session");
 
-                    session.Commit();
-                }
-            }
-            catch (Exception ex)
-            {
-                _log.Error("UnreadCounts update job failed", ex);
-                log.WriteLine("UnreadCounts update job failed. " + ex.Message);
-            }
+            //        session.Commit();
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    _log.Error("UnreadCounts update job failed", ex);
+            //    log.WriteLine("UnreadCounts update job failed. " + ex.Message);
+            //}
         }
 
         public static void NewFeederCreated([QueueTrigger("new-feeder-created")] int feederId, TextWriter log)
