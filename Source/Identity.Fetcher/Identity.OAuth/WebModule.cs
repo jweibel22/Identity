@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
+﻿using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using System.Web;
+using Identity.Domain;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
 using Identity.OAuth;
+using Identity.OAuth.EventHandlers;
 using log4net;
 using Ninject;
 using Ninject.Modules;
@@ -40,8 +40,7 @@ namespace Identity.Rest
             {
                 var t = x.Kernel.Get<IDbConnection>().BeginTransaction();
                 return t;
-            })
-                .InScope(c => RequestScope.Scope.Value);
+            }).InScope(c => RequestScope.Scope.Value);
 
             Bind<ILoadDtos>().To<DtoLoader>().InScope(c => RequestScope.Scope.Value);
             Bind<ChannelRepository>().ToSelf().InScope(c => RequestScope.Scope.Value);
@@ -49,6 +48,16 @@ namespace Identity.Rest
             Bind<PostRepository>().ToSelf().InScope(c => RequestScope.Scope.Value);
             Bind<UserRepository>().ToSelf().InScope(c => RequestScope.Scope.Value);
             Bind<Bus>().ToSelf().InSingletonScope();
+
+            //TODO: keeping all channel links in memory is of course not scalable!
+            Bind<ChannelLinkGraphCache>().ToSelf().InSingletonScope();
+            Bind<ChannelLinkGraph>().ToMethod(x =>
+            {
+                var repo = x.Kernel.Get<ChannelLinkRepository>();
+                return repo.GetGraph();
+            }).InSingletonScope();
+
+            Bind<ChannelLinkEventBatch>().ToSelf().InScope(c => RequestScope.Scope.Value);
         }
     }
 }

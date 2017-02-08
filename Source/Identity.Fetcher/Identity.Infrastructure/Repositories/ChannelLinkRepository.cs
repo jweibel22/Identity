@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,23 +48,40 @@ namespace Identity.Infrastructure.Repositories
             return new ChannelLinkGraph(userNodes.Union(channelNodes), ownerEdges.Union(channelEdges));
         }
 
-        public void UpdateUnreadCounts(ChannelLinkEdge edge)
+        public void UpdateUnreadCounts(long userId, long channelId)
         {
             var sql = @"Update ChannelOwner set UnreadCount = (SELECT Cnt FROM [dbo].[ftUnreadPosts] (@ChannelId,@UserId)) where ChannelId = @ChannelId and UserId = @UserId";
-            con.Connection.Execute(sql, new { UserId = edge.To.Id, ChannelId = edge.From.Id }, con);
+            con.Connection.Execute(sql, new { UserId = userId, ChannelId = channelId }, con);
         }
 
-        //public void UpdateUnreadCounts()
-        //{
-        //    con.Connection.Execute("Update ChannelOwner set UnreadCount = (SELECT Cnt FROM [dbo].[ftUnreadPosts] (ChannelId,UserId))", new { }, con);
-        //}
-
-        public void Flush(ChannelLinkGraph graph)
+        public bool CyclesExist(long channelId)
         {
-            foreach (var edge in graph.DirtyUserChannels)
+            try
             {
-                var sql = @"Update ChannelOwner set IsDirty = 1 where ChannelId = @ChannelId and UserId = @UserId";
-                con.Connection.Execute(sql, new { UserId = edge.To.Id, ChannelId = edge.From.Id }, con);
+                var sql = @"with cte as 
+(
+    select @ChannelId as Id
+    union all
+    select t.ChildId as Id from cte 
+        inner join [ChannelLink] t on cte.Id = t.Parentid
+)
+select Channel.Id, Name from Channel
+inner join cte on Channel.Id = cte.Id";
+
+                con.Connection.Execute(sql, new {ChannelId = channelId}, con);
+
+                return false;
+            }
+            catch (SqlException e)
+            {
+                if (e.Number == 530)
+                {
+                    return true;
+                }
+                else
+                {
+                    throw;
+                }
             }
         }
     }

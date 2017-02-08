@@ -15,6 +15,13 @@ using Microsoft.Azure.WebJobs;
 
 namespace RssFeederJob
 {
+    class DirtyUserChannel
+    {
+        public long UserId { get; set; }
+
+        public long ChannelId { get; set; }
+    }
+
     public class Functions
     {
         private static ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -26,41 +33,38 @@ namespace RssFeederJob
         {
             log.WriteLine("UnreadCounts updater was called. " + message);
 
-            //var channelIds = message.Split(';').Select(Int64.Parse);
+            var edges = message.Split(';').Select(s =>
+            {
+                var x = s.Split('-');
+                return new DirtyUserChannel { ChannelId = Int64.Parse(x[0]), UserId = Int64.Parse(x[1]) };
+            });
 
-            //var connectionFactory =
-            //    new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
+            var connectionFactory =
+                new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
 
-            //try
-            //{
-            //    using (var session = connectionFactory.NewTransaction())
-            //    {
-            //        log.WriteLine("Loading graph");
-            //        var repo = new ChannelLinkRepository(session.Transaction);
-            //        var channelLinkGraph = repo.GetGraph();
+            try
+            {
+                using (var session = connectionFactory.NewTransaction())
+                {
+                    var repo = new ChannelLinkRepository(session.Transaction);
 
-            //        log.WriteLine("updating unread counts");
+                    log.WriteLine("updating unread counts");
 
-            //        foreach (var e in channelIds)
-            //        {
-            //            channelLinkGraph.MarkAsDirty(e);
-            //        }
+                    foreach (var e in edges)
+                    {
+                        repo.UpdateUnreadCounts(e.UserId, e.ChannelId);
+                    }
 
-            //        foreach (var edge in channelLinkGraph.DirtyUserChannels)
-            //        {
-            //            repo.UpdateUnreadCounts(edge);
-            //        }
+                    log.WriteLine("Committing session");
 
-            //        log.WriteLine("Committing session");
-
-            //        session.Commit();
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    _log.Error("UnreadCounts update job failed", ex);
-            //    log.WriteLine("UnreadCounts update job failed. " + ex.Message);
-            //}
+                    session.Commit();
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.Error("UnreadCounts update job failed", ex);
+                log.WriteLine("UnreadCounts update job failed. " + ex.Message);
+            }
         }
 
         public static void NewFeederCreated([QueueTrigger("new-feeder-created")] int feederId, TextWriter log)

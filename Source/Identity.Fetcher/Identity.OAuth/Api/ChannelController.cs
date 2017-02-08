@@ -12,10 +12,12 @@ using System.Web.Http;
 using AutoMapper;
 using CsQuery;
 using Identity.Domain;
+using Identity.Domain.Events;
 using Identity.Infrastructure.DTO;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
 using Identity.OAuth;
+using Identity.OAuth.EventHandlers;
 using log4net;
 using Channel = Identity.Infrastructure.DTO.Channel;
 using ChannelDisplaySettings = Identity.Infrastructure.DTO.ChannelDisplaySettings;
@@ -35,12 +37,13 @@ namespace Identity.Rest.Api
         private readonly ChannelLinkRepository channelLinkRepo;
         private readonly ILoadDtos dtoLoader;
         private readonly Bus bus;
+        private readonly ChannelLinkEventBatch eventBatch;
 
         private PostListLoader postListLoader;
         private Domain.User user;
 
         public ChannelController(ILoadDtos dtoLoader, ChannelRepository channelRepo, PostRepository postRepo,
-            UserRepository userRepo, Bus bus, PostListLoader postListLoader, ChannelLinkRepository channelLinkRepo)
+            UserRepository userRepo, Bus bus, PostListLoader postListLoader, ChannelLinkRepository channelLinkRepo, ChannelLinkEventBatch eventBatch)
         {
             var identity = User.Identity as ClaimsIdentity;
             user = userRepo.FindByName(identity.Name);
@@ -52,6 +55,7 @@ namespace Identity.Rest.Api
             this.bus = bus;
             this.postListLoader = postListLoader;
             this.channelLinkRepo = channelLinkRepo;
+            this.eventBatch = eventBatch;
         }
 
         [HttpGet]
@@ -101,31 +105,28 @@ namespace Identity.Rest.Api
         public void Leave(long id)
         {
             userRepo.Leave(user.Id, id);
+            eventBatch.Add(new UserLeaves { ChannelId = id, UserId = user.Id });
         }
 
         [HttpPut]
         public void Grant(long id, long userId)
         {
             userRepo.Grant(userId, id);
-        }
-
-        private void RefreshUnreadCounts(long channelId)
-        {
-            bus.Publish("refresh-unread-counts", channelId.ToString());
+            eventBatch.Add(new UserJoins { ChannelId = id, UserId = user.Id });
         }
 
         [HttpPut]
         public void Posts(long id, long postId)
         {
             userRepo.Publish(user.Id, id, postId);
-            RefreshUnreadCounts(id);
+            eventBatch.Add(new PostAdded { ChannelId = id, PostId = postId });
         }
 
         [HttpDelete]
         public void DeletePost(long id, long postId)
         {
             userRepo.Remove(user.Id, id, postId);
-            RefreshUnreadCounts(id);
+            eventBatch.Add(new PostRemoved { ChannelId = id, PostId = postId });
         }
 
         [HttpPost]
@@ -137,6 +138,9 @@ namespace Identity.Rest.Api
 
             channel.Id = x.Id;
             channel.IsPrivate = true;
+
+            eventBatch.Add(new ChannelAdded { ChannelId = channel.Id });
+            eventBatch.Add(new UserJoins { ChannelId = channel.Id, UserId = user.Id });
             return channel;
         }
 
@@ -148,8 +152,17 @@ namespace Identity.Rest.Api
             c.IsPublic = !channel.IsPrivate;
             c.Name = channel.Name;
 
+            var existingSubscriptions = channelRepo.GetSubscriptions(channel.Id);
             channelRepo.UpdateChannel(c, channel.Subscriptions.Select(x => x.Id));
-            RefreshUnreadCounts(id);
+
+            foreach (var removed in existingSubscriptions.Select(s => s.Id).Except(channel.Subscriptions.Select(x => x.Id)))
+            {
+                eventBatch.Add(new SubscriptionRemoved { UpstreamChannelId = removed, DownstreamChannelId = id });
+            }
+            foreach (var added in channel.Subscriptions.Select(x => x.Id).Except(existingSubscriptions.Select(s => s.Id)))
+            {
+                eventBatch.Add(new SubscriptionAdded { UpstreamChannelId = added, DownstreamChannelId = id });
+            }
 
             return dtoLoader.LoadChannel(user, channelRepo.GetById(id));
         }
@@ -158,24 +171,20 @@ namespace Identity.Rest.Api
         public void RemoveSubscription(long id, long childId)
         {
             channelRepo.RemoveSubscription(id, childId);
-            RefreshUnreadCounts(id);
+            eventBatch.Add(new SubscriptionRemoved { UpstreamChannelId = childId, DownstreamChannelId = id });
         }
 
         [HttpPut]
         public void AddSubscription(long id, long childId)
         {
-            var graph = channelLinkRepo.GetGraph(); //TODO: cache the ChannelLinkGraph
-            var newEdge = new ChannelLinkEdge
-            {
-                From = graph.GetChannelNode(childId),
-                To = graph.GetChannelNode(id)
-            };
-            if (graph.IntroducesCycle(newEdge))
+            channelRepo.AddSubscription(id, childId);
+
+            if (channelLinkRepo.CyclesExist(id))
             {
                 throw new ApplicationException("Unable to add subscription because it would introduce a cycle");
             }
-            channelRepo.AddSubscription(id, childId);
-            RefreshUnreadCounts(id);
+
+            eventBatch.Add(new SubscriptionAdded { UpstreamChannelId = childId, DownstreamChannelId = id });
         }
 
         [HttpPut]
@@ -183,7 +192,7 @@ namespace Identity.Rest.Api
         {
             var feed = channelRepo.GetFeed(url, type);
             channelRepo.AddSubscription(id, feed.ChannelId);
-            RefreshUnreadCounts(id);
+            eventBatch.Add(new SubscriptionAdded { UpstreamChannelId = feed.ChannelId, DownstreamChannelId = id });
             bus.Publish("new-feeder-created", feed.Id.ToString());
         }
 
@@ -191,6 +200,7 @@ namespace Identity.Rest.Api
         public void Delete(long id)
         {
             channelRepo.Delete(user.Id, id);
+            eventBatch.Add(new ChannelDeleted { ChannelId = id });
         }
 
         [HttpPost]
@@ -213,11 +223,11 @@ namespace Identity.Rest.Api
                     PopulateMetaData(p);
                 }
 
-                postRepo.AddPost(p, false);
+                postRepo.AddPost(p, false);                
             }
             
             userRepo.Publish(user.Id, id, p.Id);
-            RefreshUnreadCounts(id);
+            eventBatch.Add(new PostAdded { ChannelId = id, PostId = p.Id });
 
             if (post.Tags != null)
             {

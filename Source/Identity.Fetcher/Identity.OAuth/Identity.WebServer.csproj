@@ -197,6 +197,8 @@
     <Compile Include="Api\HomeController.cs" />
     <Compile Include="Api\PostController.cs" />
     <Compile Include="Bus.cs" />
+    <Compile Include="ChannelLinkEventBatch.cs" />
+    <Compile Include="EventHandlers\ChannelLinkGraphCache.cs" />
     <Compile Include="Models\ReadHistory.cs" />
     <Compile Include="Api\RssFeederController.cs" />
     <Compile Include="Api\TagController.cs" />

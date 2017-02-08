@@ -57,6 +57,17 @@
     <Compile Include="Clustering\Document.cs" />
     <Compile Include="Clustering\DistanceMeasure.cs" />
     <Compile Include="Clustering\World.cs" />
+    <Compile Include="Events\ChannelAdded.cs" />
+    <Compile Include="Events\ChannelDeleted.cs" />
+    <Compile Include="Events\IChannelLinkEvent.cs" />
+    <Compile Include="Events\PostAdded.cs" />
+    <Compile Include="Events\PostRemoved.cs" />
+    <Compile Include="Events\SubscriptionAdded.cs" />
+    <Compile Include="Events\SubscriptionRemoved.cs" />
+    <Compile Include="Events\UserAdded.cs" />
+    <Compile Include="Events\UserDeleted.cs" />
+    <Compile Include="Events\UserJoins.cs" />
+    <Compile Include="Events\UserLeaves.cs" />
     <Compile Include="InlineArticleSelector.cs" />
     <Compile Include="Ontology.cs" />
     <Compile Include="PublishedIn.cs" />

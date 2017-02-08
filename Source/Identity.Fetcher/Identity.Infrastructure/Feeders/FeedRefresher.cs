@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks.Dataflow;
 using Identity.Domain;
+using Identity.Domain.Events;
 using Identity.Infrastructure.Feeders;
 using Identity.Infrastructure.Repositories;
 using MoreLinq;
@@ -27,7 +28,7 @@ namespace Identity.Infrastructure.Rss
             log = new Logger(azureLog);
         }
 
-        private void ProcessFeedItem(DbSession session, Feed feed, User rssFeederUser, FeedItem feedItem, IDictionary<string, long> upstreamChannels)
+        private void ProcessFeedItem(DbSession session, Feed feed, User rssFeederUser, FeedItem feedItem, IDictionary<string, long> upstreamChannels, IList<IChannelLinkEvent> events)
         {
             var userRepo = new UserRepository(session.Transaction);
             var postRepo = new PostRepository(session.Transaction);
@@ -58,6 +59,7 @@ namespace Identity.Infrastructure.Rss
                     foreach (var tag in feedItem.Tags)
                     {
                         userRepo.Publish(rssFeederUser.Id, upstreamChannels[tag], post.Id);
+                        events.Add(new PostAdded { ChannelId = upstreamChannels[tag], PostId = post.Id});
                     }
                 }
 
@@ -65,9 +67,10 @@ namespace Identity.Infrastructure.Rss
             }
 
             userRepo.Publish(rssFeederUser.Id, feed.ChannelId, post.Id);
+            events.Add(new PostAdded { ChannelId = feed.ChannelId, PostId = post.Id });
         }
 
-        private void ProcessFeed(DbSession session, User rssFeederUser, Feed feed, ChannelLinkGraph graph, IEnumerable<FeedItem> items)
+        private void ProcessFeed(DbSession session, User rssFeederUser, Feed feed, IList<IChannelLinkEvent> events, IEnumerable<FeedItem> items)
         {
             var channelRepo = new ChannelRepository(session.Transaction);
             //var autoTagger = new AutoTagger(new TagCountRepository(session), postRepo);
@@ -103,13 +106,12 @@ namespace Identity.Infrastructure.Rss
 
             feed.LastFetch = DateTimeOffset.Now;
             channelRepo.UpdateFeed(feed);
-            graph.MarkAsDirty(feed.ChannelId);
 
             foreach (var feedItem in items)
             {
                 try
                 {
-                    ProcessFeedItem(session, feed, rssFeederUser, feedItem, allUpstreamChannels);
+                    ProcessFeedItem(session, feed, rssFeederUser, feedItem, allUpstreamChannels, events);
                 }
                 catch (Exception ex)
                 {
@@ -121,6 +123,7 @@ namespace Identity.Infrastructure.Rss
         public void Run(User rssFeederUser, IEnumerable<Feed> feeders)
         {
             ChannelLinkGraph graph;
+            var events = new List<IChannelLinkEvent>();
 
             using (var session = connectionFactory.NewTransaction())
             {
@@ -158,7 +161,7 @@ namespace Identity.Infrastructure.Rss
                 {
                     try
                     {
-                        ProcessFeed(session, rssFeederUser, t.Item1, graph, t.Item2);   
+                        ProcessFeed(session, rssFeederUser, t.Item1, events, t.Item2);   
                         session.Commit();
 
                         log.Info("Done processing feed items from feed " + t.Item1.Url);
@@ -195,10 +198,11 @@ namespace Identity.Infrastructure.Rss
             using (var session = connectionFactory.NewTransaction())
             {
                 var repo = new ChannelLinkRepository(session.Transaction);
+                var dirtyUserChannels = graph.ApplyChanges(events);
 
-                foreach (var edge in graph.DirtyUserChannels)
+                foreach (var edge in dirtyUserChannels.Channels)
                 {
-                    repo.UpdateUnreadCounts(edge);
+                    repo.UpdateUnreadCounts(edge.To.Id, edge.From.Id);
                 }
 
                 session.Commit();
