@@ -19,6 +19,7 @@ angular.module('inspire')
 
         $scope.rssUrl = ngSettings.baseUrl + "/Api/Channel/" + channelPromise.data.Id + "/Rss";
 
+        $scope.showChannelCloud = channelPromise.data.Subscriptions.length > 0;
         //we want the $scope.channel to point to the same channel object that is used in the channel list, such that the unread counter gets updated
         var x = $scope.findChannel(channelPromise.data.Id);
         $scope.channel = x ? x : channelPromise.data;

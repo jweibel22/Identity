@@ -89,7 +89,14 @@ angular.module('inspire')
                 $(allNodes).each(function (index, element) {
 
                     function handleDropEvent(event, ui) {
-                        postService.savePost2(element.uid, ui.draggable.attr('id'));
+                        var dataType = ui.draggable.attr('data-type');
+
+                        if (dataType === "post") {
+                            postService.savePost2(element.uid, ui.draggable.attr('id'));
+                        }
+                        else if (dataType === "channel") {
+                            channelService.addSubscription(element.uid, ui.draggable.attr('id'));
+                        }                        
                     }
 
                     $(this.$el[0]).droppable({ drop: handleDropEvent, hoverClass: "drop-hover", });

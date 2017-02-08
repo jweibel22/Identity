@@ -59,7 +59,7 @@
 
                 <div ng-show="selectedListType == 'Full' || !post.IsCollapsed" style="margin-top: 20px;position:relative">
                     <span style="font-size: 20px; margin-left: 10px;">
-                        <span style="position: absolute; left: 0; top: 5px;width:200px" ng-show="dndEnabled" class="glyphicon glyphicon-th" data-drag="true" jqyoui-draggable="{animate:false}" data-jqyoui-options="{revert: true, revertDuration: 0}" id="{{post.Id}}"><span style="visibility: hidden" ng-bind-html="post.Title"></span></span>
+                        <span style="position: absolute; left: 0; top: 5px;width:200px" ng-show="dndEnabled" class="glyphicon glyphicon-th" data-drag="true" jqyoui-draggable="{animate:false}" data-jqyoui-options="{revert: true, revertDuration: 0}" data-type="post" id="{{post.Id}}"><span style="visibility: hidden" ng-bind-html="post.Title"></span></span>
                         <span style="font-size: 16px; margin-left: 10px;position: relative; left: 15px; top: 0;">
                             <a ng-show="post.Uri" href="{{post.Uri}}" ng-bind-html="post.Title" target="_blank"></a>
                             <span ng-hide="post.Uri">{{post.Title}}</span>
@@ -157,7 +157,7 @@
 
                 <div ng-show="selectedListType == 'List' && post.IsCollapsed" style="margin-top: 10px; position:relative">
                     <span style="font-size: 20px; margin-left: 10px;">
-                        <span style="position: absolute; left: 0; top: 5px;width:200px" ng-show="dndEnabled" class="glyphicon glyphicon-th" data-drag="true" jqyoui-draggable="{animate:false}" data-jqyoui-options="{revert: true, revertDuration: 0}" id="{{post.Id}}"><span style="visibility: hidden" ng-bind-html="post.Title"></span></span>
+                        <span style="position: absolute; left: 0; top: 5px;width:200px" ng-show="dndEnabled" class="glyphicon glyphicon-th" data-drag="true" jqyoui-draggable="{animate:false}" data-jqyoui-options="{revert: true, revertDuration: 0}" data-type="post" id="{{post.Id}}"><span style="visibility: hidden" ng-bind-html="post.Title"></span></span>
                         <span style="font-size: 16px; margin-left: 10px;position: relative; left: 15px; top: 0;">
                             <a ng-show="post.Uri" href="" ng-click="post.IsCollapsed = false" ng-bind-html="post.Title" target="_blank"></a>
                                 <button class="btn btn-default btn-xs" ng-show="!group.IsExpanded && group.Posts.length > 1" ng-click="group.IsExpanded = true">
@@ -170,7 +170,7 @@
                 </div>
 
                 <div ng-show="selectedListType == 'Titles' && post.IsCollapsed" style="margin-top: 5px; position:relative">                    
-                    <span style="position: absolute; left: 0; top: 5px; height: 20px; width: 200px" ng-show="dndEnabled" class="glyphicon glyphicon-th" data-drag="true" jqyoui-draggable="{animate:false}" data-jqyoui-options="{revert: true, revertDuration: 0}" id="{{post.Id}}">
+                    <span style="position: absolute; left: 0; top: 5px; height: 20px; width: 200px" ng-show="dndEnabled" class="glyphicon glyphicon-th" data-drag="true" jqyoui-draggable="{animate:false}" data-jqyoui-options="{revert: true, revertDuration: 0}" data-type="post" id="{{post.Id}}">
                         <span style="visibility: hidden" ng-bind-html="post.Title"></span>
                     </span>
                         <span style="font-size: 16px; margin-left: 10px;position: relative; left: 10px; top: 0;">

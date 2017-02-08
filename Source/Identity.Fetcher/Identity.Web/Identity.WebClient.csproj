@@ -92,6 +92,7 @@
     <Content Include="Content\bootstrap-treeview.css" />
     <Content Include="Content\rss-feed-icone-7025-96.png" />
     <Content Include="Content\Templates\allChannels.html" />
+    <Content Include="Content\Templates\channellist.html" />
     <Content Include="Content\Templates\help.html" />
     <Content Include="Content\Templates\home.html" />
     <Content Include="Content\Templates\readHistory.html" />
@@ -140,6 +141,7 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\Controllers\allChannels.js" />
     <Content Include="Scripts\Controllers\associate.js" />
+    <Content Include="Scripts\Controllers\channellist.js" />
     <Content Include="Scripts\Controllers\editchannel.js" />
     <Content Include="Scripts\Controllers\channels.js" />
     <Content Include="Scripts\Controllers\channel.js" />

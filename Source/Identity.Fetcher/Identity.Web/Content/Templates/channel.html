@@ -54,7 +54,8 @@
 
 <div style="margin-top:120px">
     <!--<button class="btn btn-default" ng-show="channelOwned" ng-click="rss()">RSS</button>-->
-    <jqcloud words="channel.Scores" width="400" height="100" delay="10" steps="7" font-size="{from:0.09, to:0.04}"></jqcloud>
+    <jqcloud words="channel.Scores" ng-show="showChannelCloud" width="400" height="100" delay="10" steps="7" font-size="{from:0.09, to:0.04}"></jqcloud>
+    <div ng-show="showChannelCloud"> <a href="#/channelSubscriptions/{{channel.Id}}">Show me all forwarded channels</a></div>
     <!--<stream ng-show="posts.length > 0" posts="posts" user="user" showonlyunread="showOnlyUnread" display-settings-changed="displaySettingsChanged(settings)" channel="channel" autoloadonscroll="true" showcontrols="true"/>-->
     <stream posts="posts" user="user" showonlyunread="showOnlyUnread" display-settings-changed="displaySettingsChanged(settings)" channel="channel" autoloadonscroll="true" showcontrols="true" />
 </div>

@@ -1,0 +1,9 @@
+﻿<div ng-repeat="channel in channels" style="margin-left: 20px;position:relative">
+    <span style="position: absolute; left: 0; top: 5px;width:200px" ng-show="true" class="glyphicon glyphicon-th" data-drag="true" 
+          jqyoui-draggable="{animate:false}" data-jqyoui-options="{revert: true, revertDuration: 0}" data-type="channel" id="{{channel.Id}}"><span style="visibility: hidden">{{channel.Name}}</span></span>
+    <span style="font-size: 16px; margin-left: 10px;position: relative; left: 15px; top: 0;">
+        <a href="#/home/{{channel.Id}}">
+            {{channel.Name}}
+        </a>
+    </span>
+</div>

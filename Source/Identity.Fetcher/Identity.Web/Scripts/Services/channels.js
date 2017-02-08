@@ -1,4 +1,4 @@
-angular.module('inspire').factory('channelService', ['$http', 'ngSettings', function ($http, ngSettings) {
+angular.module('inspire').factory('channelService', ['$http', '$q', 'ngSettings', function ($http, $q, ngSettings) {
 
     var o = {
         channels: [], //subscribed channels
@@ -85,6 +85,18 @@ angular.module('inspire').factory('channelService', ['$http', 'ngSettings', func
 
     o.addFeed = function (channelId, url, type) {
         return $http.put(ngSettings.baseUrl + '/Api/Channel/' + channelId + '/AddFeed?url=' + url + '&type=' + type);
+    };
+
+    o.getSubscriptions = function (id) {
+
+        var deferred = $q.defer();
+
+        $http.get(ngSettings.baseUrl + '/Api/Channel/' + id + "/GetById").success(function (data) {
+
+            deferred.resolve({ data: data.Subscriptions });
+        });
+
+        return deferred.promise;
     };
 
     return o;

@@ -70,6 +70,18 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                         }
                     }
                 })
+                .state('root.channelSubscriptions', {
+                    url: '/channelSubscriptions/{channelId}',
+                    views: {
+                        'container@': {
+                            templateUrl: 'Content/templates/channellist.html',
+                            controller: 'ChannelListController',
+                            resolve: {
+                                channelsPromise: ['$stateParams', 'channelService', function ($stateParams, channelService) { return channelService.getSubscriptions($stateParams.channelId); }]
+                            }
+                        }
+                    }
+                })
                 .state('root.home', {
                     url: '/home',
                     views: {
