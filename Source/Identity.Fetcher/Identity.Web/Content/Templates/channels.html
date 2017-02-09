@@ -1,7 +1,7 @@
 
-<!--<div class="drop-hover">
-    <div id="tree" ng-show="showMenu()" style="margin-left: 10px;" data-drop="true" data-jqyoui-options="{hoverClass: 'drop-hover'}" jqyoui-droppable></div>
-</div>-->
+<label for="input-search" class="sr-only">Search Tree:</label>
+<input type="text" class="form-control" id="input-search" style="margin-left: 10px;width:210px" ng-model="filter" ng-keyup="search()" placeholder="Type to filter..." value="">
+
 <div id="tree" ng-show="showMenu()" style="margin-left: 10px;"></div> <!--data-drop="true" data-jqyoui-options="{hoverClass: 'drop-hover'}" jqyoui-droppable-->
 
 <!--<div ng-repeat="channel in user.Owns" style="margin-left: 20px">

@@ -3,6 +3,7 @@ angular.module('inspire')
         function ($scope, $http, $stateParams, $modal, $window, $filter, userPromise, channelService, postService) {
 
             $scope.user = userPromise.data;
+            $scope.filter = "";
 
             var treeInitialized = false;
 
@@ -40,7 +41,52 @@ angular.module('inspire')
                 }
 
                 return result;
-            }            
+            }
+
+    
+            // collapse and enable all before search //
+            function reset(tree) {
+                tree.collapseAll();
+                tree.enableAll();
+            }
+
+            function collectUnrelated(nodes) {
+                var unrelated = [];
+                $.each(nodes, function (i, n) {
+                    if (!n.searchResult && !n.state.expanded) { // no hit, no parent
+                        unrelated.push(n);
+                    }
+                    if (!n.searchResult && n.nodes) { // recurse for non-result children
+                        angular.extend(unrelated, collectUnrelated(n.nodes));
+                    }
+                });
+                return unrelated;
+            }
+
+            var lastPattern = '';
+
+            $scope.search = function () {
+                var pattern = $scope.filter;
+                if (pattern === lastPattern) {
+                    return;
+                }
+                lastPattern = pattern;
+                var tree = $('#tree').treeview(true);
+                reset(tree);
+                if (pattern.length < 3) { // avoid heavy operation
+                    tree.clearSearch();
+                } else {
+                    tree.search(pattern);
+                    // get all root nodes: node 0 who is assumed to be
+                    //   a root node, and all siblings of node 0.
+                    var roots = tree.getSiblings(0);
+                    roots.push(tree.getNodes()[0]);
+
+                    var unrelated = collectUnrelated(roots);
+                    tree.disableNode(unrelated, { silent: true });
+                }
+            };
+
 
             $scope.$watch('user.Owns', function (newValue, oldValue, scope) {
 
