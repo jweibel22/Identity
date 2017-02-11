@@ -19,8 +19,7 @@ namespace RssFeederJob
         {
             XmlConfigurator.Configure();
 
-            var host = new JobHost();            
-            // The following code ensures that the WebJob will be running continuously
+            var host = new JobHost();                        
             host.RunAndBlock();
 
             //new ServiceLifecycle().Run();
