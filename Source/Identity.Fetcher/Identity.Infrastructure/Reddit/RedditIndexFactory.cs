@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Identity.Domain.RedditIndexes;
-using Identity.Infrastructure.Reddit;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 
-namespace Identity.Infrastructure.Services
+namespace Identity.Infrastructure.Reddit
 {
     public class RedditIndexFactory
     {

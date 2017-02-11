@@ -1,26 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Identity.Infrastructure.Rss;
 using Identity.Infrastructure.Services;
 using log4net;
-using log4net.Core;
 using LinqToTwitter;
 
-namespace Identity.Infrastructure.Feeders
+namespace Identity.Infrastructure.Feeders.FeedReaders
 {
-    public class TwitterFeeder : IFeederReader
+    public class TwitterReader : IFeedReader
     {
         private readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private readonly TwitterContext twitterCtx;
 
-        public TwitterFeeder()
+        public TwitterReader()
         {
             var auth = new ApplicationOnlyAuthorizer
             {

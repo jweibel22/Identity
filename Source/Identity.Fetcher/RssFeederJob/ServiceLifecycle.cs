@@ -8,9 +8,7 @@ using System.Threading;
 using Identity.Domain;
 using Identity.Infrastructure;
 using Identity.Infrastructure.Repositories;
-using Identity.Infrastructure.Rss;
 using Identity.Infrastructure.Services;
-using Identity.Infrastructure.WebScrapers;
 using log4net;
 using log4net.Config;
 

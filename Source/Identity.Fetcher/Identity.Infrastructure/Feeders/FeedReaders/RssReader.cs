@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,16 +6,10 @@ using System.Net;
 using System.ServiceModel.Syndication;
 using System.Xml;
 using System.Xml.Linq;
-using Identity.Infrastructure.Feeders;
 
-namespace Identity.Infrastructure.Rss
+namespace Identity.Infrastructure.Feeders.FeedReaders
 {
-    public interface IFeederReader
-    {
-        IEnumerable<FeedItem> Fetch(string id);
-    }
-
-    public class RssReader : IFeederReader
+    public class RssReader : IFeedReader
     {
         public IEnumerable<FeedItem> Fetch(string id)
         {

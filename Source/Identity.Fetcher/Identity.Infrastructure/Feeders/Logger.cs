@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using log4net;
 
-namespace Identity.Infrastructure.Rss
+namespace Identity.Infrastructure.Feeders
 {
     class Logger
     {

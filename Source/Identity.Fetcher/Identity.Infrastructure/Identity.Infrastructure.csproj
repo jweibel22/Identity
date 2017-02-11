@@ -141,10 +141,12 @@
     <Compile Include="DTO\Post.cs" />
     <Compile Include="DTO\RssFeeder.cs" />
     <Compile Include="DTO\User.cs" />
+    <Compile Include="Feeders\FeedReaders\IFeedReader.cs" />
     <Compile Include="Feeders\FeedItem.cs" />
     <Compile Include="Feeders\FeederFactory.cs" />
+    <Compile Include="Feeders\FeedProcessor.cs" />
     <Compile Include="Feeders\Logger.cs" />
-    <Compile Include="Feeders\TwitterFeeder.cs" />
+    <Compile Include="Feeders\FeedReaders\TwitterReader.cs" />
     <Compile Include="Helpers\BulkCopy.cs" />
     <Compile Include="Helpers\NLPHelper.cs" />
     <Compile Include="PerfCounter.cs" />
@@ -162,7 +164,7 @@
     <Compile Include="Repositories\PostRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Feeders\FeedRefresher.cs" />
-    <Compile Include="Feeders\Rss\RssReader.cs" />
+    <Compile Include="Feeders\FeedReaders\RssReader.cs" />
     <Compile Include="Feeders\WebScrapers\IWebScraper.cs" />
     <Compile Include="Services\DtoLoader.cs" />
     <Compile Include="Services\NLP\GoogleNLPClient.cs" />

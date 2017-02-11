@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Identity.Domain.RedditIndexes;
-using Identity.Infrastructure.Reddit;
-using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
-using Directory = Lucene.Net.Store.Directory;
 
-namespace Identity.Infrastructure.Services
+namespace Identity.Infrastructure.Reddit
 {
     public class SubRedditOccurences : IDisposable
     {

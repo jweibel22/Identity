@@ -5,7 +5,7 @@ using Lucene.Net.Store;
 using Lucene.Net.Store.Azure;
 using Microsoft.WindowsAzure.Storage;
 
-namespace Identity.Infrastructure.Services
+namespace Identity.Infrastructure.Reddit
 {
     public class LuceneDirectoryFactory
     {

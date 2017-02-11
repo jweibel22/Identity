@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Identity.Domain;
 
-namespace Identity.Infrastructure.WebScrapers
+namespace Identity.Infrastructure.Feeders.WebScrapers
 {
     public interface IWebScraper
     {

@@ -8,8 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Identity.Domain;
 using Identity.Infrastructure;
+using Identity.Infrastructure.Feeders;
 using Identity.Infrastructure.Repositories;
-using Identity.Infrastructure.Rss;
 using log4net;
 using Microsoft.Azure.WebJobs;
 
