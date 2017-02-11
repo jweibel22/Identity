@@ -15,7 +15,7 @@ namespace Identity.Infrastructure.Feeders
         private readonly UserRepository userRepo;
         private readonly PostRepository postRepo;
 
-        private readonly long[] FeedersWithTagsAsUpstreams = new[] { 1L, 2L, 4L, 5L, 6L, 7L };
+        private readonly long[] FeedersWithTagsAsUpstreams = new[] { 1L, 2L, 4L, 5L, 6L, 7L, 14L, 25L };
 
         public FeedProcessor(Logger log, ChannelRepository channelRepo, UserRepository userRepo, PostRepository postRepo)
         {
