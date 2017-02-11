@@ -130,6 +130,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoTagger.cs" />
+    <Compile Include="AzureTraceAppender.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="ConnectionFactory.cs" />
     <Compile Include="DTO\Channel.cs" />
