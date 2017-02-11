@@ -16,8 +16,7 @@ namespace Identity.OAuth
 
         public Bus()
         {
-            // CloudConfigurationManager.GetSetting("AzureWebJobsDashboard")
-            storageAccount = CloudStorageAccount.Parse(ConfigurationManager.ConnectionStrings["AzureWebJobsDashboard"].ConnectionString);
+            storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["AzureWebJobsDashboard"]);
             queueClient = storageAccount.CreateCloudQueueClient();
         }
 
