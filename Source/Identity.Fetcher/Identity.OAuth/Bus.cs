@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Web;
 using Microsoft.WindowsAzure;
@@ -15,7 +16,8 @@ namespace Identity.OAuth
 
         public Bus()
         {
-            storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("StorageConnectionString"));
+            // CloudConfigurationManager.GetSetting("AzureWebJobsDashboard")
+            storageAccount = CloudStorageAccount.Parse(ConfigurationManager.ConnectionStrings["AzureWebJobsDashboard"].ConnectionString);
             queueClient = storageAccount.CreateCloudQueueClient();
         }
 
