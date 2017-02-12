@@ -52,7 +52,9 @@ namespace Identity.Infrastructure.Feeders
                         };
 
                         channelRepo.AddChannel(newChannel);
-                        channelRepo.AddSubscription(feed.ChannelId, newChannel.Id);
+                        events.Add(new ChannelAdded { ChannelId = newChannel.Id });
+                        channelRepo.AddSubscription(feed.ChannelId, newChannel.Id);                        
+                        events.Add(new SubscriptionAdded { UpstreamChannelId = newChannel.Id, DownstreamChannelId = feed.ChannelId });
                         allUpstreamChannels[newChannel.Name] = newChannel.Id;
                     }
                 }
