@@ -1,15 +1,14 @@
 using System;
 using Identity.Domain;
-using Identity.Infrastructure.Feeders.FeedReaders;
 
-namespace Identity.Infrastructure.Feeders
+namespace Identity.Infrastructure.Feeders.FeedReaders
 {
-    class FeederFactory
+    class FeedReaderFactory
     {
         private readonly TwitterReader twitter;
         private readonly RssReader rss;
 
-        public FeederFactory()
+        public FeedReaderFactory()
         {
             twitter = new TwitterReader();
             rss = new RssReader();

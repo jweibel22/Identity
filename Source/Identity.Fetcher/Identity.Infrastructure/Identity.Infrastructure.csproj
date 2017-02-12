@@ -143,7 +143,7 @@
     <Compile Include="DTO\User.cs" />
     <Compile Include="Feeders\FeedReaders\IFeedReader.cs" />
     <Compile Include="Feeders\FeedItem.cs" />
-    <Compile Include="Feeders\FeederFactory.cs" />
+    <Compile Include="Feeders\FeedReaders\FeedReaderFactory.cs" />
     <Compile Include="Feeders\FeedProcessor.cs" />
     <Compile Include="Feeders\Logger.cs" />
     <Compile Include="Feeders\FeedReaders\TwitterReader.cs" />

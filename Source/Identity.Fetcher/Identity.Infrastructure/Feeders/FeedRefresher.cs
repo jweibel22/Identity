@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks.Dataflow;
 using Identity.Domain;
 using Identity.Domain.Events;
+using Identity.Infrastructure.Feeders.FeedReaders;
 using Identity.Infrastructure.Helpers;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services.NLP;
@@ -14,7 +15,7 @@ namespace Identity.Infrastructure.Feeders
     public class FeedRefresher
     {
         private readonly ConnectionFactory connectionFactory;
-        private readonly FeederFactory feederFactory;
+        private readonly FeedReaderFactory _feedReaderFactory;
         private readonly Logger log;
         private readonly EnglishLanguage language;
         private readonly GoogleNLPClient nlpClient;
@@ -24,7 +25,7 @@ namespace Identity.Infrastructure.Feeders
             this.connectionFactory = connectionFactory;
             this.language = language;
             this.nlpClient = nlpClient;
-            this.feederFactory = new FeederFactory();
+            this._feedReaderFactory = new FeedReaderFactory();
             log = new Logger(azureLog);            
         }
         
@@ -44,7 +45,7 @@ namespace Identity.Infrastructure.Feeders
                 log.Info("fetching feed " + rssFeeder.Url);
                 try
                 {
-                    var rssReader = feederFactory.GetReader(rssFeeder);
+                    var rssReader = _feedReaderFactory.GetReader(rssFeeder);
                     var feed = rssReader.Fetch(rssFeeder.Url);
                     return new Tuple<Feed, IEnumerable<FeedItem>>(rssFeeder, feed);
                 }
