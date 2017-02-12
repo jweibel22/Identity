@@ -50,7 +50,7 @@ namespace Identity.Infrastructure.Feeders
                 existingEntities.Add(e.Name, e.Id);
             }
 
-            var xx = new Dictionary<long, long>();
+            var entitiesInPosts = new List<KeyValuePair<long, long>>();
 
             foreach (var kv in articles)
             {
@@ -59,11 +59,11 @@ namespace Identity.Infrastructure.Feeders
                 foreach (var s in kv.Value.DistinctBy(e => e.Name))
                 {
                     var entityId = existingEntities[s.Name];
-                    xx.Add(entityId, postId);
+                    entitiesInPosts.Add(new KeyValuePair<long, long>(entityId, postId));
                 }
             }
 
-            repo.AddXX(xx);
+            repo.EntitiesInPosts(entitiesInPosts);
         }
 
     }

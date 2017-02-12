@@ -35,7 +35,7 @@ namespace Identity.Infrastructure.Repositories
             e.Id = con.Connection.Query<long>(sql, e, con).Single();
         }
 
-        public void AddXX(IDictionary<long,long> entityIdsAndPostIds)
+        public void EntitiesInPosts(IEnumerable<KeyValuePair<long,long>> entityIdsAndPostIds)
         {
             var table = new DataTable();
             table.TableName = "EntitiesInPosts";
