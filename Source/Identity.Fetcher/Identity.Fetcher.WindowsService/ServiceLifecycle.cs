@@ -8,8 +8,10 @@ using System.Threading;
 using Identity.Domain;
 using Identity.Infrastructure;
 using Identity.Infrastructure.Feeders;
+using Identity.Infrastructure.Helpers;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
+using Identity.Infrastructure.Services.NLP;
 using log4net;
 using log4net.Config;
 
@@ -39,9 +41,8 @@ namespace Identity.Fetcher.WindowsService
 
         private void Run(object state)
         {
-
-            //var items = new TwitterFeeder().Fetch();
-
+            var helper = new EnglishLanguage();
+            var nlpClient = new GoogleNLPClient(ConfigurationManager.AppSettings["GoogleApiKey"], "https://language.googleapis.com/v1/documents:analyzeEntities", helper);
 
             var connectionFactory = new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
 
@@ -63,7 +64,7 @@ namespace Identity.Fetcher.WindowsService
                 return;
             }
 
-            var feedRefresher = new FeedRefresher(connectionFactory, TextWriter.Null);
+            var feedRefresher = new FeedRefresher(connectionFactory, TextWriter.Null, helper, nlpClient);
             try
             {
                 feedRefresher.Run(rssFeederUser, feeders);

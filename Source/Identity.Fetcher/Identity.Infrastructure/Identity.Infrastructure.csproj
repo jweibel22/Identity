@@ -147,8 +147,9 @@
     <Compile Include="Feeders\FeedProcessor.cs" />
     <Compile Include="Feeders\Logger.cs" />
     <Compile Include="Feeders\FeedReaders\TwitterReader.cs" />
+    <Compile Include="Feeders\PostNlpAnalyzer.cs" />
     <Compile Include="Helpers\BulkCopy.cs" />
-    <Compile Include="Helpers\NLPHelper.cs" />
+    <Compile Include="Helpers\EnglishLanguage.cs" />
     <Compile Include="PerfCounter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reddit\LuceneDirectoryFactory.cs" />
@@ -156,6 +157,7 @@
     <Compile Include="Reddit\RedditIndexRepository.cs" />
     <Compile Include="Reddit\Submission.cs" />
     <Compile Include="Repositories\ChannelLinkRepository.cs" />
+    <Compile Include="Repositories\NLPEntityRepository.cs" />
     <Compile Include="Repositories\OntologyRepository.cs" />
     <Compile Include="Repositories\TagCountRepository.cs" />
     <Compile Include="Repositories\ChannelRepository.cs" />
@@ -182,6 +184,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Resources\nouns.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="commonwords-danish.txt">
@@ -189,6 +194,9 @@
     </Content>
     <Content Include="Eula.htm" />
     <Content Include="Readme.html" />
+    <Content Include="Resources\commonwords-english.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Schema.sql" />
     <Content Include="Scripts\FetchPostIds.sql" />
     <Content Include="Scripts\FetchPostsFromIds.sql" />

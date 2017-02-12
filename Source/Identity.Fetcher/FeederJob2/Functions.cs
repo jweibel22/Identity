@@ -12,7 +12,9 @@ using Identity.Domain;
 using Identity.Domain.Clustering;
 using Identity.Infrastructure;
 using Identity.Infrastructure.Feeders;
+using Identity.Infrastructure.Helpers;
 using Identity.Infrastructure.Repositories;
+using Identity.Infrastructure.Services.NLP;
 using log4net;
 using Microsoft.Azure.WebJobs;
 using User = Identity.Infrastructure.DTO.User;
@@ -29,6 +31,9 @@ namespace FeederJob2
         {
             try
             {
+                var helper = new EnglishLanguage();
+                var nlpClient = new GoogleNLPClient(ConfigurationManager.AppSettings["GoogleApiKey"], "https://language.googleapis.com/v1/documents:analyzeEntities", helper);
+
                 var connectionFactory = new ConnectionFactory(ConfigurationManager.ConnectionStrings["Sql.ConnectionString"].ConnectionString);
 
                 Identity.Domain.User rssFeederUser;
@@ -49,7 +54,7 @@ namespace FeederJob2
                     return;
                 }
 
-                var feedRefresher = new FeedRefresher(connectionFactory, log);
+                var feedRefresher = new FeedRefresher(connectionFactory, log, helper, nlpClient);
                 Console.WriteLine("Rss feeder started");
                 feedRefresher.Run(rssFeederUser, feeders);
                 Console.WriteLine("Rss feeder finished");

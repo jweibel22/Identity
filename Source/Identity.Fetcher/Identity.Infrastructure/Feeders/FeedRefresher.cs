@@ -5,7 +5,9 @@ using System.Linq;
 using System.Threading.Tasks.Dataflow;
 using Identity.Domain;
 using Identity.Domain.Events;
+using Identity.Infrastructure.Helpers;
 using Identity.Infrastructure.Repositories;
+using Identity.Infrastructure.Services.NLP;
 
 namespace Identity.Infrastructure.Feeders
 {
@@ -14,10 +16,14 @@ namespace Identity.Infrastructure.Feeders
         private readonly ConnectionFactory connectionFactory;
         private readonly FeederFactory feederFactory;
         private readonly Logger log;
+        private readonly EnglishLanguage language;
+        private readonly GoogleNLPClient nlpClient;
 
-        public FeedRefresher(ConnectionFactory connectionFactory, TextWriter azureLog)
+        public FeedRefresher(ConnectionFactory connectionFactory, TextWriter azureLog, EnglishLanguage language, GoogleNLPClient nlpClient)
         {
             this.connectionFactory = connectionFactory;
+            this.language = language;
+            this.nlpClient = nlpClient;
             this.feederFactory = new FeederFactory();
             log = new Logger(azureLog);            
         }
@@ -63,8 +69,9 @@ namespace Identity.Infrastructure.Feeders
                 {
                     try
                     {
+                        var analyzer = new PostNlpAnalyzer(new NLPEntityRepository(session.Transaction), language, nlpClient);
                         var processor = new FeedProcessor(log, new ChannelRepository(session.Transaction),
-                            new UserRepository(session.Transaction),new PostRepository(session.Transaction));
+                            new UserRepository(session.Transaction),new PostRepository(session.Transaction), analyzer);
 
                         processor.ProcessFeed(rssFeederUser, t.Item1, events, t.Item2);   
                         session.Commit();

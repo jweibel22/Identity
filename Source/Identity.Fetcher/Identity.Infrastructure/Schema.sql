@@ -369,3 +369,33 @@ CREATE TABLE [dbo].[ChannelScore](
 	[ChannelId] ASC
 )
 ) ON [PRIMARY]
+
+
+
+CREATE TABLE [dbo].[NLPEntity](
+	[Id] [bigint] IDENTITY NOT NULL,
+	[Name] [varchar](100) NOT NULL,
+	[Type] [varchar](50) NULL,
+	[CommonWord] [bit] NOT NULL,
+	[Noun] [bit] NOT NULL,
+CONSTRAINT [PK_NLPEntity] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)
+)
+
+CREATE UNIQUE INDEX [NLPEntity_NameId] ON [dbo].[NLPEntity]
+(
+	[Name] ASC
+)
+
+
+CREATE TABLE [dbo].[EntitiesInPosts](
+	[PostId] [bigint] NOT NULL,
+	[NLPEntityId] [bigint] NOT NULL,
+	[IdentifiedByGoogleNLP] [bit] NOT NULL,
+CONSTRAINT [PK_EntitiesInPosts] PRIMARY KEY CLUSTERED 
+(
+	[PostId] ASC, [NLPEntityId] ASC 
+)
+)

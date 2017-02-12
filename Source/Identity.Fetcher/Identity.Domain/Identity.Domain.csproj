@@ -69,6 +69,7 @@
     <Compile Include="Events\UserJoins.cs" />
     <Compile Include="Events\UserLeaves.cs" />
     <Compile Include="InlineArticleSelector.cs" />
+    <Compile Include="NLPEntity.cs" />
     <Compile Include="Ontology.cs" />
     <Compile Include="PublishedIn.cs" />
     <Compile Include="Comment.cs" />

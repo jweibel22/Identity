@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 using Identity.Domain;
 using Identity.Infrastructure;
 using Identity.Infrastructure.Feeders;
+using Identity.Infrastructure.Helpers;
 using Identity.Infrastructure.Repositories;
+using Identity.Infrastructure.Services.NLP;
 using log4net;
 using Microsoft.Azure.WebJobs;
 
@@ -98,7 +100,10 @@ namespace RssFeederJob
                 return;
             }
 
-            var feedRefresher = new FeedRefresher(connectionFactory, log);
+            var helper = new EnglishLanguage();
+            var nlpClient = new GoogleNLPClient(ConfigurationManager.AppSettings["GoogleApiKey"], "https://language.googleapis.com/v1/documents:analyzeEntities", helper);
+
+            var feedRefresher = new FeedRefresher(connectionFactory, log, helper, nlpClient);
             try
             {
                 Console.WriteLine("Rss feeder started");

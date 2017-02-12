@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Identity.Infrastructure.Helpers;
 using Newtonsoft.Json;
 using RestSharp;
 
@@ -81,17 +82,15 @@ namespace Identity.Infrastructure.Services.NLP
             return idx;
         }
 
-        private readonly string url;
         private readonly string apiKey;
-        private readonly string[] commonEnglishWords;
+        private readonly EnglishLanguage helper;
         private readonly IRestClient client;
 
-        public GoogleNLPClient(string[] commonEnglishWords, string apiKey, string url)
+        public GoogleNLPClient(string apiKey, string url, EnglishLanguage helper)
         {
-            this.commonEnglishWords = commonEnglishWords;
             this.apiKey = apiKey;
-            this.url = url;
-            this.client = new RestClient("https://language.googleapis.com/v1/documents:analyzeEntities");
+            this.helper = helper;
+            this.client = new RestClient(url);
         }
 
         public Entities Get(IList<Text> texts)
@@ -113,7 +112,7 @@ namespace Identity.Infrastructure.Services.NLP
             {
                 foreach (var mention in x.mentions)
                 {
-                    if (commonEnglishWords.Contains(mention.text.content.ToLower().Trim()))
+                    if (helper.CommonWords.Keys.Contains(mention.text.content.ToLower().Trim()))
                     {                        
                         continue;
                     }
