@@ -67,8 +67,8 @@ namespace Identity.Infrastructure.Feeders
             {
                 try
                 {
-                    if (!postRepo.SimilarPostAlreadyExists(feedItem.Title, feedItem.CreatedAt, feed.ChannelId))
-                    {
+                    if (!postRepo.SimilarPostAlreadyExists(feedItem.Title, feedItem.CreatedAt, feed.ChannelId) && feedItem.Links.Any())
+                    {                        
                         log.Info("processing item " + feedItem.Title + " from feed " + feed.Url);
 
                         var url = feedItem.Links.First().ToString();
