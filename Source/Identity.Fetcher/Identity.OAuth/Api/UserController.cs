@@ -45,24 +45,25 @@ namespace Identity.Rest.Api
             return u;
         }
 
-
-        private Infrastructure.DTO.Channel MapChannel(OwnChannel root, IList<OwnChannel> ownedByUser, IList<ChannelLink> channelLinks)
-        {
-            var channel = Mapper.Map<Channel>(root);
-
-            var subs = channelLinks
-                            .Where(l => l.DownStreamChannelId == channel.Id && ownedByUser.Any(x => x.Id == l.UpStreamChannelId))
-                            .Select(l => l.UpStreamChannelId);
-            channel.Subscriptions = ownedByUser.Where(x => subs.Contains(x.Id)).Select(x => MapChannel(x, ownedByUser, channelLinks)).ToList();
-
-            return channel;
-        }
-
         private User Map(Domain.User user, Domain.User loggedInUser)
         {
             var channelLinks = userRepo.ChannelLinks(user.Id).ToList();
             var ownedByUser = userRepo.Owns(user.Id).ToList();
-            var ownedAsDto = ownedByUser.Select(c => MapChannel(c, ownedByUser, channelLinks)).ToList();           
+
+            Func<OwnChannel, Channel> mapChannel = null;
+            mapChannel = root =>
+            {
+                var channel = Mapper.Map<Channel>(root);
+
+                var subs = channelLinks
+                    .Where(l => l.DownStreamChannelId == channel.Id && ownedByUser.Any(x => x.Id == l.UpStreamChannelId))
+                    .Select(l => l.UpStreamChannelId);
+                channel.Subscriptions = ownedByUser.Where(x => subs.Contains(x.Id)).Select(mapChannel).ToList();
+
+                return channel;
+            };
+
+            var ownedAsDto = ownedByUser.Select(c => mapChannel(c)).ToList();           
 
             return new User
             {

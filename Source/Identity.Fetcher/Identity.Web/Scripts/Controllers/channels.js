@@ -13,6 +13,13 @@ angular.module('inspire')
 
             function tagsEqual(n1, n2) {
 
+                if (n1.nodes) {
+                    for (var i = 0; i < n1.nodes.length; i++) {
+                        if (!tagsEqual(n1.nodes[i], n2.nodes[i]))
+                            return false;
+                    }
+                }
+
                 var n1Ok = n1.tags && n1.tags.length == 1;
                 var n2Ok = n2.tags && n2.tags.length == 1;
 
@@ -24,6 +31,15 @@ angular.module('inspire')
                     return false;
            }
 
+            function getUnreadCount(id) {
+                var x = $filter('filter')($scope.user.Owns, { Id: id }, true)[0];
+                if (x) {
+                    return x.UnreadCount;
+                } else {
+                    return 0;
+                }
+            }
+
             function createTreeViewNode(channel) {
 
                 var result = {
@@ -32,8 +48,8 @@ angular.module('inspire')
                     href: "#/home/" + channel.Id
                 };
 
-                if (channel.UnreadCount > 0) {
-                    result.tags = [channel.UnreadCount];
+                if (getUnreadCount(channel.Id) > 0) {
+                    result.tags = [getUnreadCount(channel.Id)];
                 }
 
                 if (channel.Subscriptions.length > 0) {
