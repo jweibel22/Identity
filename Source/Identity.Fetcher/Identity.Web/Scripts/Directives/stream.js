@@ -51,6 +51,10 @@
 
                         var post = posts[i];
 
+                        if (isEmpty(post)) {
+                            continue;
+                        }
+
                         if (post.ClusterId) {
                             if (processedClusters.indexOf(post.ClusterId) == -1) {
                                 processedClusters.push(post.ClusterId);
@@ -71,6 +75,10 @@
                     }
 
                     return result;
+                }
+
+                function isEmpty(post) {
+                    return post.Id === -1;
                 }
                
                 $scope.publishOnChannelWindowdata = {
@@ -152,9 +160,13 @@
                 $scope.read = function (posts) {
 
                     for (var i = 0; i < posts.length; i++) {
-                        var post = posts[i];
-                        var postId = post.Id;
-                        var exists = $filter('filter')($scope.readHistory, { Id: postId }, true).length > 0;
+                        var post = posts[i];                        
+
+                        if (isEmpty(post)) {
+                            continue;
+                        }
+
+                        var exists = $filter('filter')($scope.readHistory, { Id: post.Id }, true).length > 0;
 
                         if (!exists) {
                             console.log("Adding to history: " + post.Title);

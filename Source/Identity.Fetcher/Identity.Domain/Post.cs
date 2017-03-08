@@ -45,5 +45,21 @@ namespace Identity.Domain
         public bool PremiumContent { get; set; }
 
         public long? ClusterId { get; set; }
+
+        public static Post Empty
+        {
+            get
+            {
+                return new Post()
+                {
+                    Id = -1,
+                    PosterId = -1,
+                    Uri = "",
+                    Title = "",
+                    Description = "",
+                    PosterUsername = ""
+                };
+            } 
+        }
     }
 }

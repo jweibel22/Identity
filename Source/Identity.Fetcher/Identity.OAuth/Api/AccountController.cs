@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Identity.Domain;
 using Identity.Infrastructure.Repositories;
+using Identity.Infrastructure.Services;
 using Identity.OAuth.Models;
 using Identity.Rest;
 using Microsoft.AspNet.Identity;
@@ -20,8 +21,8 @@ namespace Identity.OAuth.Api
     [UnitOfWorkCommit]
     public class AccountController : ApiController
     {
-        private readonly ChannelRepository channelRepository;
         private readonly UserRepository userRepository;
+        private readonly UserFactory userFactory;
         private readonly IDbTransaction con;
 
         private IAuthenticationManager Authentication
@@ -29,11 +30,11 @@ namespace Identity.OAuth.Api
             get { return Request.GetOwinContext().Authentication; }
         }
 
-        public AccountController(ChannelRepository channelRepository, UserRepository userRepository, IDbTransaction con)
+        public AccountController(UserRepository userRepository, IDbTransaction con, UserFactory userFactory)
         {
-            this.channelRepository = channelRepository;
             this.userRepository = userRepository;
             this.con = con;
+            this.userFactory = userFactory;
         }
 
         [AllowAnonymous]
@@ -49,7 +50,7 @@ namespace Identity.OAuth.Api
 
             try
             {
-                user = CreateNewUser(Guid.NewGuid().ToString(), true);
+                user = userFactory.CreateNewUser(Guid.NewGuid().ToString(), true);
             }
             catch (Exception ex)
             {
@@ -72,7 +73,7 @@ namespace Identity.OAuth.Api
 
             try
             {
-                CreateNewUser(userModel.UserName, false);
+                userFactory.CreateNewUser(userModel.UserName, false);
             }
             catch (Exception ex)
             {
@@ -137,50 +138,6 @@ namespace Identity.OAuth.Api
 
         }
 
-        private User CreateNewUser(string username, bool isAnon)
-        {
-            var channelUsername = isAnon ? "Anon" : username;
-            var starredChannel = Channel.New(String.Format("{0}'s starred", channelUsername));
-            var savedChannel = Channel.New(String.Format("{0}'s saved", channelUsername));
-            var likedChannel = Channel.New(String.Format("{0}'s liked", channelUsername));
-            var inbox = Channel.New(String.Format("{0}'s inbox", channelUsername));
-            var subscriptionChannel = Channel.New(String.Format("{0}'s subscriptions", channelUsername));
-                
-            channelRepository.AddChannel(starredChannel);
-            channelRepository.AddChannel(savedChannel);
-            channelRepository.AddChannel(likedChannel);
-            channelRepository.AddChannel(inbox);
-            channelRepository.AddChannel(subscriptionChannel);
-            
-
-            var user = new User
-            {
-                IdentityId = Guid.NewGuid().ToString(),
-                Username = username,
-                StarredChannel = starredChannel.Id,
-                LikedChannel = likedChannel.Id,
-                SavedChannel = savedChannel.Id,
-                Inbox = inbox.Id,
-                SubscriptionChannel = subscriptionChannel.Id
-            };
-
-            if (isAnon)
-            {
-                userRepository.AddAnonUser(user);
-            }
-            else
-            {
-                userRepository.AddUser(user);
-            }            
-
-            userRepository.Owns(user.Id, starredChannel.Id, true);
-            userRepository.Owns(user.Id, savedChannel.Id, true);
-            userRepository.Owns(user.Id, likedChannel.Id, true);
-            userRepository.Owns(user.Id, inbox.Id, true);
-            userRepository.Owns(user.Id, subscriptionChannel.Id, true);
-
-            return user;
-        }
 
         // POST api/Account/RegisterExternal
         [AllowAnonymous]
@@ -209,7 +166,7 @@ namespace Identity.OAuth.Api
 
             try
             {
-                user = CreateNewUser(model.UserName, false);                
+                user = userFactory.CreateNewUser(model.UserName, false);                
             }
             catch (Exception ex)
             {

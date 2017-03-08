@@ -19,5 +19,7 @@
         public string IdentityId { get; set; }
 
         public bool IsAnonymous { get; set; }
+
+        public bool IsPremium { get; set; }
     }
 }

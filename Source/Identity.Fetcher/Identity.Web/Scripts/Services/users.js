@@ -36,5 +36,9 @@ angular.module('inspire').factory('userService', ['$http', '$q', 'ngSettings', f
         return $http.post(ngSettings.baseUrl + '/Api/User/' + userId + '/Block?tag=' + tag);
     }
 
+    o.update = function (user) {
+        return $http.post(ngSettings.baseUrl + '/Api/User/' + user.Id + '/Update?isPremium=' + user.IsPremium);
+    }
+
     return o;
 }]);

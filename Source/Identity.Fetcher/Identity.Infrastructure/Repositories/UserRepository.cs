@@ -21,12 +21,17 @@ namespace Identity.Infrastructure.Repositories
 
         public void AddUser(User user)
         {
-            user.Id = con.Connection.Query<long>("insert [User] values (@Username, @SavedChannel, @StarredChannel, @LikedChannel, @IdentityId, @Inbox, @SubscriptionChannel, 0); SELECT CAST(SCOPE_IDENTITY() as bigint)", user, con).Single();
+            user.Id = con.Connection.Query<long>("insert [User] values (@Username, @SavedChannel, @StarredChannel, @LikedChannel, @IdentityId, @Inbox, @SubscriptionChannel, 0, 0); SELECT CAST(SCOPE_IDENTITY() as bigint)", user, con).Single();
         }
 
         public void AddAnonUser(User user)
         {
-            user.Id = con.Connection.Query<long>("insert [User] values (@Username, @SavedChannel, @StarredChannel, @LikedChannel, @IdentityId, @Inbox, @SubscriptionChannel, 1); SELECT CAST(SCOPE_IDENTITY() as bigint)", user, con).Single();
+            user.Id = con.Connection.Query<long>("insert [User] values (@Username, @SavedChannel, @StarredChannel, @LikedChannel, @IdentityId, @Inbox, @SubscriptionChannel, 1, 0); SELECT CAST(SCOPE_IDENTITY() as bigint)", user, con).Single();
+        }
+
+        public void Update(User user)
+        {
+            con.Connection.Execute("update [User] set IsPremium = @IsPremium where Id = @Id", user, con);
         }
 
         public void AddLogin(User user, string loginProvider, string providerKey)

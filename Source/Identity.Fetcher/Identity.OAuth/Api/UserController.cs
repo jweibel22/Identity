@@ -78,7 +78,8 @@ namespace Identity.Rest.Api
                 StarredChannel = user.StarredChannel,
                 LikedChannel = user.LikedChannel,
                 SubscriptionChannel = user.SubscriptionChannel,
-                TagCloud = userRepo.GetTagCloud(user.Id, loggedInUser.Id).Select(Mapper.Map<Infrastructure.DTO.WeightedTag>).ToList()
+                TagCloud = userRepo.GetTagCloud(user.Id, loggedInUser.Id).Select(Mapper.Map<Infrastructure.DTO.WeightedTag>).ToList(),
+                IsPremium = user.IsPremium
             };
         }
 
@@ -103,6 +104,15 @@ namespace Identity.Rest.Api
             var user = userRepo.FindByName(identity.Name);
 
             return userRepo.SearchByName(query).Select(x => Map(x, user)).ToList();
+        }
+
+        [HttpPost]
+        public void Update(long id, bool isPremium)
+        {
+            var identity = User.Identity as ClaimsIdentity;
+            var user = userRepo.FindByName(identity.Name);
+            user.IsPremium = isPremium;
+            userRepo.Update(user);
         }
 
         [HttpPost]

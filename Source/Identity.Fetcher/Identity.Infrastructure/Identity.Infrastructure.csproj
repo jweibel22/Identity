@@ -175,6 +175,7 @@
     <Compile Include="Services\PostListLoader.cs" />
     <Compile Include="Reddit\SubRedditOccurences.cs" />
     <Compile Include="Services\TinyUrlResolver.cs" />
+    <Compile Include="Services\UserFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Identity.Domain\Identity.Domain.csproj">

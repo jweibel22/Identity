@@ -129,6 +129,7 @@ CREATE TABLE [dbo].[User](
 	[Inbox] [bigint] NOT NULL,
 	[SubscriptionChannel] [bigint] NOT NULL,
 	IsAnonymous bit NOT NULL DEFAULT (0),
+	IsPremium bit NOT NULL DEFAULT (0),
  CONSTRAINT [PK_User] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC

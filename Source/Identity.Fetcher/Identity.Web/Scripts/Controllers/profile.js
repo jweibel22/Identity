@@ -1,10 +1,10 @@
 ﻿angular.module('inspire')
-    .controller('ProfileController', ['$scope', '$http', '$stateParams', 'channelService', 'userPromise', 'profilePromise', 'channelSelectorService',
-        function ($scope, $http, $stateParams, channelService, userPromise, profilePromise, channelSelectorService) {
+    .controller('ProfileController', ['$scope', '$http', '$stateParams', 'channelService', 'userPromise', 'profilePromise', 'channelSelectorService', 'userService',
+        function ($scope, $http, $stateParams, channelService, userPromise, profilePromise, channelSelectorService, userService) {
 
             $scope.user = userPromise.data;
             $scope.profile = profilePromise.data;
-            $scope.channels = channelService.channels;
+            //$scope.channels = channelService.channels;
 
             for (var i = 0; i < $scope.profile.TagCloud.length; i++) {
                 $scope.profile.TagCloud[i].link = "#/searchByTag?query=" + $scope.profile.TagCloud[i].text;
@@ -16,13 +16,7 @@
                 });
             }
 
-            $scope.delete = function (channel) {
-                channelService.delete(channel).success(function(data) {
-                    var index = $scope.profile.Owns.indexOf(channel);
-                    if (index > -1) {
-                        $scope.profile.Owns.splice(index, 1);
-                    }
-                });
-
+            $scope.saveChanges = function () {
+                userService.update($scope.user);
             }
         }]);

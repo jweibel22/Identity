@@ -27,5 +27,7 @@ namespace Identity.Infrastructure.DTO
         public IList<Post> Feed { get; set; }
 
         public IList<WeightedTag> TagCloud { get; set; }
+
+        public bool IsPremium { get; set; }
     }
 }

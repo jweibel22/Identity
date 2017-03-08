@@ -46,6 +46,11 @@ namespace Identity.Infrastructure.Services
                 postRepo.UnreadPostsFromChannel(user.Id, channel.Id, orderBy, pageSize).ToList() : 
                 postRepo.PostsFromChannel(user.Id, channel.Id, fromIndex, orderBy, pageSize).ToList();
 
+            if (!user.IsPremium)
+            {
+                posts = posts.Select(p => p.PremiumContent ? Post.Empty : p).ToList();
+            }
+
             var postIds = posts.Select(p => p.Id).ToList();
             var allTags = postRepo.Tags(postIds).ToList();
             var blockedTags = userRepo.BlockedTagIds(user.Id);

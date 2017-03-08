@@ -17,29 +17,13 @@
     <a href="#/readhistory">See recent read history</a>
 </div>
 
-<h4>Public channels</h4>
-<div ng-repeat="channel in profile.Owns" style="margin-left: 20px; margin-top: 10px">
-    <div ng-if="!channel.IsPrivate">
-        <a href="#/home/{{channel.Id}}">
-            {{channel.Name}}
-        </a>
-        <div style="font-size: small">
-            <a ng-click="delete(channel)">Delete</a>
-        </div>
-    </div>
-</div>    
-
 <div ng-show="profile.Id == user.Id">
-
-    <h4>Private channels</h4>
-    <div ng-repeat="channel in profile.Owns" style="margin-left: 20px;margin-top: 10px">
-        <div ng-if="channel.IsPrivate">
-            <a href="#/home/{{channel.Id}}">
-                {{channel.Name}}
-            </a>
-            <div style="font-size: small">
-                <a ng-click="delete(channel)">Delete</a>
-            </div>
+    <h4>Settings</h4>
+    <form>
+        <div class="checkbox">
+            <label><input type="checkbox" ng-model="user.IsPremium">Premium user</label>
         </div>
-    </div>
+        <button ng-click="saveChanges()" class="btn btn-primary">Save changes</button>
+    </form>
 </div>
+

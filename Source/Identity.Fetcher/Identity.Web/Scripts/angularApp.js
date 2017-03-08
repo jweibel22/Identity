@@ -170,8 +170,8 @@ angular.module('inspire', ['ui.router', 'ui.bootstrap', 'ngSanitize', 'angular-j
                             controller: 'ProfileController',
                             resolve: {
                                 userPromise: ['userService', function (userService) { return userService.userPromise.promise; }],
-                                profilePromise: ['$stateParams', 'userService', function ($stateParams, userService) { return userService.getUser($stateParams.id); }],
-                                _: ['channelService', function(channelService) { return channelService.allPublic(); }]
+                                profilePromise: ['$stateParams', 'userService', function ($stateParams, userService) { return userService.getUser($stateParams.id); }]//,
+                                //_: ['channelService', function(channelService) { return channelService.allPublic(); }]
                             }
                         }
                     }
