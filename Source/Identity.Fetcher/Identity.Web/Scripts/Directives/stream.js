@@ -157,6 +157,11 @@
                     }
                 }
 
+                $scope.visiblePosts = function() {
+                 
+                    return $filter('filter')($scope.internalPosts, function(p) { return !isEmpty(p); }, true);
+                }
+
                 $scope.read = function (posts) {
 
                     for (var i = 0; i < posts.length; i++) {
