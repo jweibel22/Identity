@@ -139,17 +139,17 @@ namespace Identity.Infrastructure.Repositories
             public int Popularity { get; set; }
         }
 
-        public IEnumerable<Post> UnreadPostsFromChannel(long userId, long channelId, string orderBy, int count)
+        public IEnumerable<Post> UnreadPostsFromChannel(long userId, long channelId, string orderBy, int count, bool premiumUser)
         {
-            return PostsFromChannel("FetchUnreadPostIds", userId, channelId, 0, orderBy, count);
+            return PostsFromChannel("FetchUnreadPostIds", userId, channelId, 0, orderBy, count, premiumUser);
         }
 
-        public IEnumerable<Post> PostsFromChannel(long userId, long channelId, int fromIndex, string orderBy, int pageSize)
+        public IEnumerable<Post> PostsFromChannel(long userId, long channelId, int fromIndex, string orderBy, int pageSize, bool premiumUser)
         {
-            return PostsFromChannel("FetchPostIds", userId, channelId, fromIndex, orderBy, pageSize);
+            return PostsFromChannel("FetchPostIds", userId, channelId, fromIndex, orderBy, pageSize, premiumUser);
         }
 
-        private IEnumerable<Post> PostsFromChannel(string sp, long userId, long channelId, int fromIndex, string orderBy, int pageSize)
+        private IEnumerable<Post> PostsFromChannel(string sp, long userId, long channelId, int fromIndex, string orderBy, int pageSize, bool premiumUser)
         {
             int orderByColumn;
 
@@ -166,7 +166,7 @@ namespace Identity.Infrastructure.Repositories
             }
 
             var channelQueryResult = con.Connection.Query<ChannelQueryResult>(sp,
-                new { ChannelId = channelId, UserId = userId, FromIndex = fromIndex, PageSize = pageSize, OrderByColumn = orderByColumn },
+                new { ChannelId = channelId, UserId = userId, FromIndex = fromIndex, PageSize = pageSize, OrderByColumn = orderByColumn, IsPremium = premiumUser ? 2 : 0 },
                 con, true, null, CommandType.StoredProcedure).ToList();
 
             return GetByIds(channelQueryResult.Select(cqr => cqr.PostId), userId)

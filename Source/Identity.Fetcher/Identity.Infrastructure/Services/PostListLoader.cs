@@ -43,8 +43,8 @@ namespace Identity.Infrastructure.Services
             }
 
             var posts = onlyUnread ? 
-                postRepo.UnreadPostsFromChannel(user.Id, channel.Id, orderBy, pageSize).ToList() : 
-                postRepo.PostsFromChannel(user.Id, channel.Id, fromIndex, orderBy, pageSize).ToList();
+                postRepo.UnreadPostsFromChannel(user.Id, channel.Id, orderBy, pageSize, user.IsPremium).ToList() : 
+                postRepo.PostsFromChannel(user.Id, channel.Id, fromIndex, orderBy, pageSize, user.IsPremium).ToList();
 
             if (!user.IsPremium)
             {
