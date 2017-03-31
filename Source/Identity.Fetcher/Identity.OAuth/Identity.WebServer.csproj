@@ -196,6 +196,7 @@
     <Compile Include="Api\ChannelController.cs" />
     <Compile Include="Api\HomeController.cs" />
     <Compile Include="Api\PostController.cs" />
+    <Compile Include="ArticleContentsFetcher.cs" />
     <Compile Include="Bus.cs" />
     <Compile Include="ChannelLinkEventBatch.cs" />
     <Compile Include="EventHandlers\ChannelLinkGraphCache.cs" />

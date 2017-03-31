@@ -15,6 +15,7 @@ using Identity.Domain;
 using Identity.Infrastructure.DTO;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
+using Identity.OAuth;
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -35,13 +36,15 @@ namespace Identity.Rest.Api
         private readonly UserRepository userRepo;
         private readonly ILoadDtos dtoLoader;
         private Domain.User user;
+        private IArticleContentsFetcher articleContentsFetcher;
 
-        public PostController(ILoadDtos dtoLoader, PostRepository postRepo, UserRepository userRepo, CommentRepostitory commentRepo)
+        public PostController(ILoadDtos dtoLoader, PostRepository postRepo, UserRepository userRepo, CommentRepostitory commentRepo, IArticleContentsFetcher articleContentsFetcher)
         {
             this.dtoLoader = dtoLoader;
             this.postRepo = postRepo;
             this.userRepo = userRepo;
             this.commentRepo = commentRepo;
+            this.articleContentsFetcher = articleContentsFetcher;
 
             var identity = User.Identity as ClaimsIdentity;
             user = userRepo.FindByName(identity.Name);
@@ -139,14 +142,6 @@ namespace Identity.Rest.Api
             return postRepo.ReadHistory(user.Id).Select(Mapper.Map<Post>);
         }
 
-        private HttpResponseMessage RawStringResponse(string s)
-        {
-            return new HttpResponseMessage()
-            {
-                Content = new StringContent(s, Encoding.UTF8, "text/html")
-            };
-        }
-
         [HttpGet]
         [Route("Api/Post/{id}/Contents")]
         public HttpResponseMessage FetchContents(long id)
@@ -155,16 +150,12 @@ namespace Identity.Rest.Api
 
             var url = post.Uri;
 
-            using (var webClient = new WebClient())
-            {
-                webClient.Encoding = Encoding.UTF8;
-                webClient.Headers.Add("x-api-key", "WPDWyRQP3PGbktd9wB4UYGplQEDR778RrySYaAGv");
-                var result = webClient.DownloadString(String.Format("https://mercury.postlight.com/parser?url={0}", url));
+            var contents = articleContentsFetcher.Fetch(url);
 
-                dynamic json = JObject.Parse(result);
-                string content = json.content;
-                return RawStringResponse(content);
-            }
+            return new HttpResponseMessage()
+            {
+                Content = new StringContent(contents, Encoding.UTF8, "text/html")
+            };
         }
     }
 }

@@ -58,6 +58,8 @@ namespace Identity.Rest
             }).InSingletonScope();
 
             Bind<ChannelLinkEventBatch>().ToSelf().InScope(c => RequestScope.Scope.Value);
+
+            Bind<IArticleContentsFetcher>().To<ArticleContentsFetcher>().InScope(c => RequestScope.Scope.Value);
         }
     }
 }
