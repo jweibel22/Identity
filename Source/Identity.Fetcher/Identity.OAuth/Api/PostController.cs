@@ -139,7 +139,14 @@ namespace Identity.Rest.Api
         [Route("Api/Post/History")]
         public IEnumerable<Post> History()
         {
-            return postRepo.ReadHistory(user.Id).Select(Mapper.Map<Post>);
+            var posts = postRepo.ReadHistory(user.Id).Select(Mapper.Map<Post>).ToList();
+                            
+            foreach (var post in posts)
+            {
+                post.IsCollapsed = true;
+            }
+
+            return posts;
         }
 
         [HttpGet]
