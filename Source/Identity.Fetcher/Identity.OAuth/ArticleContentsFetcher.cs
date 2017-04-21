@@ -35,10 +35,12 @@ namespace Identity.OAuth
     public class ArticleContentsFetcher : IArticleContentsFetcher
     {
         private readonly IEnumerable<InlineArticleSelector> inlineArticleSelectors;
+        private readonly MercuryArticleContentsFetcher mercuryArticleContentsFetcher;
 
         public ArticleContentsFetcher(InlineArticleSelectorRepository inlineArticleSelectorRepo)
         {
             this.inlineArticleSelectors = inlineArticleSelectorRepo.GetAll();
+            this.mercuryArticleContentsFetcher = new MercuryArticleContentsFetcher();
         }
 
         public string Fetch(string url)
@@ -49,7 +51,7 @@ namespace Identity.OAuth
 
                 if (selector == null)
                 {
-                    return "";
+                    return mercuryArticleContentsFetcher.Fetch(url);
                 }
 
                 webClient.Encoding = Encoding.UTF8;
@@ -61,7 +63,7 @@ namespace Identity.OAuth
 
                 if (elm == null)
                 {
-                    return "";
+                    return mercuryArticleContentsFetcher.Fetch(url);
                 }
 
                 return elm.InnerHtml.Replace("\r\n", "").Replace("\n", "").Replace("\t", "");
