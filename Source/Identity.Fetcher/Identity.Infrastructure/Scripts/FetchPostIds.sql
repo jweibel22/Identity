@@ -3,13 +3,14 @@
 	@FromIndex int,
 	@ChannelId bigint,
 	@PageSize int,
-	@OrderByColumn int
+	@OrderByColumn int,
+	@IsPremium int
 as 
 begin
 
 --TODO: make sure @PageSize < 150 !
 drop table IF EXISTS #MyTempTable
-select RowNum, PostId, PostClusterId into #MyTempTable from [ftFetchPosts](@ChannelId,@UserId,@OrderByColumn) where RowNum BETWEEN (@FromIndex) AND (@FromIndex+@PageSize) order by RowNum
+select RowNum, PostId, PostClusterId into #MyTempTable from [ftFetchPosts](@ChannelId,@UserId,@OrderByColumn,@IsPremium) where RowNum BETWEEN (@FromIndex) AND (@FromIndex+@PageSize) order by RowNum
 DECLARE @MaxRow int
 set @MaxRow = (select Min(RowNum) from #MyTempTable where PostClusterId IS NULL and RowNum >= @FromIndex+@PageSize)
 select PostId, RowNum from #MyTempTable where RowNum BETWEEN (@FromIndex) AND (CASE WHEN @MaxRow IS NULL THEN @FromIndex+@PageSize ELSE @MaxRow END) order by RowNum
