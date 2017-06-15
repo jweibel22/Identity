@@ -11,6 +11,8 @@ using Identity.Infrastructure.Helpers;
 
 namespace Identity.Infrastructure.Reddit
 {
+
+
     public class RedditIndexRepository
     {
         private readonly IDbTransaction con;
@@ -72,8 +74,9 @@ namespace Identity.Infrastructure.Reddit
 
             BulkCopy.Copy((SqlConnection) con.Connection, table, (SqlTransaction) con);
 
-            con.Connection.Execute(@"update RedditIndex_SubReddit set Ignore = 1 where Name in @IgnoredSubReddits", new { IgnoredSubReddits  = ignoredReddits }, con);
+            //con.Connection.Execute(@"update RedditIndex_SubReddit set Ignore = 1 where Name in @IgnoredSubReddits", new { IgnoredSubReddits = ignoredReddits }, con);
             con.Connection.Execute(@"update RedditIndex_SubReddit set Ignore = 1 where Name like '%nsfw%' or Name like '%sex%'", new { }, con);
+            con.Connection.Execute(@"update RedditIndex_SubReddit set Ignore = 1 where PostCount < 100", new { }, con);
 
             //TODO: update the ids of the subreddits on the index object
         }
@@ -84,6 +87,15 @@ namespace Identity.Infrastructure.Reddit
             con.Connection.Execute("delete from RedditIndex_Text where IndexId=@Id", new { Id = id }, con);
             con.Connection.Execute("delete from RedditIndex_SubReddit where IndexId=@Id", new { Id = id }, con);
             con.Connection.Execute("delete from RedditIndex_Index where Id=@Id", new { Id = id }, con);
+        }
+
+        public FullRedditIndex GetFullRedditIndex(long id)
+        {
+            var index = GetRedditIndex(id);
+            var texts = GetAllTexts(id);
+            var occ = FindOccurences(id, 100);
+
+            return new FullRedditIndex(id, index.SubReddits, texts, occ, index.TotalPostCount);
         }
 
         public RedditIndex GetRedditIndex(long id)
@@ -97,7 +109,7 @@ namespace Identity.Infrastructure.Reddit
 
                 index.TotalPostCount =
                     con.Connection.Query<long>(
-                        "select sum(PostCount) from RedditIndex_SubReddit where IndexId = @IndexId", new {IndexId = id},
+                        "select case when sum(PostCount) IS NULL then 0 else sum(PostCount) end from RedditIndex_SubReddit where IndexId = @IndexId", new {IndexId = id},
                         con).Single();
             }
 
@@ -111,6 +123,19 @@ namespace Identity.Infrastructure.Reddit
                 .SingleOrDefault();
         }
 
+        public IEnumerable<Text> GetTexts(long indexId,  IEnumerable<string> texts)
+        {
+            return con.Connection
+                .Query<Text>("select * from RedditIndex_Text where IndexId=@IndexId and Content in @Texts", new {IndexId = indexId, Texts = texts}, con)
+                .ToList();
+        }
+
+        public IEnumerable<Text> GetAllTexts(long indexId)
+        {
+            return con.Connection
+                .Query<Text>("select * from RedditIndex_Text where IndexId=@IndexId", new { IndexId = indexId}, con)
+                .ToList();
+        }
 
         public void AddText(long indexId, Text text)
         {
@@ -153,6 +178,17 @@ where r.IndexId=@IndexId and r.TextId in @TextIds and sr.PostCount > 10 and sr.I
 
             return con.Connection
                 .Query<Occurences>(sql, new { IndexId = indexId, TextIds = textIds }, con)
+                .ToList();
+        }
+
+        public IEnumerable<Occurences> FindOccurences(long indexId, int minPostCount)
+        {
+            var sql = @"select r.TextId, r.SubRedditId, r.IndexId, r.Occurences as [Count] from RedditIndex_Occurences r
+join RedditIndex_SubReddit sr on sr.Id = r.SubRedditId
+where r.IndexId=@IndexId and sr.PostCount > @MinPostCount and sr.Ignore = 0";
+
+            return con.Connection
+                .Query<Occurences>(sql, new { IndexId = indexId, MinPostCount = minPostCount }, con)
                 .ToList();
         }
     }

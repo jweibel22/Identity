@@ -46,6 +46,11 @@ namespace Identity.Infrastructure.Reddit
             return text;
         }
 
+        public IEnumerable<Text> GetTexts(IEnumerable<string> texts)
+        {
+            return repo.GetTexts(index.Id, texts);
+        }
+
         public IEnumerable<Text> FindSubstrings(string text)
         {
             throw new NotImplementedException();
@@ -62,20 +67,27 @@ namespace Identity.Infrastructure.Reddit
             {
                 var analyzer = new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_30);
                 var parser = new QueryParser(Lucene.Net.Util.Version.LUCENE_30, "text", analyzer);
-                var query = parser.Parse(text);
+                var query = parser.Parse(String.Format("\"{0}\"", text));
+                //var query = parser.Parse(String.Format("{0}", text));
                 var hits = searcher.Search(query, QueryLimit);
                 var subreddits = new Dictionary<string, int>();
 
-                for (int i = 0; i < hits.ScoreDocs.Length; i++)
-                {
-                    var doc = searcher.Doc(hits.ScoreDocs[i].Doc);
-                    var subreddit = doc.Get("subreddit");
-                    if (!subreddits.ContainsKey(subreddit))
-                    {
-                        subreddits.Add(subreddit, 0);
-                    }
-                    subreddits[subreddit] = subreddits[subreddit] + 1;
-                }
+
+                subreddits = hits.ScoreDocs
+                    .Select(d => searcher.Doc(d.Doc))
+                    .GroupBy(doc => doc.Get("subreddit"))
+                    .ToDictionary(g => g.Key, g => g.Count());
+
+                //for (int i = 0; i < hits.ScoreDocs.Length; i++)
+                //{
+                //    var doc = searcher.Doc(hits.ScoreDocs[i].Doc);
+                //    var subreddit = doc.Get("subreddit");
+                //    if (!subreddits.ContainsKey(subreddit))
+                //    {
+                //        subreddits.Add(subreddit, 0);
+                //    }
+                //    subreddits[subreddit] = subreddits[subreddit] + 1;
+                //}
 
                 return subreddits;
             }

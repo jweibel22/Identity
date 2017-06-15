@@ -22,20 +22,22 @@ namespace Identity.Infrastructure.Repositories
         }
 
         public IDictionary<string, long> All()
-        {            
+        {
             return con.Connection
-                    .Query("select Id, Name from NLPEntity", new {}, con)
-                    .Cast<IDictionary<string, object>>()
-                    .ToDictionary(row => (string)row["Name"], row => (long)row["Id"]); ;
+                .Query("select Id, Name from NLPEntity", new {}, con)
+                .Cast<IDictionary<string, object>>()
+                .ToDictionary(row => (string) row["Name"], row => (long) row["Id"]);
+            ;
         }
 
         public void Add(NLPEntity e)
         {
-            var sql = @"insert NLPEntity (Name, Type, CommonWord, Noun) values (@Name, @Type, @CommonWord, @Noun); SELECT CAST(SCOPE_IDENTITY() as bigint)";
+            var sql =
+                @"insert NLPEntity (Name, Type, CommonWord, Noun) values (@Name, @Type, @CommonWord, @Noun); SELECT CAST(SCOPE_IDENTITY() as bigint)";
             e.Id = con.Connection.Query<long>(sql, e, con).Single();
         }
 
-        public void EntitiesInPosts(IEnumerable<KeyValuePair<long,long>> entityIdsAndPostIds)
+        public void EntitiesInPosts(IEnumerable<KeyValuePair<long, long>> entityIdsAndPostIds)
         {
             var table = new DataTable();
             table.TableName = "EntitiesInPosts";
@@ -57,7 +59,37 @@ namespace Identity.Infrastructure.Repositories
                 table.Rows.Add(row);
             }
 
-            BulkCopy.Copy((SqlConnection)con.Connection, table, (SqlTransaction)con);
+            BulkCopy.Copy((SqlConnection) con.Connection, table, (SqlTransaction) con);
+        }
+
+        public IEnumerable<KeyValuePair<long, long>> EntitiesInPosts()
+        {
+            var sql = @"select PostId, NLPEntityId from EntitiesInPosts";
+            return con.Connection.Query(sql, new {}, con)
+                        .Cast<IDictionary<string, object>>()
+                        .Select(row => new KeyValuePair<long, long>((long)row["PostId"], (long)row["NLPEntityId"]));
+        }
+
+        public IEnumerable<NLPEntity> Entities()
+        {
+            var sql = @"select e.Id, e.Name, e.Type from NLPEntity e";
+            return con.Connection.Query<NLPEntity>(sql, new { }, con).ToList();
+        }
+
+        public IEnumerable<NLPEntity> Entities(long postId)
+        {
+            var sql = @"select e.Id, e.Name, e.Type
+                        from EntitiesInPosts r join NLPEntity e on r.NLPEntityId = e.Id
+                        where r.PostId = @PostId";
+            return con.Connection.Query<NLPEntity>(sql, new {PostId = postId}, con).ToList();
+        }
+
+        public IEnumerable<Tuple<long, string>> Entities(IEnumerable<long> postIds)
+        {
+            var sql = @"select r.PostId as Item1, e.Name as Item2
+                        from EntitiesInPosts r join NLPEntity e on r.NLPEntityId = e.Id
+                        where r.PostId in @PostIds";
+            return con.Connection.Query<Tuple<long, string>>(sql, new { PostIds = postIds }, con).ToList();
         }
     }
 }

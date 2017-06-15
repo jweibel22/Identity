@@ -5,7 +5,13 @@ using log4net;
 
 namespace Identity.Infrastructure.Feeders
 {
-    class Logger
+    public interface ILogger
+    {
+        void Info(string message);
+        void Error(string message, Exception ex);
+    }
+
+    public class Logger : ILogger
     {
         private readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly TextWriter azureLog;

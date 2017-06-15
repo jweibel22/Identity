@@ -10,6 +10,13 @@ using Identity.Domain;
 
 namespace Identity.Infrastructure.Repositories
 {
+    public class PostAndChannel
+    {
+        public long PostId { get; set; }
+
+        public long ChannelId { get; set; }
+    }
+
     public class PostRepository : IDisposable
     {
         private readonly IDbTransaction con;
@@ -27,6 +34,12 @@ namespace Identity.Infrastructure.Repositories
         public Post GetByUrl(string uri)
         {
             return con.Connection.Query<Post>("select * from Post where Uri=@Uri", new { Uri = uri }, con).SingleOrDefault();
+        }
+
+        public IEnumerable<string> FindTrainingPostsTitles()
+        {
+            var sql = @"select p.Title from ChannelItem ci join Post p on p.Id = ci.PostId where ci.ChannelId in (30141,30133,30136,30122,30118,30140)";
+            return con.Connection.Query<string>(sql, new { }, con).ToList();
         }
 
         public bool WebScraperItemAlreadyPosted(string title, DateTimeOffset created, long webScraperId)
@@ -174,6 +187,13 @@ namespace Identity.Infrastructure.Repositories
                 .OrderBy(x => x.cqr.RowNum)
                 .Select(x => x.p)
                 .ToList();
+        }
+
+        public IEnumerable<Post> XXX(long channelId, long fromId, long toId)
+        {
+            //var sql = "select p.id, p.title from ChannelItem ci join Post p on p.Id = ci.PostId where ci.ChannelId = @ChannelId and ci.PostId >= @FromId and ci.PostId < @ToId";
+            var sql = "select p.id, p.title from ChannelItem ci join Post p on p.Id = ci.PostId where ci.ChannelId = @ChannelId";
+            return con.Connection.Query<Post>(sql, new {FromId = fromId, ToId = toId, ChannelId = channelId}, con);
         }
 
         public IEnumerable<Post> GetByIds(IEnumerable<long> ids, long userId)

@@ -26,4 +26,26 @@ namespace Identity.Domain.RedditIndexes
 
         public long TotalPostCount { get; set; }
     }
+
+    public class FullRedditIndex
+    {
+        public long Id { get; set; }
+
+        public IList<SubReddit> SubReddits { get; private set; }
+
+        public IEnumerable<Identity.Domain.RedditIndexes.Text> Texts { get; private set; }
+
+        public IEnumerable<Occurences> Occurences { get; private set; }
+
+        public long TotalPostCount { get; private set; }
+
+        public FullRedditIndex(long id, IList<SubReddit> subReddits, IEnumerable<Text> texts, IEnumerable<Occurences> occurences, long totalPostCount)
+        {
+            Id = id;
+            SubReddits = subReddits;
+            Texts = texts;
+            Occurences = occurences;
+            TotalPostCount = totalPostCount;
+        }
+    }
 }

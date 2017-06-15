@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Identity.Infrastructure.Helpers
-{
+{    
     public class EnglishLanguage
     {
         public IDictionary<string, bool> CommonWords { get; }
@@ -33,6 +33,12 @@ namespace Identity.Infrastructure.Helpers
                             .Select(w => w.Trim().ToLower()).Distinct().ToDictionary(s => s, s => true);
         }
 
+        private static bool IsASCII(string value)
+        {
+            // ASCII encoding replaces non-ascii with question marks, so we use UTF8 to see if multi-byte sequences are there
+            return Encoding.UTF8.GetByteCount(value) == value.Length;
+        }
+
         public string IgnoreAll(string s)
         {
             var result = s;
@@ -54,65 +60,5 @@ namespace Identity.Infrastructure.Helpers
             return words;
         }
 
-        //public Dictionary<string, long> GetAllWords(SqlConnection con)
-        //{
-        //    var words = new Dictionary<string, long>();
-
-        //    var cmd = new SqlCommand("select Id,Contents from Words", con);
-        //    using (SqlDataReader reader = cmd.ExecuteReader())
-        //    {
-        //        while (reader.Read())
-        //        {
-        //            words[(string) reader["Contents"]] = (long) reader["Id"];
-        //        }
-        //    }
-        //    return words;
-        //}
-
-        //public IEnumerable<string> ExtractWords(IEnumerable<string> texts)
-        //{
-        //    Dictionary<string, bool> seen = new Dictionary<string, bool>(100000);
-
-        //    foreach (var t in texts)
-        //    {
-        //        var words = GetWords(t);
-        //        foreach (var word in words)
-        //        {
-        //            seen[word] = true;
-        //        }
-        //    }
-
-        //    return seen.Keys;
-        //}
-
-        //public void InsertWords(SqlConnection con, IEnumerable<string> texts)
-        //{
-        //    var existing = GetAllWords(con);
-        //    var newWords = ExtractWords(texts);
-
-        //    //Console.WriteLine("Found {0} items", newWords.Count());
-
-        //    var table = new DataTable();
-        //    table.TableName = "Words";
-        //    table.Columns.Add(new DataColumn("Contents"));
-        //    var idx = 0;
-
-        //    foreach (var word in newWords.Where(w => !existing.ContainsKey(w)))
-        //    {
-        //        var row = table.NewRow();
-        //        row["Contents"] = word;
-        //        table.Rows.Add(row);
-
-        //        if (++idx % 1000000 == 0)
-        //        {
-        //            BulkCopy.Copy(con, table);
-        //            table.Clear();
-        //        }
-        //    }
-
-        //    BulkCopy.Copy(con, table);
-        //    table.Clear();
-
-        //}
     }
 }

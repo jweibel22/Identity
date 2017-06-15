@@ -32,7 +32,7 @@ namespace Identity.Infrastructure.Feeders
         public void Run(User rssFeederUser, IEnumerable<Feed> feeders)
         {
             ChannelLinkGraph graph;
-            var events = new List<IChannelLinkEvent>();
+            var events = new ChannelLinkEventListener();
 
             using (var session = connectionFactory.NewTransaction())
             {
@@ -111,7 +111,7 @@ namespace Identity.Infrastructure.Feeders
             using (var session = connectionFactory.NewTransaction())
             {
                 var repo = new ChannelLinkRepository(session.Transaction);
-                var dirtyUserChannels = graph.ApplyChanges(events);
+                var dirtyUserChannels = graph.ApplyChanges(events.Events);
 
                 foreach (var edge in dirtyUserChannels.Channels)
                 {

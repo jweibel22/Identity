@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Identity.Domain;
 using Identity.Infrastructure.Helpers;
 using Identity.Infrastructure.Repositories;
@@ -21,6 +22,12 @@ namespace Identity.Infrastructure.Feeders
             this.client = client;
         }
 
+        private static bool IsASCII(string value)
+        {
+            // ASCII encoding replaces non-ascii with question marks, so we use UTF8 to see if multi-byte sequences are there
+            return Encoding.UTF8.GetByteCount(value) == value.Length;
+        }
+
         public void AnalyzePosts(IList<Post> posts)
         {
             var existingEntities = repo.All();
@@ -29,7 +36,7 @@ namespace Identity.Infrastructure.Feeders
 
             foreach (var kv in client.Get(items.Keys.ToList()).Articles)
             {
-                articles.Add(kv.Key, kv.Value.Where(s => s.Name.Length > 1).ToList());
+                articles.Add(kv.Key, kv.Value.Where(s => s.Name.Length > 1 && s.Name.Length < 100 && IsASCII(s.Name)).ToList());
             }
 
             var toInsert = articles

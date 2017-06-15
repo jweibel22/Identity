@@ -298,6 +298,12 @@ CREATE TABLE [dbo].[PostClusterMember](
 )
 ) ON [PRIMARY]
 
+CREATE UNIQUE NONCLUSTERED INDEX [PostClusterMember_Index] ON [dbo].[PostClusterMember]
+(
+	[OntologyId] ASC,
+	[PostId] ASC
+)
+
 CREATE TABLE [dbo].[OntologyMembers](
 	[OntologyId] [bigint] NOT NULL,
 	[ChannelId] [bigint] NOT NULL,
@@ -400,3 +406,14 @@ CONSTRAINT [PK_EntitiesInPosts] PRIMARY KEY CLUSTERED
 	[PostId] ASC, [NLPEntityId] ASC 
 )
 )
+CREATE TABLE [dbo].[AutoTagger_PredictionModel](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[RedditIndexId] [bigint] NOT NULL,
+	[Name] [varchar](50) NOT NULL,
+	[Description] [varchar](max) NULL,
+	[Model] [varbinary](max) NOT NULL,
+	[SubRedditIds] [varchar](max) NOT NULL,
+CONSTRAINT [PK_AutoTagger_PredictionModel] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+))

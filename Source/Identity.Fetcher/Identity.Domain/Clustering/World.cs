@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MoreLinq;
@@ -22,7 +23,7 @@ namespace Identity.Domain.Clustering
             Clusters = clusters;
         }
 
-        public void Add(Document d)
+        public void Add(Item d)
         {
             if (!Clusters.Any())
             {
@@ -32,6 +33,8 @@ namespace Identity.Domain.Clustering
             
             var distances = Clusters.Select(c => new { Cluster = c, Distance = VectorDistanceMeasure.Get(c.Centroid, d.WordVector) }).ToList();      
             var min = distances.Any() ? distances.MinBy(x => x.Distance) : null;
+
+            Console.WriteLine("Min distance = " + (min != null ? min.Distance : double.NaN));
 
             if (min != null && min.Distance < threshold)
             {
@@ -51,6 +54,7 @@ namespace Identity.Domain.Clustering
 
             if (min != null && min.Distance < threshold)
             {
+                Console.WriteLine("Merging cluster. min distance = " + (min != null ? min.Distance : double.NaN));
                 //			if (cluster.Documents.First().Id == 361899 || min.Cluster.Documents.First().Id == 361899)
                 //			{
                 //				String.Format("Merging {0} into {1}. Get={2}", min.Cluster.FriendlyName, cluster.FriendlyName, min.Get).Dump();

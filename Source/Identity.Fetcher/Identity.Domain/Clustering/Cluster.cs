@@ -12,11 +12,11 @@ namespace Identity.Domain.Clustering
 
         public double[] Sums { get; set; }
 
-        public List<Document> Documents { get; set; }
+        public List<Item> Documents { get; set; }
 
         private readonly int n;
 
-        public Cluster(List<Document> documents)
+        public Cluster(List<Item> documents)
         {
             this.Documents = documents;
             this.n = documents.First().WordVector.Count;
@@ -30,15 +30,15 @@ namespace Identity.Domain.Clustering
             ComputeCentroid();
         }
 
-        public Cluster(Document d)
+        public Cluster(Item d)
         {
-            Documents = new List<Document>();
+            Documents = new List<Item>();
             n = d.WordVector.Count;
             Sums = new double[n];
             Add(d);
         }
 
-        public void Add(Document d)
+        public void Add(Item d)
         {
             //		if (d.Id == 362179)
             //		{
@@ -83,7 +83,7 @@ namespace Identity.Domain.Clustering
 
         public string FriendlyName
         {
-            get { return Documents.First().Title; }
+            get { return ""; }
         }
     }
 }

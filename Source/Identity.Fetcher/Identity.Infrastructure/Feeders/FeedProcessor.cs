@@ -10,17 +10,17 @@ using MoreLinq;
 
 namespace Identity.Infrastructure.Feeders
 {
-    class FeedProcessor
+    public class FeedProcessor
     {
-        private readonly Logger log;
+        private readonly ILogger log;
         private readonly ChannelRepository channelRepo;
         private readonly UserRepository userRepo;
         private readonly PostRepository postRepo;
         private readonly PostNlpAnalyzer nlpAnalyzer;
 
-        private readonly long[] FeedersWithTagsAsUpstreams = new[] { 1L, 2L, 4L, 5L, 6L, 7L, 14L, 25L };
+        private readonly long[] FeedersWithTagsAsUpstreams = new[] { 1L, 2L, 4L, 5L, 6L, 7L, 14L, 25L, 1000L };
 
-        public FeedProcessor(Logger log, ChannelRepository channelRepo, UserRepository userRepo, PostRepository postRepo, PostNlpAnalyzer nlpAnalyzer)
+        public FeedProcessor(ILogger log, ChannelRepository channelRepo, UserRepository userRepo, PostRepository postRepo, PostNlpAnalyzer nlpAnalyzer)
         {
             this.log = log;
             this.channelRepo = channelRepo;
@@ -29,7 +29,7 @@ namespace Identity.Infrastructure.Feeders
             this.nlpAnalyzer = nlpAnalyzer;
         }
 
-        public void ProcessFeed(User rssFeederUser, Feed feed, IList<IChannelLinkEvent> events, IEnumerable<FeedItem> items)
+        public void ProcessFeed(User rssFeederUser, Feed feed, IChannelLinkEventListener eventListener, IEnumerable<FeedItem> items)
         {
             log.Info("Processing feed items from feed " + feed.Url);
 
@@ -52,9 +52,9 @@ namespace Identity.Infrastructure.Feeders
                         };
 
                         channelRepo.AddChannel(newChannel);
-                        events.Add(new ChannelAdded { ChannelId = newChannel.Id });
-                        channelRepo.AddSubscription(feed.ChannelId, newChannel.Id);                        
-                        events.Add(new SubscriptionAdded { UpstreamChannelId = newChannel.Id, DownstreamChannelId = feed.ChannelId });
+                        eventListener.Add(new ChannelAdded { ChannelId = newChannel.Id });
+                        channelRepo.AddSubscription(feed.ChannelId, newChannel.Id);
+                        eventListener.Add(new SubscriptionAdded { UpstreamChannelId = newChannel.Id, DownstreamChannelId = feed.ChannelId });
                         allUpstreamChannels[newChannel.Name] = newChannel.Id;
                     }
                 }
@@ -78,12 +78,21 @@ namespace Identity.Infrastructure.Feeders
 
                         if (post == null)
                         {
-                            post = AddNewPost(feed, rssFeederUser, feedItem, allUpstreamChannels, events);
+                            post = AddNewPost(feedItem);
                             newPosts.Add(post);
                         }
 
+                        if (FeedersWithTagsAsUpstreams.Contains(feed.Id))
+                        {
+                            foreach (var tag in feedItem.Tags)
+                            {
+                                userRepo.Publish(rssFeederUser.Id, allUpstreamChannels[tag], post.Id);
+                                eventListener.Add(new PostAdded { ChannelId = allUpstreamChannels[tag], PostId = post.Id });
+                            }
+                        }
+
                         userRepo.Publish(rssFeederUser.Id, feed.ChannelId, post.Id);
-                        events.Add(new PostAdded { ChannelId = feed.ChannelId, PostId = post.Id });
+                        eventListener.Add(new PostAdded { ChannelId = feed.ChannelId, PostId = post.Id });
                     }
                         
                 }
@@ -93,13 +102,13 @@ namespace Identity.Infrastructure.Feeders
                 }
             }
 
-            if (feed.Id == 36)
+            if (feed.Id == 36 || feed.Id == 1000)
             {
                 nlpAnalyzer.AnalyzePosts(newPosts);
             }            
         }
 
-        private Post AddNewPost(Feed feed, User rssFeederUser, FeedItem feedItem, IDictionary<string, long> upstreamChannels, IList<IChannelLinkEvent> events)
+        private Post AddNewPost(FeedItem feedItem)
         {
             var url = feedItem.Links.First().ToString();
 
@@ -112,17 +121,7 @@ namespace Identity.Infrastructure.Feeders
                 PremiumContent = url.Contains("protected/premium")
             };
 
-            postRepo.AddPost(post, false);
-
-            if (FeedersWithTagsAsUpstreams.Contains(feed.Id))
-            {
-                foreach (var tag in feedItem.Tags)
-                {
-                    userRepo.Publish(rssFeederUser.Id, upstreamChannels[tag], post.Id);
-                    events.Add(new PostAdded { ChannelId = upstreamChannels[tag], PostId = post.Id });
-                }
-            }
-
+            postRepo.AddPost(post, false); 
             postRepo.TagPost(post.Id, feedItem.Tags);
 
             return post;

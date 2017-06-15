@@ -69,8 +69,8 @@ namespace FeederJob2
 
         private static List<Cluster> RebuildCluster(IList<Document> articles, IList<PostClusterMember> conf)
         {
-            var clusters = conf.Select(c => c.ClusterId).Distinct().ToDictionary(id => id, id => new List<Document>());
-            var xx = new List<List<Document>>();
+            var clusters = conf.Select(c => c.ClusterId).Distinct().ToDictionary(id => id, id => new List<Item>());
+            var xx = new List<List<Item>>();
 
             foreach (var article in articles)
             {
@@ -78,11 +78,11 @@ namespace FeederJob2
 
                 if (member != null)
                 {
-                    clusters[member.ClusterId].Add(article);
+                    clusters[member.ClusterId].Add(new Item { Id = article.Id, WordVector = article.WordVector, Added = article.Added });
                 }
                 else
                 {
-                    xx.Add(new[] { article }.ToList());
+                    xx.Add(new[] { new Item { Id = article.Id, WordVector = article.WordVector, Added = article.Added} }.ToList());
                 }
             }            
 
@@ -143,7 +143,7 @@ namespace FeederJob2
                         sw.Start();
                     }
 
-                    world.Add(article);
+                    world.Add(new Item {Id = article.Id, WordVector = article.WordVector, Added = article.Added });
                 }
 
                 sw.Stop();
